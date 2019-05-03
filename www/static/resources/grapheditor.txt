@@ -215,6 +215,7 @@ openLink=Open Link
 openSupported=Supported format is .XML files saved from this software
 openInNewWindow=Open in New Window
 openInThisWindow=Open in this Window
+operators=Airflow Operators
 options=Options
 organic=Organic
 orthogonal=Orthogonal

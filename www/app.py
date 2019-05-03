@@ -8,7 +8,8 @@ app = Flask(__name__, template_folder="templates", static_folder='static')
 
 @app.route("/")
 def helloworld():
-    return render_template("index.html")
+    operators = [{"name": "Table 27"}]
+    return render_template("index.html", airflow_operators=operators)
 
 
 @app.route("/open", methods=("POST",))
@@ -22,7 +23,7 @@ def save():
     xml = request.form['xml']
 
     resp = Response(urllib.parse.unquote_plus(xml).encode("utf-8"))
-    resp.headers["Content-Disposition"] = "attachment; filename=\"{}\"; filename*=UTF-8''".format(
+    resp.headers["Content-Disposition"] = "attachment; filename=\"{}\"; filename*=UTF-8l''".format(
         filename)
     resp.status_code = 200
 
@@ -30,5 +31,6 @@ def save():
 
 
 @app.route("/export", methods=("POST",))
-def export():
+def export():  
+    #TODO
     return "200"

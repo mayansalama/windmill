@@ -80,24 +80,8 @@ Sidebar.prototype.init = function()
 	var dir = STENCIL_PATH;
 	
 	this.addSearchPalette(true);
-	this.addGeneralPalette(true);
-	// this.addMiscPalette(false);
-	// this.addAdvancedPalette(false);
-	// this.addBasicPalette(dir);
-	// this.addStencilPalette('arrows', mxResources.get('arrows'), dir + '/arrows.xml',
-	// 	';whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=2');
-	// this.addUmlPalette(false);
-	// this.addBpmnPalette(dir, false);
-	// this.addStencilPalette('flowchart', 'Flowchart', dir + '/flowchart.xml',
-	// 	';whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=2');
-	// this.addImagePalette('clipart', mxResources.get('clipart'), dir + '/clipart/', '_128x128.png',
-	// 	['Earth_globe', 'Empty_Folder', 'Full_Folder', 'Gear', 'Lock', 'Software', 'Virus', 'Email',
-	// 	 'Database', 'Router_Icon', 'iPad', 'iMac', 'Laptop', 'MacBook', 'Monitor_Tower', 'Printer',
-	// 	 'Server_Tower', 'Workstation', 'Firewall_02', 'Wireless_Router_N', 'Credit_Card',
-	// 	 'Piggy_Bank', 'Graph', 'Safe', 'Shopping_Cart', 'Suit1', 'Suit2', 'Suit3', 'Pilot1',
-	// 	 'Worker1', 'Soldier1', 'Doctor1', 'Tech1', 'Security1', 'Telesales1'], null,
-	// 	 {'Wireless_Router_N': 'wireless router switch wap wifi access point wlan',
-	// 	  'Router_Icon': 'router switch'});
+	this.addAirflowPalette(true);
+	this.addGeneralPalette(false);
 };
 
 /**
@@ -950,18 +934,18 @@ Sidebar.prototype.addGeneralPalette = function(expand)
 };
 
 /**
- * Adds the general palette to the sidebar.
+ * Adds the airflow operators palette to the sidebar.
  */
-Sidebar.prototype.addBasicPalette = function(dir)
+Sidebar.prototype.addAirflowPalette = function(expand)
 {
-	this.addStencilPalette('basic', mxResources.get('basic'), dir + '/basic.xml',
-		';whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=2',
-		null, null, null, null, [
-			this.createVertexTemplateEntry('shape=partialRectangle;whiteSpace=wrap;html=1;top=0;bottom=0;fillColor=none;', 120, 60, '', 'Partial Rectangle'),
-			this.createVertexTemplateEntry('shape=partialRectangle;whiteSpace=wrap;html=1;right=0;top=0;bottom=0;fillColor=none;routingCenterX=-0.5;', 120, 60, '', 'Partial Rectangle'),
-			this.createVertexTemplateEntry('shape=partialRectangle;whiteSpace=wrap;html=1;bottom=0;right=0;fillColor=none;', 120, 60, '', 'Partial Rectangle'),
-			this.createVertexTemplateEntry('shape=partialRectangle;whiteSpace=wrap;html=1;top=0;left=0;fillColor=none;', 120, 60, '', 'Partial Rectangle')
-	]);
+	var fns = [
+		this.createVertexTemplateEntry('text;html=1;strokeColor=none;fillColor=none;overflow=fill;', 160, 140,
+		'<table border="1" width="100%" height="100%" cellpadding="4" style="width:100%;height:100%;border-collapse:collapse;">' +
+		'<tr><th align="center"><b>Title</b></th></tr>' +
+		'<tr><td align="center">Section 1.1\nSection 1.2\nSection 1.3</td></tr>' +
+		'<tr><td align="center">Section 2.1\nSection 2.2\nSection 2.3</td></tr></table>', airflowOperators[0].name)	
+	]
+	this.addPaletteFunctions('operators', mxResources.get('operators'), (expand != null) ? expand : true, fns);
 };
 
 /**

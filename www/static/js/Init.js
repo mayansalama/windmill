@@ -26,3 +26,13 @@ window.OPEN_FORM = window.OPEN_FORM || 'static/open.html';
 // each properties file since only one file is loaded.
 window.mxLanguage = window.mxLanguage || urlParams['lang'];
 window.mxLanguages = window.mxLanguages || ['de'];
+
+// Handle Airflow Operators
+if (typeof(airflowOperators) != 'undefined')
+{
+	window.airflowOperators = airflowOperators;
+}
+else
+{
+	window.airflowOperators = "hello";
+}
