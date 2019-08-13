@@ -1,3 +1,3 @@
 export * from "./Page";
 export * from "./Sidebar";
-export * from "./Toolbar"
+export * from "./Navbar"

@@ -3,6 +3,13 @@ import styled from "styled-components";
 import { IChart } from "@mrblenny/react-flow-chart";
 import { Sidebar } from ".";
 
+const Title = styled.div`
+  font-size: 1.3em;
+  margin: 10px;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.05);
+`;
+
 const Message = styled.div`
   margin: 10px;
   padding: 10px;
@@ -32,6 +39,7 @@ export class SelectedSidebar extends React.Component<{
   public render() {
     return (
       <Sidebar>
+        <Title>Node Properties</Title>
         {this.props.chart.selected.type ? (
           <Message>
             <div>Type: {this.props.chart.selected.type}</div>

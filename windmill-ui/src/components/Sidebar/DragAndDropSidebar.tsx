@@ -2,15 +2,16 @@ import * as React from "react";
 import styled from "styled-components";
 import { Sidebar, SidebarItem } from ".";
 
-const Message = styled.div`
+const Title = styled.div`
+  font-size: 1.3em;
   margin: 10px;
-  padding: 10px;
+  padding: 15px;
   background: rgba(0, 0, 0, 0.05);
 `;
 
 export const DragAndDropSidebar = () => (
   <Sidebar>
-    <Message>Drag and drop these items onto the canvas.</Message>
+    <Title>Operator Library</Title>
     <SidebarItem
       type="top/bottom"
       ports={{

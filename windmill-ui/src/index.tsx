@@ -4,7 +4,12 @@ import { cloneDeep, mapValues } from "lodash";
 import * as React from "react";
 import { render } from "react-dom";
 import styled from "styled-components";
-import { DragAndDropSidebar, Page, SelectedSidebar, Toolbar } from "./components";
+import {
+  DragAndDropSidebar,
+  Page,
+  SelectedSidebar,
+  DropdownNavbar
+} from "./components";
 import { chartSimple } from "./misc/exampleChartState";
 
 const AppLayout = styled.div`
@@ -22,6 +27,15 @@ const Content = styled.div`
   overflow: hidden;
 `;
 
+const navigation = {
+  brand: { name: "Windmill", to: "/" },
+  links: [
+    { name: "File", to: "/" },
+    { name: "View", to: "/" },
+    { name: "About", to: "/" }
+  ]
+};
+
 class App extends React.Component {
   public state = cloneDeep(chartSimple);
 
@@ -30,6 +44,8 @@ class App extends React.Component {
   }
 
   public render() {
+    const { brand, links } = navigation;
+
     const chart = this.state;
     const stateActions = mapValues(actions, (func: any) => (...args: any) =>
       this.setState(func(...args))
@@ -37,7 +53,9 @@ class App extends React.Component {
 
     return (
       <AppLayout>
-        <Toolbar />
+        <Page>
+          <DropdownNavbar brand={brand} links={links} />
+        </Page>
         <Page>
           <DragAndDropSidebar />
           <Content>
