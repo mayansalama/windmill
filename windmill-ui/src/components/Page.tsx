@@ -1,5 +1,5 @@
-import * as React from 'react'
-import styled, { createGlobalStyle } from 'styled-components'
+import * as React from "react";
+import styled, { createGlobalStyle } from "styled-components";
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -14,7 +14,7 @@ const GlobalStyle = createGlobalStyle`
   *, :after, :before {
     box-sizing: inherit;
   }
-`
+`;
 
 const PageContent = styled.div`
   display: flex;
@@ -22,11 +22,11 @@ const PageContent = styled.div`
   flex: 1;
   max-width: 100vw;
   max-height: 100vh;
-`
+`;
 
-export const Page = ({ children }: { children: any}) => (
+export const Page = ({ children }: { children: any }) => (
   <PageContent>
     {children}
     <GlobalStyle />
   </PageContent>
-)
+);

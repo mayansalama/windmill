@@ -1,4 +1,4 @@
-# To start
+# To start developing
 
 ```bash
 cd windmill-ui
