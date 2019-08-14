@@ -6,22 +6,22 @@ const ButtonSplit = styled.div`
   display: flex;
   flex-direction: row;
   flex: 1;
-  max-width: 100vw;
+  min-width: 400px;
   max-height: 100vh;
 `;
 
 const BaseSidebar = styled.div`
-  width: 300px;
   background: white;
   display: flex;
   flex-direction: column;
-  flex-shrink: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
 `;
 
 const Button = styled.div`
-  padding: 10px 7.5px;
+  padding: 7.5px 10px;
   color: cornflowerblue;
-  border-radius: 30px;
+  border-radius: 20px;
   text-align: top;
   transition: 0.3s ease all;
   cursor: pointer;
@@ -31,6 +31,12 @@ const Button = styled.div`
   &:active {
     background: #5682d2;
   }
+`;
+
+export const Title = styled.div`
+  font-size: 1.3em;
+  margin: 10px;
+  padding: 15px;
 `;
 
 export class Sidebar extends React.Component {

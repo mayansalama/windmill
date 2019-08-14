@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "parcel public/index.html"
   },
   "keywords": [],
@@ -21,9 +20,12 @@
     "@mrblenny/react-flow-chart": "0.0.6",
     "@types/react": "^16.9.1",
     "@types/react-dom": "^16.8.5",
+    "@types/react-resizable": "^1.7.1",
     "@types/styled-components": "^4.1.18",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
-    "react-icons": "^3.7.0"
+    "react-icons": "^3.7.0",
+    "react-resizable": "^1.8.0",
+    "react-styled-sidebar": "0.0.3"
   }
 }

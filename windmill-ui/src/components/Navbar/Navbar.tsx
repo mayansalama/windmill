@@ -2,10 +2,11 @@ import * as React from "react";
 import styled from "styled-components";
 
 export const DropdownNavbar = (props: {
+  icon: JSX.Element;
   brand: { name: string; to: string };
   links: Array<{ name: string; to: string }>;
 }) => {
-  const { brand, links } = props;
+  const { icon, brand, links } = props;
   const NavLinks: any = () =>
     links.map((link: { name: string; to: string }) => (
       <Li key={link.name}>
@@ -14,6 +15,7 @@ export const DropdownNavbar = (props: {
     ));
   return (
     <Navbar>
+      <Icon>{icon}</Icon>
       <Brand href={brand.to}>{brand.name}</Brand>
       <Ul>
         <NavLinks />
@@ -46,6 +48,14 @@ const Navbar = styled.nav`
     color: white;
     text-decoration: none;
   }
+`;
+
+const Icon = styled.a`
+  font-weight: bold;
+  font-style: italic;
+  font-size: 1.5em;
+  margin-left: 1rem;
+  padding-right: 1rem;
 `;
 
 const Brand = styled.a`

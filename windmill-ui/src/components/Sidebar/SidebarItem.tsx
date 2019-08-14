@@ -7,6 +7,9 @@ const Outer = styled.div`
   font-size: 14px;
   background: white;
   cursor: move;
+  &:hover {
+    box-shadow: 2px 5px 10px rgba(0, 0, 0, 0.1) inset;
+  }
 `;
 
 export interface ISidebarItemProps {

@@ -1,14 +1,17 @@
 import { FlowChart, IChart } from "@mrblenny/react-flow-chart";
 import * as actions from "@mrblenny/react-flow-chart/src/container/actions";
 import { cloneDeep, mapValues } from "lodash";
+import { FaWind } from "react-icons/fa";
 import * as React from "react";
 import { render } from "react-dom";
 import styled from "styled-components";
 import {
   DragAndDropSidebar,
+  DropdownNavbar,
   Page,
+  ResizablePanel,
   SelectedSidebar,
-  DropdownNavbar
+  Sidebar
 } from "./components";
 import { chartSimple } from "./misc/exampleChartState";
 
@@ -23,11 +26,12 @@ const AppLayout = styled.div`
 const Content = styled.div`
   display: flex;
   flex-direction: column;
-  flex: 1;
+  flex: 1 1 auto;
   overflow: hidden;
 `;
 
 const navigation = {
+  icon: <FaWind />,
   brand: { name: "Windmill", to: "/" },
   links: [
     { name: "File", to: "/" },
@@ -44,8 +48,7 @@ class App extends React.Component {
   }
 
   public render() {
-    const { brand, links } = navigation;
-
+    const { icon, brand, links } = navigation;
     const chart = this.state;
     const stateActions = mapValues(actions, (func: any) => (...args: any) =>
       this.setState(func(...args))
@@ -54,16 +57,40 @@ class App extends React.Component {
     return (
       <AppLayout>
         <Page>
-          <DropdownNavbar brand={brand} links={links} />
+          <DropdownNavbar icon={icon} brand={brand} links={links} />
         </Page>
         <Page>
-          <DragAndDropSidebar />
-          <Content>
-            <FlowChart chart={chart} callbacks={stateActions} />
-          </Content>
-          {this.renderSelectedSidebar(chart, stateActions.onDeleteKey)}
+          <ResizablePanel>
+            <DragAndDropSidebar />
+            <Content>
+              <FlowChart chart={chart} callbacks={stateActions} />
+            </Content>
+            <SelectedSidebar
+              chart={chart}
+              onDeleteKey={stateActions.onDeleteKey}
+            />
+            ;
+          </ResizablePanel>
         </Page>
       </AppLayout>
+    );
+  }
+}
+
+class Test extends React.Component {
+  public render() {
+    return (
+      <div>
+        <h1>ReactJS Resizable Panels</h1>
+        <ResizablePanel>
+          <div>
+            This is the first panel. It will use the rest of the available
+            space.
+          </div>
+          <div>This is the second panel. Starts with 300px.</div>
+          <div>This is the third panel. Starts with 300px.</div>
+        </ResizablePanel>
+      </div>
     );
   }
 }

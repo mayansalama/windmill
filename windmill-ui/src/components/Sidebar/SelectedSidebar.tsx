@@ -1,14 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
 import { IChart } from "@mrblenny/react-flow-chart";
-import { Sidebar } from ".";
-
-const Title = styled.div`
-  font-size: 1.3em;
-  margin: 10px;
-  padding: 15px;
-  background: rgba(0, 0, 0, 0.05);
-`;
+import { Sidebar, Title } from ".";
 
 const Message = styled.div`
   margin: 10px;

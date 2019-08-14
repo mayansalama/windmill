@@ -1,16 +1,18 @@
 import * as React from "react";
 import styled from "styled-components";
-import { Sidebar, SidebarItem } from ".";
+import { SidebarItem, Title } from ".";
 
-const Title = styled.div`
-  font-size: 1.3em;
-  margin: 10px;
-  padding: 15px;
-  background: rgba(0, 0, 0, 0.05);
+const BaseSidebar = styled.div`
+  background: white;
+  flex-wrap: wrap;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  overflow: hidden;
 `;
 
 export const DragAndDropSidebar = () => (
-  <Sidebar>
+  <BaseSidebar>
     <Title>Operator Library</Title>
     <SidebarItem
       type="top/bottom"
@@ -139,5 +141,5 @@ export const DragAndDropSidebar = () => (
         }
       }}
     />
-  </Sidebar>
+  </BaseSidebar>
 );
