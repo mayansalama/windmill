@@ -1,32 +1,20 @@
 import * as React from "react";
-import { AirflowOperator } from ".";
+import { AirflowOperator, IAirflowOperator } from ".";
 import { SidebarTitle, BaseSidebar } from "../Theme";
 
-export const AirflowPanel = () => (
-  <BaseSidebar>
-    <SidebarTitle>Operator Library</SidebarTitle>
-    <AirflowOperator
-      type="top/bottom"
-      ports={{
-        port1: {
-          id: "port1",
-          type: "top",
-          properties: {
-            custom: "property"
-          }
-        },
-        port2: {
-          id: "port1",
-          type: "bottom",
-          properties: {
-            custom: "property"
-          }
-        }
-      }}
-      properties={{
-        name: "test1",
-        parameters: [{id: "sql", type: "str", default: "SELECT * FROM `TABLE`"}]
-      }}
-    />
-  </BaseSidebar>
-);
+export class AirflowPanel extends React.Component<{
+  operators: IAirflowOperator[];
+}> {
+  public render() {
+    return (
+      <BaseSidebar>
+        <SidebarTitle>Operator Library</SidebarTitle>
+        {[].concat(
+          ...this.props.operators.map((operator: IAirflowOperator) => (
+            <AirflowOperator {...operator} />
+          ))
+        )}
+      </BaseSidebar>
+    );
+  }
+}

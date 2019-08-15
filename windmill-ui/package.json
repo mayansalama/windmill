@@ -1,8 +1,9 @@
 {
   "name": "windmill-ui",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
+  "repository": "git@github.com:mayansalama/windmill.git",
   "scripts": {
     "start": "parcel public/index.html"
   },
@@ -13,6 +14,7 @@
     "@types/lodash": "^4.14.136",
     "lodash": "^4.17.15",
     "parcel-bundler": "^1.12.3",
+    "react-dropdown-advanced": "^1.2.9",
     "styled-components": "^4.3.2",
     "typescript": "^3.5.3"
   },

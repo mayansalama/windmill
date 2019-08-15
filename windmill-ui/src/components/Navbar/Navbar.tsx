@@ -1,13 +1,17 @@
 import * as React from "react";
 import styled from "styled-components";
-import {Theme} from "../Theme"
+import { ActionItem, DropDownItemBase } from "react-dropdown-advanced";
+import { Theme } from "../Theme";
 
-export const DropdownNavbar = (props: {
+export interface IDropdownNavbarProps {
   icon: JSX.Element;
-  brand: { name: string; to: string };
+  brand: { name: string; to: any };
   links: Array<{ name: string; to: string }>;
-}) => {
-  const { icon, brand, links } = props;
+  dropdownHandlers: Array<{ name: string; callback: Function }>;
+}
+
+export const DropdownNavbar = (props: IDropdownNavbarProps) => {
+  const { icon, brand, links, dropdownHandlers } = props;
   const NavLinks: any = () =>
     links.map((link: { name: string; to: string }) => (
       <Li key={link.name}>
@@ -55,8 +59,6 @@ const Brand = styled.a`
 const Ul = styled.ul`
   display: flex;
   flex-wrap: nowrap;
-  /* overflow: scroll; */
-  /* overflow-x: hidden; */
   -webkit-overflow-scrolling: touch;
 `;
 
@@ -70,15 +72,6 @@ const Li = styled.li`
   height: 100%;
   justify-content: center;
   text-decoration: none;
-  -webkit-box-align: center;
-  -webkit-box-pack: center;
-  -webkit-tap-highlight-color: transparent;
-  align-items: center;
-  color: #999;
-  display: flex;
-  font-size: 14px;
-  height: 20px;
-  justify-content: center;
   line-height: 16px;
   margin: 0 1.125rem;
   text-decoration: none;

@@ -33,6 +33,7 @@ export class RenderedAirflowParameterAsForm extends React.Component<
             <Input
               placeholder="Input field value..."
               type={"text"}
+              // onInput={e => alert("Oi")}
               onClick={e => e.stopPropagation()}
               onMouseUp={e => e.stopPropagation()}
               onMouseDown={e => e.stopPropagation()}
@@ -85,7 +86,7 @@ export class RenderedAirflowOperatorAsNode extends React.Component<
   }
 }
 
-interface IAirflowNode extends INode {
+export interface IAirflowNode extends INode {
   properties?: IAirflowOperatorProperties;
 }
 
@@ -93,10 +94,6 @@ interface IAirflowNodeDefaultProps extends INodeInnerDefaultProps {
   node: IAirflowNode;
 }
 
-/**
- * Create the custom component,
- * Make sure it has the same prop signature
- */
 export const AirflowNode = ({ node }: IAirflowNodeDefaultProps) => {
   if (node.type === "output-only") {
     return (

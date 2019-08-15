@@ -2,7 +2,9 @@ import * as React from "react";
 import styled from "styled-components";
 import { IChart } from "@mrblenny/react-flow-chart";
 import { Sidebar } from ".";
+import { IAirflowNode } from "../";
 import { SidebarTitle, Theme } from "../Theme";
+import { AirflowNode } from "../Airflow";
 
 const Message = styled.div`
   margin: 10px;
@@ -32,20 +34,26 @@ export class SelectedSidebar extends React.Component<{
 }> {
   public render() {
     const selected = this.props.chart.selected;
-    return (
-      <Sidebar>
-        <SidebarTitle>Node Properties</SidebarTitle>
-        {selected.type ? (
+
+    if (selected.type === "node" || false) {
+      const node: IAirflowNode = this.props.chart.nodes[selected.id];
+      return (
+        <Sidebar>
+          <SidebarTitle>Node Properties</SidebarTitle>
           <Message>
             <div>Type: {selected.type}</div>
             <div>ID: {this.props.chart.selected.id}</div>
-            {selected.type === "node" ? <div>Node Selected</div> : null}
+            <AirflowNode node={node} />
             <br />
             <Button onClick={() => this.props.onDeleteKey()}>Delete</Button>
           </Message>
-        ) : (
-          <Message>Click on a Node, Port or Link</Message>
-        )}
+        </Sidebar>
+      );
+    }
+    return (
+      <Sidebar>
+        <SidebarTitle>Node Properties</SidebarTitle>
+        <Message>Click on a Node, Port or Link</Message>
       </Sidebar>
     );
   }

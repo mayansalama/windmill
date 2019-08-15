@@ -44,7 +44,7 @@ export const AirflowOperator = ({
         );
       }}
     >
-      {properties.name}
+      {type}
     </Outer>
   );
 };

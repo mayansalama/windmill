@@ -3,17 +3,19 @@ import * as actions from "@mrblenny/react-flow-chart/src/container/actions";
 import { cloneDeep, mapValues } from "lodash";
 import { FaWind } from "react-icons/fa";
 import * as React from "react";
-import { render } from "react-dom";
 import styled from "styled-components";
 import {
   AirflowNode,
   AirflowPanel,
   DropdownNavbar,
+  IDropdownNavbarProps,
   Page,
   ResizablePanel,
   SelectedSidebar
 } from "./components";
-import { chartSimple } from "./misc/exampleChartState";
+import { emptyChart } from "./misc/exampleChartState";
+import { dummyOperators } from "./misc/exampleAirflowOperators";
+import { render } from "react-dom";
 
 const AppLayout = styled.div`
   display: flex;
@@ -30,26 +32,43 @@ const Content = styled.div`
   overflow: hidden;
 `;
 
-const navigation = {
+const Navigation = {
   icon: <FaWind />,
   brand: { name: "Windmill", to: "/" },
   links: [
     { name: "File", to: "/" },
     { name: "View", to: "/" },
     { name: "About", to: "/" }
-  ]
+  ],
+  dropdownHandlers: [{ name: "File", callback: this.renderFile }]
 };
 
-class App extends React.Component {
-  public state = cloneDeep(chartSimple);
+interface IAppState {
+  chart: IChart;
+}
+
+class App extends React.Component
+// <
+//   { navigation: IDropdownNavbarProps },
+//   IAppState
+// > 
+{
+  public state = cloneDeep(emptyChart)
+
+  // public constructor(props) {
+  //   super(props);
+  //   this.setState({
+  //     chart: cloneDeep(emptyChart)
+  //   });
+  // }
+
+  public renderFile() {}
 
   public renderSelectedSidebar(chart: IChart, onDeleteKey: Function) {
     return <SelectedSidebar chart={chart} onDeleteKey={onDeleteKey} />;
   }
 
   public render() {
-    const { icon, brand, links } = navigation;
-    const chart = this.state;
     const stateActions = mapValues(actions, (func: any) => (...args: any) =>
       this.setState(func(...args))
     ) as typeof actions;
@@ -57,11 +76,11 @@ class App extends React.Component {
     return (
       <AppLayout>
         <Page>
-          <DropdownNavbar icon={icon} brand={brand} links={links} />
+          <DropdownNavbar {...Navigation} />
         </Page>
         <Page>
           <ResizablePanel>
-            <AirflowPanel />
+            <AirflowPanel operators={dummyOperators} />
             <Content>
               <FlowChart
                 chart={this.state}
@@ -72,7 +91,7 @@ class App extends React.Component {
               />
             </Content>
             <SelectedSidebar
-              chart={chart}
+              chart={this.state}
               onDeleteKey={stateActions.onDeleteKey}
             />
             ;
