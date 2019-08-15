@@ -1,4 +1,4 @@
-import { FlowChart, IChart } from "@mrblenny/react-flow-chart";
+import { IChart, FlowChart } from "@mrblenny/react-flow-chart";
 import * as actions from "@mrblenny/react-flow-chart/src/container/actions";
 import { cloneDeep, mapValues } from "lodash";
 import { FaWind } from "react-icons/fa";
@@ -6,12 +6,12 @@ import * as React from "react";
 import { render } from "react-dom";
 import styled from "styled-components";
 import {
-  DragAndDropSidebar,
+  AirflowNode,
+  AirflowPanel,
   DropdownNavbar,
   Page,
   ResizablePanel,
-  SelectedSidebar,
-  Sidebar
+  SelectedSidebar
 } from "./components";
 import { chartSimple } from "./misc/exampleChartState";
 
@@ -61,9 +61,15 @@ class App extends React.Component {
         </Page>
         <Page>
           <ResizablePanel>
-            <DragAndDropSidebar />
+            <AirflowPanel />
             <Content>
-              <FlowChart chart={chart} callbacks={stateActions} />
+              <FlowChart
+                chart={this.state}
+                callbacks={stateActions}
+                Components={{
+                  NodeInner: AirflowNode
+                }}
+              />
             </Content>
             <SelectedSidebar
               chart={chart}
@@ -73,24 +79,6 @@ class App extends React.Component {
           </ResizablePanel>
         </Page>
       </AppLayout>
-    );
-  }
-}
-
-class Test extends React.Component {
-  public render() {
-    return (
-      <div>
-        <h1>ReactJS Resizable Panels</h1>
-        <ResizablePanel>
-          <div>
-            This is the first panel. It will use the rest of the available
-            space.
-          </div>
-          <div>This is the second panel. Starts with 300px.</div>
-          <div>This is the third panel. Starts with 300px.</div>
-        </ResizablePanel>
-      </div>
     );
   }
 }

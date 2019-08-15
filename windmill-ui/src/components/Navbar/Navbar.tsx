@@ -1,5 +1,6 @@
 import * as React from "react";
 import styled from "styled-components";
+import {Theme} from "../Theme"
 
 export const DropdownNavbar = (props: {
   icon: JSX.Element;
@@ -15,26 +16,12 @@ export const DropdownNavbar = (props: {
     ));
   return (
     <Navbar>
-      <Icon>{icon}</Icon>
       <Brand href={brand.to}>{brand.name}</Brand>
       <Ul>
         <NavLinks />
       </Ul>
     </Navbar>
   );
-};
-
-const Theme = {
-  colors: {
-    bg: `#fff`,
-    dark: `#24292e`,
-    light: `#EEEEEE`,
-    red: `#ff5851`
-  },
-  fonts: {
-    body: `IBM Plex Sans, sans-serif`,
-    heading: `IBM Plex Sans, sans-serif`
-  }
 };
 
 const Navbar = styled.nav`
@@ -45,12 +32,12 @@ const Navbar = styled.nav`
   flex: 1;
   align-items: center;
   a {
-    color: white;
+    color: ${Theme.colors.light};
     text-decoration: none;
   }
 `;
 
-const Icon = styled.a`
+const Icon = styled.div`
   font-weight: bold;
   font-style: italic;
   font-size: 1.5em;

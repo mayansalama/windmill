@@ -1,7 +1,8 @@
 import * as React from "react";
 import styled from "styled-components";
 import { IChart } from "@mrblenny/react-flow-chart";
-import { Sidebar, Title } from ".";
+import { Sidebar } from ".";
+import { SidebarTitle, Theme } from "../Theme";
 
 const Message = styled.div`
   margin: 10px;
@@ -11,7 +12,7 @@ const Message = styled.div`
 
 const Button = styled.div`
   padding: 10px 15px;
-  background: cornflowerblue;
+  background: ${Theme.colors.brand};
   color: white;
   border-radius: 3px;
   text-align: center;
@@ -30,13 +31,15 @@ export class SelectedSidebar extends React.Component<{
   onDeleteKey: Function;
 }> {
   public render() {
+    const selected = this.props.chart.selected;
     return (
       <Sidebar>
-        <Title>Node Properties</Title>
-        {this.props.chart.selected.type ? (
+        <SidebarTitle>Node Properties</SidebarTitle>
+        {selected.type ? (
           <Message>
-            <div>Type: {this.props.chart.selected.type}</div>
+            <div>Type: {selected.type}</div>
             <div>ID: {this.props.chart.selected.id}</div>
+            {selected.type === "node" ? <div>Node Selected</div> : null}
             <br />
             <Button onClick={() => this.props.onDeleteKey()}>Delete</Button>
           </Message>
