@@ -14,7 +14,6 @@
     "@types/lodash": "^4.14.136",
     "lodash": "^4.17.15",
     "parcel-bundler": "^1.12.3",
-    "react-dropdown-advanced": "^1.2.9",
     "styled-components": "^4.3.2",
     "typescript": "^3.5.3"
   },

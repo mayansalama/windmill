@@ -3,7 +3,7 @@ import styled from "styled-components"
 export const Theme = {
   colors: {
     light: `#F5F7F9`,
-    lightAccent: `#CFAF8C`,
+    lightAccent: `#dcdee0`,
     dark: `#45689D`,
     darkAccent: `#809BC6`,
     brand: "cornflowerBlue",
