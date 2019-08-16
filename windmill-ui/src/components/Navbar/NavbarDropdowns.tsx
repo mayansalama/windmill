@@ -1,6 +1,5 @@
 import * as React from "react";
-import styled, { ThemeConsumer } from "styled-components";
-import { IAppState } from "../../App";
+import styled from "styled-components";
 import { Theme } from "../Theme";
 import ReactDOM = require("react-dom");
 
@@ -77,10 +76,7 @@ class Dropdown extends React.Component<
   };
 
   public closeAfterUnrelatedClick = event => {
-    console.log("hello");
-
     if (this.node.current && !this.node.current.contains(event.target)) {
-      console.log("in here");
       this.setState({ showDropdown: false });
     }
   };
@@ -91,12 +87,13 @@ class Dropdown extends React.Component<
 
   public render() {
     const DropdownButtons: any = () =>
-      this.props.items.map((item: IDropdownItem) =>
+      this.props.items.map((item: IDropdownItem, index: Number) =>
         item.sep || false ? (
-          <Sep />
+          <Sep key={`${this.props.title}-sep-${index}`} />
         ) : (
           <DropdownBoxItem
             onClick={() => this.closeDropdownBeforeCallback(item.callback)}
+            key={`${this.props.title}-${item.title}-${index}`}
           >
             {item.title}
           </DropdownBoxItem>
@@ -116,7 +113,11 @@ class Dropdown extends React.Component<
   }
 }
 
-export class FileDropdown extends React.Component<IAppState> {
+interface IDropdown {
+  getState: Function;
+}
+
+export class FileDropdown extends React.Component<IDropdown> {
   public handleNew() {
     alert("new is not implemented");
   }
@@ -140,7 +141,7 @@ export class FileDropdown extends React.Component<IAppState> {
   }
 }
 
-export class ViewDropdown extends React.Component<IAppState> {
+export class ViewDropdown extends React.Component<IDropdown> {
   public handleDagState() {
     alert("test");
   }

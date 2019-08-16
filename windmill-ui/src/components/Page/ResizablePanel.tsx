@@ -72,7 +72,7 @@ export class ResizablePanel extends React.Component<
     if (this.state.isDragging) {
       console.log(this.state);
       this.setState(({ delta, initialPos }) => ({
-        isDragging: false,
+        isDragging: false
         delta: 0,
         panelWidth: initialPos + delta
       }));
