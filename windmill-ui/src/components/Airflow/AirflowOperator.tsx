@@ -17,11 +17,13 @@ export interface IAirflowOperatorParameter {
   id: string;
   type: "str" | "bool" | "dict";
   default?: string;
+  tooltip?: string;
 }
 
 export interface IAirflowOperatorProperties {
-  name: string;
-  parameters: Array<IAirflowOperatorParameter>;
+  name?: string;
+  parameters?: Array<IAirflowOperatorParameter>;
+  description?: string;
 }
 
 export interface IAirflowOperator {

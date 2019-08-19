@@ -1,10 +1,22 @@
-import { FlowChart, IChart, ICanvasOuterDefaultProps } from "@mrblenny/react-flow-chart";
+import {
+  FlowChart,
+  IChart,
+  ICanvasOuterDefaultProps
+} from "@mrblenny/react-flow-chart";
 import * as actions from "@mrblenny/react-flow-chart/src/container/actions";
-import { cloneDeep, mapValues } from "lodash";
+import { cloneDeep, mapValues, Dictionary } from "lodash";
 import * as React from "react";
 import { render } from "react-dom";
 import styled from "styled-components";
-import { AirflowNode, AirflowPanel, DropdownNavbar, Page, ResizablePanel, SelectedSidebar } from "./components";
+import {
+  AirflowNode,
+  AirflowPanel,
+  IAirflowOperatorProperties,
+  DropdownNavbar,
+  Page,
+  ResizablePanel,
+  SelectedSidebar
+} from "./components";
 import * as MenuItems from "./components/Navbar/NavbarDropdowns";
 import { dummyOperators } from "./misc/exampleAirflowOperators";
 import { emptyChart } from "./misc/exampleChartState";
@@ -29,14 +41,17 @@ const CanvasStyle = styled.div<ICanvasOuterDefaultProps>`
   position: relative;
   background-size: 10px 10px;
   background-color: white;
-  background-image:
-    linear-gradient(90deg,hsla(0,10%,0%,.05) 1px,transparent 0),
-    linear-gradient(180deg,hsla(0,10%,0%,.05) 1px,transparent 0);
+  background-image: linear-gradient(
+      90deg,
+      hsla(0, 10%, 0%, 0.05) 1px,
+      transparent 0
+    ),
+    linear-gradient(180deg, hsla(0, 10%, 0%, 0.05) 1px, transparent 0);
   width: 100%;
   height: 100%;
   overflow: hidden;
   cursor: not-allowed;
-` as any
+` as any;
 
 export interface IAppState extends IChart {
   // The AppState has to extend, not include, the IChart or the dragndrop breaks (not sure why)
@@ -70,8 +85,20 @@ class App extends React.Component<{}, IAppState> {
 
   public state = cloneDeep(emptyChart);
 
-  public renderSelectedSidebar(chart: IChart, onDeleteKey: Function) {
-    return <SelectedSidebar chart={chart} onDeleteKey={onDeleteKey} />;
+  public updateNodeProperties(
+    key: string,
+    newProps: IAirflowOperatorProperties
+  ) {
+    this.setState(prevState => ({
+      ...prevState,
+      nodes: {
+        ...prevState.nodes,
+        [key]: {
+          ...prevState.nodes[key],
+          ["properties"]: newProps
+        }
+      }
+    }));
   }
 
   public render() {
@@ -93,7 +120,7 @@ class App extends React.Component<{}, IAppState> {
                 callbacks={stateActions}
                 Components={{
                   NodeInner: AirflowNode,
-                  CanvasOuter: CanvasStyle,
+                  CanvasOuter: CanvasStyle
                 }}
               />
             </Content>

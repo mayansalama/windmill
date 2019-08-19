@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { Theme } from "../components/Theme";
 
 const Svg = styled.svg`
-  padding: 3px 3px;
+  padding: 7px 7px;
   flex: 0 1;
   width: 70px;
   height: 65px;

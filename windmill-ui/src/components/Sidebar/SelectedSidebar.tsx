@@ -82,10 +82,8 @@ export class SelectedSidebar extends React.Component<{
       const node: IAirflowNode = this.props.chart.nodes[selected.id];
       return (
         <div>
-          {this.renderTitle("Node Properties")}
+          {this.renderTitle("Operator Properties")}
           <Message>
-            <div>Type: {selected.type}</div>
-            <div>Name: {node.properties.name}</div>
             <AirflowNodeForm node={node} />
             <br />
             <Button onClick={() => this.props.onDeleteKey()}>Delete</Button>
@@ -95,8 +93,8 @@ export class SelectedSidebar extends React.Component<{
     }
     return (
       <div>
-        {this.renderTitle("Chart Properties")}
-        <Message>Click on a Node, Port or Link</Message>
+        {this.renderTitle("DAG Properties")}
+        <Message>Click on an Operator Node to modify parameters</Message>
       </div>
     );
   }
