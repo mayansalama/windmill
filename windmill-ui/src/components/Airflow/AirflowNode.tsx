@@ -5,14 +5,30 @@ import { Theme } from "../Theme";
 import { IAirflowOperatorParameter, IAirflowOperatorProperties } from ".";
 
 const Inner = styled.div`
-  /* padding: 5px; */
   display: flex;
   flex-direction: row;
   flex: 1;
 `;
 
 const Outer = styled.div`
-  padding: 30px;
+  padding: 15px;
+  /* border: 1px solid ${Theme.colors.darkAccent}; */
+`;
+
+const TypeText = styled.div`
+  padding: 4px;
+  font-size: ${Theme.fonts.normalSize};
+  color: ${Theme.colors.darkAccent};
+`;
+
+const OperatorName = styled.input`
+  padding: 7px;
+  font-size: ${Theme.fonts.subHeadingSize};
+  border: 2px solid ${Theme.colors.light};
+  border-radius: 3px;
+  &:hover {
+    border: 2px solid ${Theme.colors.brand};
+  }
 `;
 
 const Input = styled.input`
@@ -33,7 +49,6 @@ export class RenderedAirflowParameterAsForm extends React.Component<
             <Input
               placeholder="Input field value..."
               type={"text"}
-              // onInput={e => alert("Oi")}
               onClick={e => e.stopPropagation()}
               onMouseUp={e => e.stopPropagation()}
               onMouseDown={e => e.stopPropagation()}
@@ -62,7 +77,7 @@ export class RenderedAirflowParameterAsForm extends React.Component<
   }
 }
 
-export class RenderedAirflowOperatorAsNode extends React.Component<
+export class RenderedAirflowOperatorAsForm extends React.Component<
   IAirflowOperatorProperties
 > {
   public render() {
@@ -70,14 +85,15 @@ export class RenderedAirflowOperatorAsNode extends React.Component<
       <Outer>
         <p>{this.props.name}</p>
         {[].concat(
-          ...this.props.parameters.map(p => {
+          ...this.props.parameters.map((p, i) => {
             return [
               <RenderedAirflowParameterAsForm
                 id={p.id}
                 type={p.type}
                 default={p.default}
+                key={`${p.id}-i`}
               />,
-              <br />
+              <br key={`${p.id}-br-i`} />
             ];
           })
         )}
@@ -95,24 +111,28 @@ interface IAirflowNodeDefaultProps extends INodeInnerDefaultProps {
 }
 
 export const AirflowNode = ({ node }: IAirflowNodeDefaultProps) => {
-  if (node.type === "output-only") {
-    return (
-      <Outer>
-        <p>Use Node inner to customise the content of the node</p>
-      </Outer>
-    );
-  } else if (node.properties || false) {
-    return (
-      <RenderedAirflowOperatorAsNode
+  return (
+    <Outer>
+      <TypeText>{node.type}</TypeText>
+      <OperatorName
+        placeholder="Enter name..."
+        type={"text"}
+        onClick={e => e.stopPropagation()}
+        onMouseUp={e => e.stopPropagation()}
+        onMouseDown={e => e.stopPropagation()}
+      />
+    </Outer>
+  );
+};
+
+export const AirflowNodeForm = ({ node }: IAirflowNodeDefaultProps) => {
+  return (
+    <div>
+      <AirflowNode node={node} />
+      <RenderedAirflowOperatorAsForm
         name={node.properties.name}
         parameters={node.properties.parameters}
       />
-    );
-  } else {
-    return (
-      <Outer>
-        <p>RegularNode</p>
-      </Outer>
-    );
-  }
+    </div>
+  );
 };

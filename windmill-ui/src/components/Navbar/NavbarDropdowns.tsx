@@ -1,10 +1,10 @@
 import * as React from "react";
 import styled from "styled-components";
 import { Theme } from "../Theme";
-import ReactDOM = require("react-dom");
 
 const MenuItem = styled.div`
-  padding: 5px 7.5px;
+  font-size: ${Theme.fonts.subHeadingSize};
+  padding: 3px 12px;
   &:hover {
     box-shadow: 30px 30px 30px rgba(0, 0, 0, 0.5) inset;
   }
@@ -19,7 +19,7 @@ const DropdownBox = styled.div`
   position: absolute;
   background: ${Theme.colors.light};
   flex-direction: column;
-  border: 3px solid ${Theme.colors.lightAccent};
+  border: 3px solid ${Theme.colors.lightAccent2};
   z-index: 10;
 `;
 
@@ -114,7 +114,7 @@ class Dropdown extends React.Component<
 }
 
 interface IDropdown {
-  getState: Function;
+  getAppState: Function;
 }
 
 export class FileDropdown extends React.Component<IDropdown> {
@@ -142,15 +142,40 @@ export class FileDropdown extends React.Component<IDropdown> {
 }
 
 export class ViewDropdown extends React.Component<IDropdown> {
-  public handleDagState() {
-    alert("test");
+  public handleDagState(getAppState: Function) {
+    console.log(getAppState());
   }
 
   public render() {
     return (
       <Dropdown
         title="View"
-        items={[{ title: "DagState", callback: this.handleDagState }]}
+        items={[
+          {
+            title: "Log DagState",
+            callback: () => this.handleDagState(this.props.getAppState)
+          }
+        ]}
+      />
+    );
+  }
+}
+
+export class HelpDropdown extends React.Component<IDropdown> {
+  public handleAbout(getAppState: Function) {
+    console.log(getAppState());
+  }
+
+  public render() {
+    return (
+      <Dropdown
+        title="Help"
+        items={[
+          {
+            title: "About",
+            callback: () => this.handleAbout(this.props.getAppState)
+          }
+        ]}
       />
     );
   }

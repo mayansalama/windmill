@@ -1,10 +1,11 @@
 import * as React from "react";
 import styled from "styled-components";
 import { INode, REACT_FLOW_CHART } from "@mrblenny/react-flow-chart";
+import { Theme } from "../Theme"
 
 const Outer = styled.div`
   padding: 20px 30px;
-  font-size: 14px;
+  font-size: ${Theme.fonts.normalSize};
   background: white;
   cursor: move;
   &:hover {

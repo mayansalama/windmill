@@ -1,6 +1,8 @@
 import * as React from "react";
 import ReactDOM from "react-dom";
 import styled from "styled-components";
+import { FaGripLinesVertical } from "react-icons/fa";
+import { Theme } from "../Theme";
 
 const PanelContainer = styled.div`
   display: flex;
@@ -14,18 +16,35 @@ const PanelContainer = styled.div`
 `;
 
 const Resizer = styled.div`
-  width: 8px;
-  background: darkGray;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  width: 15px;
+  background: ${Theme.colors.light};
+  border: 1px solid ${Theme.colors.lightAccent};
   position: relative;
   cursor: col-Resize;
   &:hover {
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    background: ${Theme.colors.lightAccent};
   }
   flex-shrink: 0;
   -webkit-user-select: none; /* Chrome all / Safari all */
   -moz-user-select: none; /* Firefox all */
   -ms-user-select: none; /* IE 10+ */
   user-select: none; /* Likely future */
+`;
+
+const GripLines = styled.div`
+  color: darkgray;
+  font-size: ${Theme.fonts.normalSize};
+`;
+
+const Divider = styled.div`
+  width: 1.5px;
+  background: ${Theme.colors.lightAccent};
+  position: relative;
+  flex-shrink: 0;
 `;
 
 interface IResizablePanelState {
@@ -72,7 +91,7 @@ export class ResizablePanel extends React.Component<
     if (this.state.isDragging) {
       console.log(this.state);
       this.setState(({ delta, initialPos }) => ({
-        isDragging: false
+        isDragging: false,
         delta: 0,
         panelWidth: initialPos + delta
       }));
@@ -107,8 +126,14 @@ export class ResizablePanel extends React.Component<
           ...rest.map((child, i) => {
             return [
               i == 0 ? (
-                <Resizer onMouseDown={e => this.startResize(e)} />
-              ) : null,
+                <Resizer onMouseDown={e => this.startResize(e)}>
+                  <GripLines>
+                    <FaGripLinesVertical />
+                  </GripLines>
+                </Resizer>
+              ) : (
+                <Divider />
+              ),
               <div
                 key={"panel_" + i}
                 className="panel"
