@@ -1,11 +1,11 @@
-# To start developing
+## To start developing
 
 ```bash
 cd windmill-ui
 npm install
 ```
 
-# To run
+## To run
 
 ```bash
 npm start

@@ -1,0 +1,1 @@
+(cd app/http/web/app && npm start)
