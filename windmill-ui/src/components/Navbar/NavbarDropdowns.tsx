@@ -25,6 +25,7 @@ const DropdownBox = styled.div`
 
 const DropdownBoxItem = styled.div`
   justify-content: center;
+  font-size: ${Theme.fonts.normalSize};
   padding: 10px 30px;
   color: ${Theme.colors.dark};
   &:hover {
@@ -131,7 +132,7 @@ export class FileDropdown extends React.Component<IDropdown> {
       <Dropdown
         title="File"
         items={[
-          { title: "New", callback: this.handleNew },
+          { title: "New...", callback: this.handleNew },
           { title: "Open", callback: this.handleOpen },
           { sep: true },
           { title: "Sep!", callback: () => {} }

@@ -1,4 +1,5 @@
 import * as React from "react";
+import { cloneDeep } from "lodash";
 import styled from "styled-components";
 import { INodeInnerDefaultProps, INode } from "@mrblenny/react-flow-chart";
 import { Theme } from "../Theme";
@@ -31,24 +32,40 @@ const Input = styled.input`
   width: 100%;
 `;
 
-export class RenderedAirflowParameterAsForm extends React.Component<
-  IAirflowOperatorParameter
-> {
+export class RenderedAirflowParameterAsForm extends React.Component<{
+  params: IAirflowOperatorParameter;
+  index: number;
+  updateFunc: Function;
+}> {
+  constructor(props) {
+    super(props);
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const newParams = cloneDeep(this.params);
+    newParams["value"] = event.target.value;
+    this.props.updateFunc(newParams, this.props.index);
+  }
+
+  get params(): IAirflowOperatorParameter {
+    return this.props.params;
+  }
+
   public render() {
-    switch (this.props.type) {
+    switch (this.params.type) {
       case "str": {
         return (
           <tr>
             <td>
-              <Tooltip>{this.props.id}</Tooltip>
+              <Tooltip>{this.params.id}</Tooltip>
             </td>
             <td>
               <Input
                 placeholder="Input field value..."
                 type={"text"}
-                onClick={e => e.stopPropagation()}
-                onMouseUp={e => e.stopPropagation()}
-                onMouseDown={e => e.stopPropagation()}
+                value={this.params.value || ""}
+                onChange={this.handleChange}
               />
             </td>
           </tr>
@@ -58,12 +75,12 @@ export class RenderedAirflowParameterAsForm extends React.Component<
         return (
           <tr>
             <td>
-              <Tooltip>{this.props.id}</Tooltip>
+              <Tooltip>{this.params.id}</Tooltip>
             </td>
             <td>
               <Input
                 type={"checkbox"}
-                checked={this.props.default === "true" || false}
+                checked={this.params.default === "true" || false}
                 onClick={e => e.stopPropagation()}
                 onMouseUp={e => e.stopPropagation()}
                 onMouseDown={e => e.stopPropagation()}
@@ -79,9 +96,21 @@ export class RenderedAirflowParameterAsForm extends React.Component<
   }
 }
 
-export class RenderedAirflowOperatorAsForm extends React.Component<
-  IAirflowOperatorProperties
-> {
+export class RenderedAirflowOperatorAsForm extends React.Component<{
+  operatorProps: IAirflowOperatorProperties;
+  updateParams: Function;
+}> {
+  constructor(props) {
+    super(props);
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(params: IAirflowOperatorParameter, index: number) {
+    const newProps = cloneDeep(this.props.operatorProps);
+    newProps["parameters"][index] = params;
+    this.props.updateParams(newProps);
+  }
+
   public render() {
     return (
       <div>
@@ -90,13 +119,13 @@ export class RenderedAirflowOperatorAsForm extends React.Component<
         <table>
           <tbody>
             {[].concat(
-              ...this.props.parameters.map((p, i) => {
+              ...this.props.operatorProps.parameters.map((p, i) => {
                 return [
                   <RenderedAirflowParameterAsForm
-                    id={p.id}
-                    type={p.type}
-                    default={p.default}
+                    params={p}
                     key={`${p.id}-i`}
+                    updateFunc={this.handleChange}
+                    index={i}
                   />
                 ];
               })
@@ -139,14 +168,28 @@ export const AirflowNode = ({ node }: IAirflowNodeDefaultProps) => {
   );
 };
 
-export const AirflowNodeForm = ({ node }: IAirflowNodeDefaultProps) => {
-  return (
-    <div>
-      <AirflowNodeInterior node={node} />
-      <RenderedAirflowOperatorAsForm
-        name={node.properties.name}
-        parameters={node.properties.parameters}
-      />
-    </div>
-  );
-};
+export class AirflowNodeForm extends React.Component<{
+  node: IAirflowNode;
+  updateNodeProps: Function;
+}> {
+  constructor(props) {
+    super(props);
+    this.handleParameterUpdate = this.handleParameterUpdate.bind(this);
+  }
+
+  handleParameterUpdate(newProps: IAirflowOperatorProperties) {
+    this.props.updateNodeProps(this.props.node.id, newProps);
+  }
+
+  public render() {
+    return (
+      <div>
+        <AirflowNodeInterior node={this.props.node} />
+        <RenderedAirflowOperatorAsForm
+          operatorProps={this.props.node.properties}
+          updateParams={this.handleParameterUpdate}
+        />
+      </div>
+    );
+  }
+}

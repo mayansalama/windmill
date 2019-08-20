@@ -58,6 +58,11 @@ export interface IAppState extends IChart {
 }
 
 class App extends React.Component<{}, IAppState> {
+  constructor(props) {
+    super(props);
+    this.updateNodeProperties = this.updateNodeProperties.bind(this);
+  }
+
   public Navigation = {
     icon: <Icon />,
     brand: { name: "Windmill", to: "/" },
@@ -127,6 +132,7 @@ class App extends React.Component<{}, IAppState> {
             <SelectedSidebar
               chart={this.state}
               onDeleteKey={stateActions.onDeleteKey}
+              updateNodeProps={this.updateNodeProperties}
             />
           </ResizablePanel>
         </Page>

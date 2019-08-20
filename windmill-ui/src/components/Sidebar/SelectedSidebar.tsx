@@ -52,6 +52,7 @@ const Button = styled.div`
 export class SelectedSidebar extends React.Component<{
   chart: IChart;
   onDeleteKey: Function;
+  updateNodeProps: Function;
 }> {
   public state = {
     isOpen: true
@@ -84,7 +85,10 @@ export class SelectedSidebar extends React.Component<{
         <div>
           {this.renderTitle("Operator Properties")}
           <Message>
-            <AirflowNodeForm node={node} />
+            <AirflowNodeForm
+              node={node}
+              updateNodeProps={this.props.updateNodeProps}
+            />
             <br />
             <Button onClick={() => this.props.onDeleteKey()}>Delete</Button>
           </Message>

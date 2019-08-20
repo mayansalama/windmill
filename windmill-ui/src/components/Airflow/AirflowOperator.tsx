@@ -16,6 +16,7 @@ const Outer = styled.div`
 export interface IAirflowOperatorParameter {
   id: string;
   type: "str" | "bool" | "dict";
+  value?: string;
   default?: string;
   tooltip?: string;
 }
