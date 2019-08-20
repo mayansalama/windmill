@@ -4,7 +4,8 @@ import {
   ICanvasOuterDefaultProps
 } from "@mrblenny/react-flow-chart";
 import * as actions from "@mrblenny/react-flow-chart/src/container/actions";
-import { cloneDeep, mapValues, Dictionary } from "lodash";
+import { cloneDeep, mapValues } from "lodash";
+import * as localStorage from "local-storage";
 import * as React from "react";
 import { render } from "react-dom";
 import styled from "styled-components";
@@ -60,7 +61,13 @@ export interface IAppState extends IChart {
 class App extends React.Component<{}, IAppState> {
   constructor(props) {
     super(props);
+    this.state = localStorage.get("windmillChart") || cloneDeep(emptyChart);
+
     this.updateNodeProperties = this.updateNodeProperties.bind(this);
+  }
+
+  public componentDidUpdate() {
+    localStorage.set("windmillChart", this.state);
   }
 
   public Navigation = {
@@ -87,8 +94,6 @@ class App extends React.Component<{}, IAppState> {
       }
     ]
   };
-
-  public state = cloneDeep(emptyChart);
 
   public updateNodeProperties(
     key: string,

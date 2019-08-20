@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
+  "homepage": "https://github.com/mayansalama/windmill",
   "repository": "git@github.com:mayansalama/windmill.git",
   "scripts": {
     "start": "parcel public/index.html"
@@ -24,6 +25,8 @@
     "@types/react-dom": "^16.8.5",
     "@types/react-resizable": "^1.7.1",
     "@types/styled-components": "^4.1.18",
+    "gh-pages": "^2.1.1",
+    "local-storage": "^2.0.0",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-icons": "^3.7.0",

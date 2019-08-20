@@ -1,29 +1,54 @@
 import * as React from "react";
 import { cloneDeep } from "lodash";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { INodeInnerDefaultProps, INode } from "@mrblenny/react-flow-chart";
 import { Theme } from "../Theme";
 import { IAirflowOperatorParameter, IAirflowOperatorProperties } from ".";
 
-const Node = styled.div`
-  border: 1px solid ${Theme.colors.darkAccent};
+const Outer = styled.div`
+  border: 1px solid ${Theme.colors.lightAccent};
   padding: 15px;
+  display: flex;
+  flex: 0 1 auto;
+  flex-direction: column;
 `;
 
 const Tooltip = styled.div`
+  float: left;
   padding: 4px;
   font-size: ${Theme.fonts.normalSize};
   color: ${Theme.colors.darkAccent};
 `;
 
-const OperatorName = styled.input`
-  padding: 7px;
+const SectionTitle = styled.div`
+  padding: 8px 4px;
   font-size: ${Theme.fonts.subHeadingSize};
-  border: 2px solid ${Theme.colors.light};
+  color: ${Theme.colors.darkAccent};
+`;
+
+const OperatorNameStyle = css`
+  font-size: ${Theme.fonts.subHeadingSize};
   border-radius: 3px;
+`;
+
+const OperatorName = styled.div`
+  ${OperatorNameStyle}
+  padding: 3px;
+`;
+
+const OperatorInput = styled.input`
+  padding: 7px;
+  border: 1px solid ${Theme.colors.brand};
   &:hover {
-    border: 2px solid ${Theme.colors.brand};
+    background: ${Theme.colors.light};
   }
+  ${OperatorNameStyle}
+`;
+
+const OperatorType = styled.div`
+  float: right;
+  font-size: ${Theme.fonts.normalSize};
+  font-style: italic;
 `;
 
 const Input = styled.input`
@@ -98,11 +123,13 @@ export class RenderedAirflowParameterAsForm extends React.Component<{
 
 export class RenderedAirflowOperatorAsForm extends React.Component<{
   operatorProps: IAirflowOperatorProperties;
+  type: string;
   updateParams: Function;
 }> {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
+    this.handleNameChange = this.handleNameChange.bind(this);
   }
 
   handleChange(params: IAirflowOperatorParameter, index: number) {
@@ -111,27 +138,46 @@ export class RenderedAirflowOperatorAsForm extends React.Component<{
     this.props.updateParams(newProps);
   }
 
+  handleNameChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const newProps = cloneDeep(this.props.operatorProps);
+    newProps["name"] = event.target.value;
+    this.props.updateParams(newProps);
+  }
+
   public render() {
     return (
       <div>
-        <br />
-        <Tooltip>Required Parameters</Tooltip>
-        <table>
-          <tbody>
-            {[].concat(
-              ...this.props.operatorProps.parameters.map((p, i) => {
-                return [
-                  <RenderedAirflowParameterAsForm
-                    params={p}
-                    key={`${p.id}-i`}
-                    updateFunc={this.handleChange}
-                    index={i}
-                  />
-                ];
-              })
-            )}
-          </tbody>
-        </table>
+        <Outer>
+          <div>
+            <Tooltip>Name</Tooltip>
+            <OperatorType>{this.props.type}</OperatorType>
+          </div>
+          <OperatorInput
+            placeholder="Input operator name..."
+            type={"text"}
+            value={this.props.operatorProps.name || ""}
+            onChange={this.handleNameChange}
+          />
+        </Outer>
+        <Outer>
+          <SectionTitle>Parameters</SectionTitle>
+          <table>
+            <tbody>
+              {[].concat(
+                ...this.props.operatorProps.parameters.map((p, i) => {
+                  return [
+                    <RenderedAirflowParameterAsForm
+                      params={p}
+                      key={`${p.id}-i`}
+                      updateFunc={this.handleChange}
+                      index={i}
+                    />
+                  ];
+                })
+              )}
+            </tbody>
+          </table>
+        </Outer>
       </div>
     );
   }
@@ -145,26 +191,12 @@ interface IAirflowNodeDefaultProps extends INodeInnerDefaultProps {
   node: IAirflowNode;
 }
 
-export const AirflowNodeInterior = ({ node }: IAirflowNodeDefaultProps) => {
-  return (
-    <div>
-      <Tooltip>{node.type}</Tooltip>
-      <OperatorName
-        placeholder="Operator name..."
-        type={"text"}
-        onClick={e => e.stopPropagation()}
-        onMouseUp={e => e.stopPropagation()}
-        onMouseDown={e => e.stopPropagation()}
-      />
-    </div>
-  );
-};
-
 export const AirflowNode = ({ node }: IAirflowNodeDefaultProps) => {
   return (
-    <Node>
-      <AirflowNodeInterior node={node} />
-    </Node>
+    <Outer>
+      <Tooltip>{node.type}</Tooltip>
+      <OperatorName>{node.properties.name || "Unnamed"}</OperatorName>
+    </Outer>
   );
 };
 
@@ -184,10 +216,10 @@ export class AirflowNodeForm extends React.Component<{
   public render() {
     return (
       <div>
-        <AirflowNodeInterior node={this.props.node} />
         <RenderedAirflowOperatorAsForm
           operatorProps={this.props.node.properties}
           updateParams={this.handleParameterUpdate}
+          type={this.props.node.type}
         />
       </div>
     );

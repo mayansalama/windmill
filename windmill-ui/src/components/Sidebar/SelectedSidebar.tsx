@@ -27,13 +27,8 @@ const BurgerButton = styled.div`
   }
 `;
 
-const Message = styled.div`
-  margin: 10px;
-  padding: 10px;
-  line-height: 1.4em;
-`;
-
 const Button = styled.div`
+  margin: 30px;
   padding: 10px 15px;
   background: ${Theme.colors.brand};
   color: white;
@@ -84,21 +79,21 @@ export class SelectedSidebar extends React.Component<{
       return (
         <div>
           {this.renderTitle("Operator Properties")}
-          <Message>
+          <div>
             <AirflowNodeForm
               node={node}
               updateNodeProps={this.props.updateNodeProps}
             />
             <br />
             <Button onClick={() => this.props.onDeleteKey()}>Delete</Button>
-          </Message>
+          </div>
         </div>
       );
     }
     return (
       <div>
         {this.renderTitle("DAG Properties")}
-        <Message>Click on an Operator Node to modify parameters</Message>
+        <div>Click on an Operator Node to modify parameters</div>
       </div>
     );
   }

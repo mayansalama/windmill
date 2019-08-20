@@ -1,7 +1,6 @@
-Drag'n'drop web app to manage and create Airflow DAGs. 
+Drag'n'drop web app to manage and create Airflow DAGs. The goal is to 
+have a Web UI that can generate YML Dag Definitions, integrating with
+custom operators and potentially existing DAGs. 
 
-- Front end is built using React
-- Back end is built using Flask on Python 3
-
-Note that this relies on the Airconditioner extension to Airflow, which
-allows YAML DAG definitions. 
+- Front end is built using Typescript React
+- Back end is planned to be built using Flask on Python 3

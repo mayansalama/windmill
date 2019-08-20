@@ -20,7 +20,6 @@ export const dummyOperators: IAirflowOperator[] = [
       }
     },
     properties: {
-      name: "test1",
       parameters: [{ id: "sql", type: "str", default: "SELECT * FROM `TABLE`" }]
     }
   },
@@ -43,7 +42,6 @@ export const dummyOperators: IAirflowOperator[] = [
       }
     },
     properties: {
-      name: "test1",
       parameters: [{ id: "useLegacySql", type: "bool", default: "true" }]
     }
   }
