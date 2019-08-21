@@ -1,0 +1,16 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pytest = "*"
+pylint = "*"
+
+[packages]
+flask-restplus = "*"
+apache-airflow = "*"
+marshmallow = "*"
+
+[requires]
+python_version = "3.7"

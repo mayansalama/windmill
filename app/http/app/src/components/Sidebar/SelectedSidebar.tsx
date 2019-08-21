@@ -2,8 +2,17 @@ import * as React from "react";
 import styled from "styled-components";
 import { IChart, ISelectedOrHovered } from "@mrblenny/react-flow-chart";
 import { IAirflowNode, AirflowNodeForm } from "../";
-import { SidebarTitle, Theme, BaseSidebar } from "../Theme";
+import { SidebarTitle, Theme } from "../Theme";
 import { FaBars, FaTimes } from "react-icons/fa";
+
+export const Sidebar = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  overflow: hidden;
+  border-radius: 20px;
+  border: 1px 
+`;
 
 const BurgerSplit = styled.div`
   min-width: 400px;
@@ -77,7 +86,7 @@ export class SelectedSidebar extends React.Component<{
     if (selected.type === "node" || false) {
       const node: IAirflowNode = this.props.chart.nodes[selected.id];
       return (
-        <div>
+        <Sidebar>
           {this.renderTitle("Operator Properties")}
           <div>
             <AirflowNodeForm
@@ -87,7 +96,7 @@ export class SelectedSidebar extends React.Component<{
             <br />
             <Button onClick={() => this.props.onDeleteKey()}>Delete</Button>
           </div>
-        </div>
+        </Sidebar>
       );
     }
     return (

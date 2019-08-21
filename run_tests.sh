@@ -1,0 +1,1 @@
+pytest --ignore=app/http/app

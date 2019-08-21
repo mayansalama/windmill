@@ -1,1 +1,2 @@
-(cd app/http/web/app && npm start)
+sh run_front.sh & 
+sh run_back.sh
