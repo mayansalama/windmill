@@ -44,11 +44,11 @@ class TestOperatorMarshalling(TestCase):
 
         marshalled_oh = oh.dump()
 
-        self.assertDictEqual(marshalled_oh.data, operator_data.data)
+        self.assertDictEqual(marshalled_oh, operator_data.data)
 
     def test_operator_to_operator_handler(self):
         oh = OperatorHandler.from_operator(BashOperator)
-        bash_data = oh.dump().data
+        bash_data = oh.dump()
 
         assert bash_data["type"] == "BashOperator"
         assert [p["id"] for p in bash_data["properties"]["parameters"]] == [

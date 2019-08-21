@@ -21,20 +21,37 @@ class OperatorIndex:
         self.custom_operators = custom_operators
         self.operator_list = self.get_operators()
 
-    def get_operators(self):
-        return self.get_default_operators()
-
     def marshall_operator_list(self):
+        """Return a JSON marshalled list of Operators as per OperatorHanlder schema
+        
+        Returns:
+            List[Dict]: List of OperatorHandler Dict - see `schemas.app_schemas.OperatorSchema`
+        """
         handlers = [OperatorHandler.from_operator(o) for o in self.operator_list]
         return [h.dump() for h in handlers]
 
+    def get_operators(self):
+        """Get all default and custom operators
+        
+        Returns:
+            List[Operator]: List of classes that inherit from BaseOperator
+        """
+        return self.get_default_operators()
+
     @staticmethod
     def get_default_operators():
+        """Scrapes operators module for all classes that inherit from the BaseOperator
+        class
+        
+        Returns:
+            List[Operator]: List of Operator classes
+        """
         ops = set()
         for _, modname, _ in pkgutil.iter_modules(operators.__path__):
             try:
                 mod = import_module(f"airflow.operators.{modname}")
             except (ModuleNotFoundError, SyntaxError) as e:
+                # NOTE Some of the HDFS libraries in Airflow don't support Python 3 
                 logging.info(f"Unable to import operator from {modname}: {e}")
 
             ops = ops.union(

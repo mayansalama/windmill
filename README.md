@@ -1,4 +1,4 @@
-#Overview
+# Windmill
 
 Drag'n'drop web app to manage and create Airflow DAGs. The goal is to
 have a Web UI that can generate YML Dag Definitions, integrating with
@@ -24,12 +24,14 @@ synced to a remote repo
 
 ## Back-End Features
 
-- [ ] Generate Operator Lists
+- [x] Generate Operator Lists
+- [ ] CLI to start Web and Front End 
 - [ ] Save/Load Windmill Files functionality
 - [ ] Generate YML Airflow Specs
 - [ ] Integrate with Git
 - [ ] Get default values using inspect.getfullargspec
 - [ ] Allow custom operators
+- [ ] Strategy for Python Opjects (e.g. callables) - maybe import statement?
 - [ ] Backport existing Python DAGs to WMLs
 - [ ] Allow YML updates to propogate to WMLs
 - [ ] Allow user specified Airflow Version

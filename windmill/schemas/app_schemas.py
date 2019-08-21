@@ -3,18 +3,28 @@ import re
 from marshmallow import Schema, fields
 
 
-def validate_parameter_type(typ):
-    VALID_PARAMETER_TYPES = ("dict", "str", "bool", "mapping", "float")
-    VALID_REG_PATTERNS = (r"list\[.*\]",)
+VALID_PARAMETER_TYPES = (
+    "str",
+    "dict",
+    "list",
+    "mapping",
+    "bool",
+    "int",
+    "float",
+    "datetime.timedelta",
+    "datetime.datetime",
+    "callable",
+)
 
-    return typ in VALID_PARAMETER_TYPES or any(
-        [re.match(p, typ) for p in VALID_REG_PATTERNS]
-    )
+
+def validate_parameter_type(typ):
+
+    return typ in VALID_PARAMETER_TYPES
 
 
 class OperatorParameterSchema(Schema):
-    id = fields.Str()
-    type = fields.Str(validator=validate_parameter_type)
+    id = fields.Str(required=True)
+    type = fields.Str(validator=validate_parameter_type, required=True)
     default = fields.Str()
     value = fields.Str()
     description = fields.Str()
@@ -22,7 +32,7 @@ class OperatorParameterSchema(Schema):
 
 class OperatorPropertiesSchema(Schema):
     name = fields.Str()
-    parameters = fields.List(fields.Nested(OperatorParameterSchema()))
+    parameters = fields.List(fields.Nested(OperatorParameterSchema()), required=True)
 
 
 class OperatorSchema(Schema):

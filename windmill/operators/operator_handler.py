@@ -1,11 +1,20 @@
+import logging
 import re
 
-from airflow.operators import BaseOperator, http_operator
+from airflow.operators import BaseOperator
 from docstring_parser import parse
 from marshmallow import MarshalResult, UnmarshalResult
 
-from ..schemas.app_schemas import OperatorSchema, validate_parameter_type
+from ..schemas.app_schemas import (
+    OperatorSchema,
+    validate_parameter_type,
+    VALID_PARAMETER_TYPES,
+)
 from ..utils.exceptions import OperatorMarshallError
+
+
+def fix_types(typ: str):
+    pass
 
 
 def fix_docstring(docs: str):
@@ -30,7 +39,13 @@ def fix_docstring(docs: str):
     type_re = r":type (.*): (.*)"
 
     for param, typ in re.findall(type_re, docs):
+        if typ.lower().startswith("a "):
+            typ = typ[2:]
+        for root in VALID_PARAMETER_TYPES:
+            if typ.startswith(root):
+                typ = root
         if not validate_parameter_type(typ):
+            logging.warning(f"Unable to parse field {typ}")
             typ = "str"
         docs = docs.replace(f":param {param}:", f":param {typ} {param}:")
     return docs
@@ -40,6 +55,8 @@ class OperatorHandler:
     """Handler to translate between Mashall Schemas, Operator Objects and
     dictionaries
     """
+
+    schema = OperatorSchema()
 
     def __init__(self, type: str, properties: dict):
         """Should initialise using the from_marsh or from_operator method
@@ -57,7 +74,7 @@ class OperatorHandler:
         Returns:
             MarshalResult: Named tuple with fields 'data' and 'errors'
         """
-        res = OperatorSchema().dump(self)
+        res = self.schema.dump(self)
         if res.errors:
             raise OperatorMarshallError(f"Error marshalling {self.type}: {res.errors}")
         return res.data
@@ -65,6 +82,7 @@ class OperatorHandler:
     @staticmethod
     def from_operator(operator: BaseOperator.__class__):
         """Instantiate a handler from an Airflow Operator
+
         Arguments:
             operator {BaseOperator} -- Airflow Operator Class
         """
@@ -85,10 +103,25 @@ class OperatorHandler:
         )
 
     @staticmethod
+    def from_dict(d: dict):
+        """[summary]
+        
+        Args:
+            d (dict): Unparsed dict
+        
+        Returns:
+            OperatorHandler: Parsed operator handler
+        """
+        return OperatorHandler.from_marsh(OperatorHandler.schema.load(d))
+
+    @staticmethod
     def from_marsh(res: UnmarshalResult):
         """Instantiate a handler from an Unmarshal Result
 
         Args:
             data (UnmarshalResult): Result from Marshmallow.load
+        
+        Returns:
+            OperatorHandler: Parsed operator handler
         """
         return OperatorHandler(res.data["type"], res.data["properties"])
