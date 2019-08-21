@@ -4,13 +4,17 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-pytest = "*"
 pylint = "*"
+pytest = "<=5.0.1"
+black = "*"
 
 [packages]
-flask-restplus = "*"
-apache-airflow = "*"
+apache-airflow = {version = "==1.10.4", extras=["devel_all"]}
 marshmallow = "*"
+docstring-parser = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.6.9"
+
+[pipenv]
+allow_prereleases = true

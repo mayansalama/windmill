@@ -28,6 +28,7 @@ synced to a remote repo
 - [ ] Save/Load Windmill Files functionality
 - [ ] Generate YML Airflow Specs
 - [ ] Integrate with Git
+- [ ] Get default values using inspect.getfullargspec
 - [ ] Allow custom operators
 - [ ] Backport existing Python DAGs to WMLs
 - [ ] Allow YML updates to propogate to WMLs
