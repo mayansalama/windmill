@@ -34,4 +34,12 @@ synced to a remote repo
 - [ ] Strategy for Python Opjects (e.g. callables) - maybe import statement?
 - [ ] Backport existing Python DAGs to WMLs
 - [ ] Allow YML updates to propogate to WMLs
-- [ ] Allow user specified Airflow Version
+- [ ] Allow user specified Airflow Version - isolate to docker or something so we can run 2.7 if we want?
+
+## Getting Started 
+
+This package can be installed and run using Pip:
+
+```
+pip install git+git://github.com/mayansalama/windmill.git
+```

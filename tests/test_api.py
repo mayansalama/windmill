@@ -1,9 +1,10 @@
+import logging
 from unittest import TestCase
 
 from flask import Response
 
-from ..http.api import endpoints
-from ..operators.operator_handler import OperatorHandler
+from windmill.http.api import endpoints
+from windmill.operators.operator_handler import OperatorHandler
 
 
 class Fixture(TestCase):
@@ -19,6 +20,10 @@ class TestV1Operators(Fixture):
         data = res.get_json()
 
         for operator in data:
-            op = OperatorHandler.from_dict(operator)
-            assert op.type
-            assert op.properties
+            try:
+                op = OperatorHandler.from_dict(operator)
+                assert op.type
+                assert op.properties
+            except Exception as e:
+                logging.info(f"{operator}")
+                raise e

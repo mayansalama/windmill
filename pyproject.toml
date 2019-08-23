@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "windmill"
+version = "0.1.0"
+description = ""
+authors = ["mayansalama <micsalama@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.6"
+apache-airflow = {version = "1.10.4", extras = ["crypto","celery","postgres","hive","jdbc","mysql","ssh"]}
+marshmallow = "^3.0"
+docstring-parser = "^0.3.0"
+
+[tool.poetry.dev-dependencies]
+pylint = "^2.3"
+black = {version = "^18.3-alpha.0", allows-prereleases = true}
+pytest = "5.0.1"
+
+[tool.poetry.scripts]
+windmill = "windmill:bin.cli.run_cli"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

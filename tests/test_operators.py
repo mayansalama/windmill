@@ -3,10 +3,12 @@ import re
 from unittest import TestCase
 
 from airflow.operators.bash_operator import BaseOperator, BashOperator
+from airflow.operators.python_operator import PythonVirtualenvOperator
+from airflow.operators.sensors import S3KeySensor
 
-from ..schemas.app_schemas import OperatorSchema
-from ..operators.operator_handler import fix_docstring, OperatorHandler
-from ..operators.operator_index import OperatorIndex
+from windmill.schemas.app_schemas import OperatorSchema
+from windmill.operators.operator_handler import fix_docstring, OperatorHandler
+from windmill.operators.operator_index import OperatorIndex
 
 
 def test_fix_docstring():
@@ -33,9 +35,7 @@ class TestOperatorMarshalling(TestCase):
 
     def test_dict_to_operator(self):
         operator_data = OperatorSchema().load(self.test_input)
-        self.assertDictEqual(operator_data.data, self.test_input)
-
-        assert not operator_data.errors
+        self.assertDictEqual(operator_data, self.test_input)
 
     def test_marshall_result_to_operator_handler(self):
         operator_data = OperatorSchema().load(self.test_input)
@@ -44,19 +44,17 @@ class TestOperatorMarshalling(TestCase):
 
         marshalled_oh = oh.dump()
 
-        self.assertDictEqual(marshalled_oh, operator_data.data)
+        self.assertDictEqual(marshalled_oh, operator_data)
 
     def test_operator_to_operator_handler(self):
         oh = OperatorHandler.from_operator(BashOperator)
         bash_data = oh.dump()
 
         assert bash_data["type"] == "BashOperator"
-        assert [p["id"] for p in bash_data["properties"]["parameters"]] == [
-            "bash_command",
-            "xcom_push",
-            "env",
-            "output_encoding",
-        ]
+        self.assertListEqual(
+            [p["id"] for p in bash_data["properties"]["parameters"]],
+            ["bash_command", "xcom_push", "env", "output_encoding"],
+        )
 
         # Bash Command is described - check length to minimise fragility
         assert bash_data["properties"]["parameters"][0]["description"]
