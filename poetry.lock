@@ -442,6 +442,14 @@ test = ["pytest (>=3.6.0,<3.9.0 || >3.9.0,<3.9.1 || >3.9.1,<3.9.2 || >3.9.2)", "
 
 [[package]]
 category = "main"
+description = "Minimal, easy-to-use, declarative cli tool"
+name = "decli"
+optional = false
+python-versions = ">=3.6"
+version = "0.5.0"
+
+[[package]]
+category = "main"
 description = "serialize all of python"
 name = "dill"
 optional = false
@@ -554,6 +562,18 @@ version = "1.3.3"
 [package.dependencies]
 Flask = "*"
 Werkzeug = ">=0.12"
+
+[[package]]
+category = "main"
+description = "A Flask extension adding a decorator for CORS support"
+name = "flask-cors"
+optional = false
+python-versions = "*"
+version = "3.0.8"
+
+[package.dependencies]
+Flask = ">=0.9"
+Six = "*"
 
 [[package]]
 category = "main"
@@ -1451,7 +1471,7 @@ docs = ["sphinx"]
 test = ["zope.testrunner"]
 
 [metadata]
-content-hash = "22a83381c72a5fefa03ea12fd8f4716512c8233182f1545d4f963b64329e1074"
+content-hash = "ecb3b66ced702c2a643d72484ff632829d7f56826560cbeb6e4b5c6cd709d84a"
 python-versions = "^3.6"
 
 [metadata.hashes]
@@ -1478,6 +1498,7 @@ colorlog = ["3cf31b25cbc8f86ec01fef582ef3b840950dea414084ed19ab922c8b493f9b42", 
 configparser = ["18873eb33d111429143eef0ad334f76abdf9736d5da1219de513d74b0a559674", "561d6a2303a3e9afaafbaa9f459b2a16e5d49f5390954cd4e6ce1a4bfbd8f726", "adaba55d292e94fac7a1080de30ea776139ea48b65db869659e87357f10c55d2"]
 croniter = ["0d905dbe6f131a910fd3dde792f0129788cd2cb3a8048c5f7aaa212670b0cef2", "538adeb3a7f7816c3cdec6db974c441620d764c25ff4ed0146ee7296b8a50590"]
 cryptography = ["24b61e5fcb506424d3ec4e18bca995833839bf13c59fc43e530e488f28d46b8c", "25dd1581a183e9e7a806fe0543f485103232f940fcfc301db65e630512cce643", "3452bba7c21c69f2df772762be0066c7ed5dc65df494a1d53a58b683a83e1216", "41a0be220dd1ed9e998f5891948306eb8c812b512dc398e5a01846d855050799", "5751d8a11b956fbfa314f6553d186b94aa70fdb03d8a4d4f1c82dcacf0cbe28a", "5f61c7d749048fa6e3322258b4263463bfccefecb0dd731b6561cb617a1d9bb9", "72e24c521fa2106f19623a3851e9f89ddfdeb9ac63871c7643790f872a305dfc", "7b97ae6ef5cba2e3bb14256625423413d5ce8d1abb91d4f29b6d1a081da765f8", "961e886d8a3590fd2c723cf07be14e2a91cf53c25f02435c04d39e90780e3b53", "96d8473848e984184b6728e2c9d391482008646276c3ff084a1bd89e15ff53a1", "ae536da50c7ad1e002c3eee101871d93abdc90d9c5f651818450a0d3af718609", "b0db0cecf396033abb4a93c95d1602f268b3a68bb0a9cc06a7cff587bb9a7292", "cfee9164954c186b191b91d4193989ca994703b2fff406f71cf454a2d3c7327e", "e6347742ac8f35ded4a46ff835c60e68c22a536a8ae5c4422966d06946b6d4c6", "f27d93f0139a3c056172ebb5d4f9056e770fdf0206c2f422ff2ebbad142e09ed", "f57b76e46a58b63d1c6375017f4564a28f19a5ca912691fd2e4261b3414b618d"]
+decli = ["aff64ceb222b089d18038529ef8d6983aa220bd77ee97a23717dbb864b0cf719", "d115345961973dcca812a2100e0f0241bc344f4bcd04a01d0213708d1692e229"]
 dill = ["f6d6046f9f9195206063dd0415dff185ad593d6ee8b0e67f12597c0f4df4986f"]
 docstring-parser = ["06e012a6e4410427423d401928709f5b10f1bd3f07d947c5dc5a27aa86df272e"]
 docutils = ["6c4f696463b79f1fb8ba0c594b63840ebd41f059e92b31957c46b74a4599b6d0", "9e4d7ecfc600058e07ba661411a2b7de2fd0fafa17d1a7f7361cd47b1175c827", "a2aeea129088da402665e92e0b25b04b073c04b2dce4ab65caaa38b7ce2e1a99"]
@@ -1487,6 +1508,7 @@ flask-admin = ["ca0be6ec11a6913b73f656c65c444ae5be416c57c75638dd3199376ce6bc7422
 flask-appbuilder = ["f48f0fae0a51811f5643c94558a4c83ed7758246575e61bf93e23cb72a66a79d"]
 flask-babel = ["316ad183e42003f3922957fa643d0a1e8e34a0f0301a88c3a8f605bc37ba5c86"]
 flask-caching = ["21236d2b4567deb9fc95e474a604602097189e834629c24f4d62937abc963636", "5af1759e5ae3424abec918537f0201a1476ae9442452bcb5c8787468a9de0f5a"]
+flask-cors = ["72170423eb4612f0847318afff8c247b38bd516b7737adfc10d1c2cdbb382d16", "f4d97201660e6bbcff2d89d082b5b6d31abee04b1b3003ee073a6fd25ad1d69a"]
 flask-login = ["c815c1ac7b3e35e2081685e389a665f2c74d7e077cb93cecabaea352da4752ec"]
 flask-openid = ["5a8ffe1c8c0ad1cc1f5030e1223ea27f8861ee0215a2a58a528cc61379e5ccab"]
 flask-sqlalchemy = ["0c9609b0d72871c540a7945ea559c8fdf5455192d2db67219509aed680a3d45a", "8631bbea987bc3eb0f72b1f691d47bd37ceb795e73b59ab48586d76d75a7c605"]

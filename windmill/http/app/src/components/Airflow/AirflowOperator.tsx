@@ -13,9 +13,26 @@ const Outer = styled.div`
   }
 `;
 
+const DefaultPorts = {
+  port1: {
+    id: "port1",
+    type: "top",
+    properties: {
+      custom: "property"
+    }
+  },
+  port2: {
+    id: "port1",
+    type: "bottom",
+    properties: {
+      custom: "property"
+    }
+  }
+};
+
 export interface IAirflowOperatorParameter {
   id: string;
-  type: "str" | "bool" | "dict";
+  type: "str" | "bool" | "dict" | "list";
   value?: string;
   default?: string;
   tooltip?: string;
@@ -29,8 +46,8 @@ export interface IAirflowOperatorProperties {
 
 export interface IAirflowOperator {
   type: string;
-  ports: INode["ports"];
   properties: IAirflowOperatorProperties;
+  ports?: INode["ports"];
 }
 
 export const AirflowOperator = ({
@@ -38,6 +55,9 @@ export const AirflowOperator = ({
   ports,
   properties
 }: IAirflowOperator) => {
+  if (!ports) {
+    ports = DefaultPorts;
+  }
   return (
     <Outer
       draggable={true}

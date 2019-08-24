@@ -117,6 +117,9 @@ export class RenderedAirflowParameterAsForm extends React.Component<{
       case "dict": {
         return <p>Dict Not Implemented Yet</p>;
       }
+      case "list": {
+        return <p>List Not Implemented Yet</p>;
+      }
     }
   }
 }
@@ -168,7 +171,7 @@ export class RenderedAirflowOperatorAsForm extends React.Component<{
                   return [
                     <RenderedAirflowParameterAsForm
                       params={p}
-                      key={`${p.id}-i`}
+                      key={`${p.id}-${i}`}
                       updateFunc={this.handleChange}
                       index={i}
                     />

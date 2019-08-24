@@ -9,10 +9,16 @@ export class AirflowPanel extends React.Component<{
     return (
       <BaseSidebar>
         <SidebarTitle>Operator Library</SidebarTitle>
-        {[].concat(
-          ...this.props.operators.map((operator: IAirflowOperator) => (
-            <AirflowOperator {...operator} />
-          ))
+        {this.props.operators ? (
+          [].concat(
+            ...this.props.operators.map(
+              (operator: IAirflowOperator, i: Number) => (
+                <AirflowOperator {...operator} key={`${operator.type}-${i}`} />
+              )
+            )
+          )
+        ) : (
+          <p>Loading operators...</p>
         )}
       </BaseSidebar>
     );

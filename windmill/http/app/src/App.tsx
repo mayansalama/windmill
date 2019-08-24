@@ -1,25 +1,26 @@
 import {
   FlowChart,
-  IChart,
-  ICanvasOuterDefaultProps
+  ICanvasOuterDefaultProps,
+  IChart
 } from "@mrblenny/react-flow-chart";
 import * as actions from "@mrblenny/react-flow-chart/src/container/actions";
-import { cloneDeep, mapValues } from "lodash";
 import * as localStorage from "local-storage";
+import { cloneDeep, mapValues } from "lodash";
 import * as React from "react";
 import { render } from "react-dom";
 import styled from "styled-components";
+import { APIClient } from "./ApiClient";
 import {
   AirflowNode,
   AirflowPanel,
-  IAirflowOperatorProperties,
   DropdownNavbar,
+  IAirflowOperator,
+  IAirflowOperatorProperties,
   Page,
   ResizablePanel,
   SelectedSidebar
 } from "./components";
 import * as MenuItems from "./components/Navbar/NavbarDropdowns";
-import { dummyOperators } from "./misc/exampleAirflowOperators";
 import { emptyChart } from "./misc/exampleChartState";
 import { Icon } from "./misc/icon";
 
@@ -56,14 +57,28 @@ const CanvasStyle = styled.div<ICanvasOuterDefaultProps>`
 
 export interface IAppState extends IChart {
   // The AppState has to extend, not include, the IChart or the dragndrop breaks (not sure why)
+  operators?: IAirflowOperator[];
 }
 
 class App extends React.Component<{}, IAppState> {
+  apiClient = new APIClient();
+
   constructor(props) {
     super(props);
     this.state = localStorage.get("windmillChart") || cloneDeep(emptyChart);
 
     this.updateNodeProperties = this.updateNodeProperties.bind(this);
+  }
+
+  public componentDidMount() {
+    if (this.operators.length == 0) {
+      this.apiClient.getOperators().then(data => {
+        this.setState(prevState => ({
+          ...prevState,
+          operators: data
+        }));
+      });
+    }
   }
 
   public componentDidUpdate() {
@@ -95,6 +110,10 @@ class App extends React.Component<{}, IAppState> {
     ]
   };
 
+  public get operators(): IAirflowOperator[] {
+    return this.state.operators;
+  }
+
   public updateNodeProperties(
     key: string,
     newProps: IAirflowOperatorProperties
@@ -123,7 +142,7 @@ class App extends React.Component<{}, IAppState> {
         </Page>
         <Page>
           <ResizablePanel>
-            <AirflowPanel operators={dummyOperators} />
+            <AirflowPanel operators={this.operators} />
             <Content>
               <FlowChart
                 chart={this.state}

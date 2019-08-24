@@ -11,7 +11,7 @@ export const Sidebar = styled.div`
   flex: 1 1 auto;
   overflow: hidden;
   border-radius: 20px;
-  border: 1px 
+  border: 1px;
 `;
 
 const BurgerSplit = styled.div`

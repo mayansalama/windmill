@@ -10,6 +10,8 @@ python = "^3.6"
 apache-airflow = {version = "1.10.4", extras = ["crypto","celery","postgres","hive","jdbc","mysql","ssh"]}
 marshmallow = "^3.0"
 docstring-parser = "^0.3.0"
+decli = "^0.5.0"
+flask-cors = "^3.0.8"
 
 [tool.poetry.dev-dependencies]
 pylint = "^2.3"
