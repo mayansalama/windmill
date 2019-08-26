@@ -1,4 +1,5 @@
-import logging.config
+import os
+import subprocess
 from copy import deepcopy
 
 from decli import cli
@@ -8,6 +9,11 @@ from ..http.api.endpoints import app
 
 def start_backend(port, **kwargs):
     app.run(port=port)
+
+
+def start_frontend(**kwargs):
+    wd = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "http", "app"))
+    subprocess.Popen(["npm", "start"], cwd=wd)
 
 
 cli_spec = {
@@ -22,7 +28,13 @@ cli_spec = {
                 "help": "Starts the backend flask server",
                 "func": start_backend,
                 "arguments": [{"name": "--port", "default": 8000, "type": int}],
-            }
+            },
+            {
+                "name": "start-frontend",
+                "help": "Starts the frontend react server",
+                "func": start_frontend,
+                "arguments": [],
+            },
         ],
     },
 }

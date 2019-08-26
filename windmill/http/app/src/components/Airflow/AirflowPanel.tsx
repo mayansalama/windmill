@@ -1,6 +1,6 @@
 import * as React from "react";
 import styled from "styled-components";
-import { FaSync, FaCaretDown, FaCaretRight } from "react-icons/fa";
+import { FaSync, FaCaretDown, FaCaretRight, FaSearch } from "react-icons/fa";
 import { AirflowOperator, IAirflowOperator } from ".";
 import { SidebarTitle, BaseSidebar, Theme } from "../Theme";
 
@@ -54,6 +54,27 @@ const DropdownTitle = styled.div`
   }
 `;
 
+const SearchDiv = styled.div`
+  border: 1px solid ${Theme.colors.lightAccent};
+  display: flex;
+  flex-direction: row;
+`;
+
+const SearchBar = styled.input`
+  margin: 10px 20px;
+  padding: 7px;
+  border: 1px solid ${Theme.colors.brand};
+  border-radius: 3px;
+  &:hover {
+    background: ${Theme.colors.light};
+  }
+`;
+
+const SearchIcon = styled.div`
+  color: ${Theme.colors.brand};
+  margin: 20px 0px;
+`;
+
 const ModuleDiv = styled.div`
   flex: 1;
   overflow-y: scroll;
@@ -84,21 +105,25 @@ class AirflowModule extends React.Component<{
   }
 
   public render() {
-    return this.isOpen ? (
-      <div>
-        <DropdownTitle onClick={this.handleFoldUp}>
-          <FaCaretDown />
-          {this.props.moduleName}
-        </DropdownTitle>
-        {this.props.children}
-      </div>
+    return React.Children.toArray(this.props.children).length === 1 ? (
+      this.isOpen ? (
+        <div>
+          <DropdownTitle onClick={this.handleFoldUp}>
+            <FaCaretDown />
+            {this.props.moduleName}
+          </DropdownTitle>
+          {this.props.children}
+        </div>
+      ) : (
+        <div>
+          <DropdownTitle onClick={this.handleDropDown}>
+            <FaCaretRight />
+            {this.props.moduleName}
+          </DropdownTitle>
+        </div>
+      )
     ) : (
-      <div>
-        <DropdownTitle onClick={this.handleDropDown}>
-          <FaCaretRight />
-          {this.props.moduleName}
-        </DropdownTitle>
-      </div>
+      <div />
     );
   }
 }
@@ -110,22 +135,33 @@ export class AirflowPanel extends React.Component<
   },
   {
     openComponent: AirflowModule;
+    searchValue: string;
   }
 > {
   public constructor(props) {
     super(props);
 
+    this.handleSearch = this.handleSearch.bind(this);
     this.handleRefresh = this.handleRefresh.bind(this);
     this.isModuleOpen = this.isModuleOpen.bind(this);
     this.setOpenModule = this.setOpenModule.bind(this);
   }
 
   state = {
-    openComponent: null
+    openComponent: null,
+    searchValue: " "
   };
 
   public handleRefresh() {
     this.props.refreshOperators();
+  }
+
+  public handleSearch(event: React.ChangeEvent<HTMLInputElement>) {
+    const val = event.target.value;
+    this.setState(prevState => ({
+      ...prevState,
+      searchValue: val
+    }));
   }
 
   public isModuleOpen(moduleComponent: AirflowModule) {
@@ -156,6 +192,15 @@ export class AirflowPanel extends React.Component<
             </RefreshButton>
           </RefreshSplit>
         </SidebarTitle>
+        <SearchDiv>
+          <SearchBar
+            placeholder={"Search operators"}
+            onChange={this.handleSearch}
+          />
+          <SearchIcon>
+            <FaSearch />
+          </SearchIcon>
+        </SearchDiv>
         <ModuleDiv>
           {this.props.operators ? (
             [].concat(
@@ -171,6 +216,12 @@ export class AirflowPanel extends React.Component<
                         (operator: IAirflowOperator) =>
                           prettyName(operator.properties.module) == mod
                       )
+                      // .filter(
+                      //   (operator: IAirflowOperator) =>
+                      //     operator.properties.module.search(
+                      //       this.state.searchValue
+                      //     ) != -1
+                      // )
                       .map((operator: IAirflowOperator, i: Number) => (
                         <AirflowOperator
                           {...operator}
