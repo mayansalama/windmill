@@ -8,8 +8,6 @@ const Outer = styled.div`
   padding: 10px 10px;
   font-size: ${Theme.fonts.normalSize};
   background: white;
-  /* margin: 1px 5px; */
-  /* background: ${Theme.colors.lightAccent}; */
   border: 1px solid ${Theme.colors.lightAccent};
   cursor: move;
   &:hover {

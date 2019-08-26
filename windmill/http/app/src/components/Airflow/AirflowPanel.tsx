@@ -5,7 +5,10 @@ import { AirflowOperator, IAirflowOperator } from ".";
 import { SidebarTitle, BaseSidebar, Theme } from "../Theme";
 
 const RefreshSplit = styled.div`
-  min-width: 250px;
+  /* min-width: 250px; */
+  /* display: flex; */
+  min-width: 100%;
+  /* flex-direction: row; */
 `;
 
 const RefreshText = styled.div`
@@ -15,6 +18,7 @@ const RefreshText = styled.div`
 const RefreshButton = styled.div`
   color: ${Theme.colors.brand};
   border-radius: 20px;
+  margin-right: 5px;
   float: right;
   transition: 0.3s ease all;
   cursor: pointer;
@@ -25,21 +29,6 @@ const RefreshButton = styled.div`
     background: #5682d2;
   }
 `;
-
-const distinct = (value, index, self) => {
-  return self.indexOf(value) === index;
-};
-
-const prettyName = (name: string) => {
-  return name
-    .split(".")
-    .pop()
-    .split("_")
-    .map((val: string) =>
-      "".concat(val.slice(0, 1).toUpperCase(), val.slice(1))
-    )
-    .join(" ");
-};
 
 const DropdownTitle = styled.div`
   padding: 10px 10px;
@@ -61,7 +50,8 @@ const SearchDiv = styled.div`
 `;
 
 const SearchBar = styled.input`
-  margin: 10px 20px;
+  margin: 10px 20px 10px 10px;
+  width: 100%;
   padding: 7px;
   border: 1px solid ${Theme.colors.brand};
   border-radius: 3px;
@@ -72,13 +62,48 @@ const SearchBar = styled.input`
 
 const SearchIcon = styled.div`
   color: ${Theme.colors.brand};
-  margin: 20px 0px;
+  margin: 20px 20px 20px 0px;
 `;
 
 const ModuleDiv = styled.div`
   flex: 1;
   overflow-y: scroll;
 `;
+
+const distinct = (value, index, self) => {
+  return self.indexOf(value) === index;
+};
+
+const prettyName = (name: string) => {
+  return name
+    .split(".")
+    .pop()
+    .split("_")
+    .map((val: string) =>
+      "".concat(val.slice(0, 1).toUpperCase(), val.slice(1))
+    )
+    .join(" ");
+};
+
+const cleanModuleName = (str: string) => {
+  str = str.replace(" ", "");
+  str = str.replace("_", "");
+  return str;
+};
+
+const filterModules = (operator: IAirflowOperator, searchTerm: string) => {
+  // Returns true if an operator should be displayed for a given search term
+
+  searchTerm = cleanModuleName(searchTerm);
+  return (
+    cleanModuleName(operator.properties.module)
+      .toLowerCase()
+      .indexOf(searchTerm.toLowerCase()) >= 0 ||
+    cleanModuleName(operator.type)
+      .toLowerCase()
+      .indexOf(searchTerm.toLowerCase()) >= 0
+  );
+};
 
 class AirflowModule extends React.Component<{
   moduleName: string;
@@ -105,7 +130,8 @@ class AirflowModule extends React.Component<{
   }
 
   public render() {
-    return React.Children.toArray(this.props.children).length === 1 ? (
+    return React.Children.toArray(this.props.children).length >= 1 ? (
+      // return true ? (
       this.isOpen ? (
         <div>
           <DropdownTitle onClick={this.handleFoldUp}>
@@ -149,7 +175,7 @@ export class AirflowPanel extends React.Component<
 
   state = {
     openComponent: null,
-    searchValue: " "
+    searchValue: ""
   };
 
   public handleRefresh() {
@@ -165,7 +191,9 @@ export class AirflowPanel extends React.Component<
   }
 
   public isModuleOpen(moduleComponent: AirflowModule) {
-    return moduleComponent === this.state.openComponent;
+    return this.state.searchValue.length > 0
+      ? true
+      : moduleComponent === this.state.openComponent;
   }
 
   public setOpenModule(moduleComponent: AirflowModule) {
@@ -204,33 +232,38 @@ export class AirflowPanel extends React.Component<
         <ModuleDiv>
           {this.props.operators ? (
             [].concat(
-              ...this.getModules().map((mod: string) => (
-                <AirflowModule
-                  moduleName={mod}
-                  isModuleOpen={this.isModuleOpen}
-                  setModule={this.setOpenModule}
-                >
-                  {[].concat(
-                    ...this.props.operators
-                      .filter(
-                        (operator: IAirflowOperator) =>
-                          prettyName(operator.properties.module) == mod
-                      )
-                      // .filter(
-                      //   (operator: IAirflowOperator) =>
-                      //     operator.properties.module.search(
-                      //       this.state.searchValue
-                      //     ) != -1
-                      // )
-                      .map((operator: IAirflowOperator, i: Number) => (
-                        <AirflowOperator
-                          {...operator}
-                          key={`${operator.type}-${i}`}
-                        />
-                      ))
-                  )}
-                </AirflowModule>
-              ))
+              ...this.getModules()
+                .sort()
+                .map((mod: string) => (
+                  <AirflowModule
+                    moduleName={mod}
+                    isModuleOpen={this.isModuleOpen}
+                    setModule={this.setOpenModule}
+                  >
+                    {[].concat(
+                      ...this.props.operators
+                        .filter(
+                          //Operators are grouped by module name
+                          (operator: IAirflowOperator) =>
+                            prettyName(operator.properties.module) == mod
+                        )
+                        .filter(
+                          //Only return results expected by search value
+                          (operator: IAirflowOperator) =>
+                            filterModules(operator, this.state.searchValue)
+                        )
+                        .sort((a: IAirflowOperator, b: IAirflowOperator) =>
+                          a.type < b.type ? -1 : a.type > b.type ? 1 : 0
+                        )
+                        .map((operator: IAirflowOperator, i: Number) => (
+                          <AirflowOperator
+                            {...operator}
+                            key={`${operator.type}-${i}`}
+                          />
+                        ))
+                    )}
+                  </AirflowModule>
+                ))
             )
           ) : (
             <p>Loading operators...</p>
