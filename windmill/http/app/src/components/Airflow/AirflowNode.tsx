@@ -114,12 +114,8 @@ export class RenderedAirflowParameterAsForm extends React.Component<{
           </tr>
         );
       }
-      case "dict": {
-        return <p>Dict Not Implemented Yet</p>;
-      }
-      case "list": {
-        return <p>List Not Implemented Yet</p>;
-      }
+      default:
+        return <p>{this.params.type} is not Implemented Yet</p>
     }
   }
 }

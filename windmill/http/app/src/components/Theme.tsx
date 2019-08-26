@@ -31,6 +31,6 @@ export const SidebarTitle = styled.div`
 export const BaseSidebar = styled.div`
   display: flex;
   flex-direction: column;
-  flex: 1 1 auto;
+  height: 100%;
   overflow: hidden;
 `;

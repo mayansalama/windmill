@@ -51,6 +51,7 @@ class TestOperatorMarshalling(TestCase):
         bash_data = oh.dump()
 
         assert bash_data["type"] == "BashOperator"
+        assert bash_data["properties"]["module"] == "airflow.operators.bash_operator"
         self.assertListEqual(
             [p["id"] for p in bash_data["properties"]["parameters"]],
             ["bash_command", "xcom_push", "env", "output_encoding"],

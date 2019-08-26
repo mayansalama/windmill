@@ -10,7 +10,6 @@ const PanelContainer = styled.div`
   margin: 0px;
   max-width: 100vw;
   max-height: 100vh;
-  overflow: hidden;
   box-sizing: border-box;
   font-family: sans-serif;
 `;

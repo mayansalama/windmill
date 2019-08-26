@@ -56,7 +56,6 @@ const CanvasStyle = styled.div<ICanvasOuterDefaultProps>`
 ` as any;
 
 export interface IAppState extends IChart {
-  // The AppState has to extend, not include, the IChart or the dragndrop breaks (not sure why)
   operators?: IAirflowOperator[];
 }
 
@@ -68,16 +67,12 @@ class App extends React.Component<{}, IAppState> {
     this.state = localStorage.get("windmillChart") || cloneDeep(emptyChart);
 
     this.updateNodeProperties = this.updateNodeProperties.bind(this);
+    this.refreshOperators = this.refreshOperators.bind(this);
   }
 
   public componentDidMount() {
     if (this.operators.length == 0) {
-      this.apiClient.getOperators().then(data => {
-        this.setState(prevState => ({
-          ...prevState,
-          operators: data
-        }));
-      });
+      this.refreshOperators();
     }
   }
 
@@ -109,6 +104,15 @@ class App extends React.Component<{}, IAppState> {
       }
     ]
   };
+
+  public refreshOperators() {
+    this.apiClient.getOperators().then(data => {
+      this.setState(prevState => ({
+        ...prevState,
+        operators: data
+      }));
+    });
+  }
 
   public get operators(): IAirflowOperator[] {
     return this.state.operators;
@@ -142,7 +146,10 @@ class App extends React.Component<{}, IAppState> {
         </Page>
         <Page>
           <ResizablePanel>
-            <AirflowPanel operators={this.operators} />
+            <AirflowPanel
+              operators={this.operators}
+              refreshOperators={this.refreshOperators}
+            />
             <Content>
               <FlowChart
                 chart={this.state}

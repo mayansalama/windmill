@@ -1,12 +1,16 @@
 import * as React from "react";
 import styled from "styled-components";
+import { FaWindowMaximize } from "react-icons/fa";
 import { INode, REACT_FLOW_CHART } from "@mrblenny/react-flow-chart";
 import { Theme } from "../Theme";
 
 const Outer = styled.div`
-  padding: 20px 30px;
+  padding: 10px 10px;
   font-size: ${Theme.fonts.normalSize};
   background: white;
+  /* margin: 1px 5px; */
+  /* background: ${Theme.colors.lightAccent}; */
+  border: 1px solid ${Theme.colors.lightAccent};
   cursor: move;
   &:hover {
     box-shadow: 2px 5px 10px rgba(0, 0, 0, 0.1) inset;
@@ -32,16 +36,30 @@ const DefaultPorts = {
 
 export interface IAirflowOperatorParameter {
   id: string;
-  type: "str" | "bool" | "dict" | "list";
+  type:
+    | "str"
+    | "bool"
+    | "dict"
+    | "list"
+    | "str"
+    | "dict"
+    | "list"
+    | "mapping"
+    | "bool"
+    | "int"
+    | "float"
+    | "datetime.timedelta"
+    | "datetime.datetime";
   value?: string;
   default?: string;
-  tooltip?: string;
+  description?: string;
 }
 
 export interface IAirflowOperatorProperties {
   name?: string;
   parameters?: Array<IAirflowOperatorParameter>;
   description?: string;
+  module?: string;
 }
 
 export interface IAirflowOperator {
@@ -68,6 +86,8 @@ export const AirflowOperator = ({
         );
       }}
     >
+      <FaWindowMaximize />
+      {" "}
       {type}
     </Outer>
   );

@@ -12,8 +12,8 @@ synced to a remote repo
 
 - [x] Dynamic Operators
 - [x] Menu Dropdowns
-- [ ] Load Operators from App
-- [ ] Format operator display into classes
+- [x] Load Operators from App
+- [x] Format operator display into classes
 - [ ] Search functionality for operators
 - [ ] Implement DAG level properties
 - [ ] Render arbitrary viewport windows for New/Save/Load etc
@@ -25,15 +25,17 @@ synced to a remote repo
 ## Back-End Features
 
 - [x] Generate Operator Lists
-- [ ] CLI to start Web and Front End 
+- [x] CLI to start Web and Front End 
 - [ ] Save/Load Windmill Files functionality
-- [ ] Generate YML Airflow Specs
+- [ ] Generate YML Airflow Specs 
 - [ ] Integrate with Git
 - [ ] Get default values using inspect.getfullargspec
+- [ ] Pull parameters from parent classes 
+- [ ] Dedupe multi import operators
 - [ ] Allow custom operators
 - [ ] Strategy for Python Opjects (e.g. callables) - maybe import statement?
 - [ ] Backport existing Python DAGs to WMLs
-- [ ] Allow YML updates to propogate to WMLs
+- [ ] Allow YML updates to propogate to WMLs 
 - [ ] Allow user specified Airflow Version - isolate to docker or something so we can run 2.7 if we want?
 
 ## Getting Started 

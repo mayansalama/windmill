@@ -13,12 +13,10 @@ VALID_PARAMETER_TYPES = (
     "float",
     "datetime.timedelta",
     "datetime.datetime",
-    "callable",
 )
 
 
 def validate_parameter_type(typ):
-
     return typ in VALID_PARAMETER_TYPES
 
 
@@ -32,6 +30,8 @@ class OperatorParameterSchema(Schema):
 
 class OperatorPropertiesSchema(Schema):
     name = fields.Str()
+    module = fields.Str()
+    description = fields.Str()
     parameters = fields.List(fields.Nested(OperatorParameterSchema()), required=True)
 
 

@@ -88,8 +88,13 @@ class OperatorHandler:
             operator {BaseOperator} -- Airflow Operator Class
         """
         doc_string = operator.__doc__
-        if not doc_string and BaseOperator not in operator.__bases__:
+        parent_classes = operator.__bases__
+
+        # Some of the sensors inherit fron themselves for some reason
+        if not doc_string and BaseOperator not in parent_classes:
             doc_string = operator.__bases__[0].__doc__
+
+        # TODO: Grab parent class properties
 
         if doc_string:
             fixed_docs = fix_docstring(doc_string)
@@ -97,6 +102,8 @@ class OperatorHandler:
             return OperatorHandler(
                 operator.__name__,
                 {
+                    "module": operator.__module__,
+                    "description": docs.long_description,
                     "parameters": [
                         {
                             "id": p.arg_name,
@@ -104,11 +111,13 @@ class OperatorHandler:
                             "description": p.description,
                         }
                         for p in docs.params
-                    ]
+                    ],
                 },
             )
         else:
-            raise OperatorMarshallError(f"Unable to parse docstring for class {operator}")
+            raise OperatorMarshallError(
+                f"Unable to parse docstring for class {operator}"
+            )
 
     @staticmethod
     def from_dict(d: dict):
