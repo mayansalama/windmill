@@ -12,6 +12,10 @@ export class APIClient {
     return this.perform("GET", "/v1/operators");
   }
 
+  public getDagSpec() {
+    return this.perform("GET", "/v1/dag")
+  }
+
   async perform(method: Method, resource: string, data?: any) {
     return client({
       method,

@@ -115,12 +115,18 @@ class Dropdown extends React.Component<
 }
 
 interface IDropdown {
-  getAppState: Function;
+  getApp: Function;
 }
 
 export class FileDropdown extends React.Component<IDropdown> {
+  constructor(props) {
+    super(props);
+
+    this.handleNew = this.handleNew.bind(this);
+  }
+
   public handleNew() {
-    alert("new is not implemented");
+    this.props.getApp().newDag();
   }
 
   public handleOpen() {
@@ -143,8 +149,8 @@ export class FileDropdown extends React.Component<IDropdown> {
 }
 
 export class ViewDropdown extends React.Component<IDropdown> {
-  public handleDagState(getAppState: Function) {
-    console.log(getAppState());
+  public handleDagState(getApp: Function) {
+    console.log(getApp().state);
   }
 
   public render() {
@@ -154,7 +160,7 @@ export class ViewDropdown extends React.Component<IDropdown> {
         items={[
           {
             title: "Log DagState",
-            callback: () => this.handleDagState(this.props.getAppState)
+            callback: () => this.handleDagState(this.props.getApp)
           }
         ]}
       />
@@ -163,8 +169,8 @@ export class ViewDropdown extends React.Component<IDropdown> {
 }
 
 export class HelpDropdown extends React.Component<IDropdown> {
-  public handleAbout(getAppState: Function) {
-    console.log(getAppState());
+  public handleAbout() {
+    console.log("About?");
   }
 
   public render() {
@@ -174,7 +180,7 @@ export class HelpDropdown extends React.Component<IDropdown> {
         items={[
           {
             title: "About",
-            callback: () => this.handleAbout(this.props.getAppState)
+            callback: () => this.handleAbout()
           }
         ]}
       />

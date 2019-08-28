@@ -6,7 +6,7 @@ import { INodeInnerDefaultProps, INode } from "@mrblenny/react-flow-chart";
 import { Theme } from "../Theme";
 import { IAirflowOperatorParameter, IAirflowOperatorProperties } from ".";
 
-const Outer = styled.div`
+export const Outer = styled.div`
   border: 1px solid ${Theme.colors.lightAccent};
   padding: 15px;
   display: flex;
@@ -21,7 +21,7 @@ const Tooltip = styled.div`
   color: ${Theme.colors.darkAccent};
 `;
 
-const SectionTitle = styled.div`
+export const SectionTitle = styled.div`
   padding: 8px 4px;
   font-size: ${Theme.fonts.subHeadingSize};
   color: ${Theme.colors.darkAccent};
@@ -32,12 +32,12 @@ const OperatorNameStyle = css`
   border-radius: 3px;
 `;
 
-const OperatorName = styled.div`
+const Name = styled.div`
   ${OperatorNameStyle}
   padding: 3px;
 `;
 
-const OperatorInput = styled.input`
+const NameInput = styled.input`
   padding: 7px;
   border: 1px solid ${Theme.colors.brand};
   &:hover {
@@ -46,7 +46,7 @@ const OperatorInput = styled.input`
   ${OperatorNameStyle}
 `;
 
-const OperatorType = styled.div`
+export const Type = styled.div`
   float: right;
   font-size: ${Theme.fonts.normalSize};
   font-style: italic;
@@ -323,9 +323,9 @@ export class RenderedAirflowParametersAsForm extends React.Component<{
         <Outer>
           <div>
             <Tooltip>Name</Tooltip>
-            <OperatorType>{this.props.type}</OperatorType>
+            <Type>{this.props.type}</Type>
           </div>
-          <OperatorInput
+          <NameInput
             placeholder="Input name.."
             type={"text"}
             value={this.props.operatorProps.name || ""}
@@ -367,7 +367,7 @@ export const AirflowNode = ({ node }: IAirflowNodeDefaultProps) => {
   return (
     <Outer>
       <Tooltip>{node.type}</Tooltip>
-      <OperatorName>{node.properties.name || "Unnamed"}</OperatorName>
+      <Name>{node.properties.name || "Unnamed"}</Name>
     </Outer>
   );
 };

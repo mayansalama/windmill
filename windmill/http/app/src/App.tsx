@@ -10,6 +10,7 @@ import { CanvasStyle } from "./components/Theme";
 import {
   AirflowNode,
   DropdownNavbar,
+  IAirflowDag,
   IAirflowOperator,
   IAirflowOperatorProperties,
   NavbarPage,
@@ -19,7 +20,7 @@ import {
   SelectedSidebar
 } from "./components";
 import * as MenuItems from "./components/Navbar/NavbarDropdowns";
-import { defaultChart, IAppState } from "./misc/defaultChartState";
+import { defaultChart } from "./misc/defaultChartState";
 import { Icon } from "./misc/icon";
 
 const AppLayout = styled.div`
@@ -37,6 +38,11 @@ const Content = styled.div`
   overflow: hidden;
 `;
 
+export interface IAppState extends IChart {
+  operators?: IAirflowOperator[];
+  dag?: IAirflowDag;
+}
+
 class App extends React.Component<{}, IAppState> {
   apiClient = new APIClient();
 
@@ -44,13 +50,19 @@ class App extends React.Component<{}, IAppState> {
     super(props);
     this.state = localStorage.get("windmillChart") || cloneDeep(defaultChart);
 
+    this.newDag = this.newDag.bind(this);
     this.updateNodeProperties = this.updateNodeProperties.bind(this);
+    this.updateDag = this.updateDag.bind(this);
     this.refreshOperators = this.refreshOperators.bind(this);
+    this.refreshDag = this.refreshDag.bind(this);
   }
 
   public componentDidMount() {
     if (this.operators.length == 0) {
       this.refreshOperators();
+    }
+    if (!this.dag) {
+      this.refreshDag();
     }
   }
 
@@ -64,24 +76,24 @@ class App extends React.Component<{}, IAppState> {
     dropdownHandlers: [
       {
         name: "File",
-        callback: () => (
-          <MenuItems.FileDropdown getAppState={() => this.state} />
-        )
+        callback: () => <MenuItems.FileDropdown getApp={() => this} />
       },
       {
         name: "View",
-        callback: () => (
-          <MenuItems.ViewDropdown getAppState={() => this.state} />
-        )
+        callback: () => <MenuItems.ViewDropdown getApp={() => this} />
       },
       {
         name: "Help",
-        callback: () => (
-          <MenuItems.HelpDropdown getAppState={() => this.state} />
-        )
+        callback: () => <MenuItems.HelpDropdown getApp={() => this} />
       }
     ]
   };
+
+  public newDag() {
+    this.setState({
+      ...defaultChart
+    });
+  }
 
   public refreshOperators() {
     this.apiClient.getOperators().then(data => {
@@ -92,8 +104,21 @@ class App extends React.Component<{}, IAppState> {
     });
   }
 
+  public refreshDag() {
+    this.apiClient.getDagSpec().then(data => {
+      this.setState(prevState => ({
+        ...prevState,
+        dag: data
+      }));
+    });
+  }
+
   public get operators(): IAirflowOperator[] {
     return this.state.operators;
+  }
+
+  public get dag(): IAirflowDag {
+    return this.state.dag;
   }
 
   public updateNodeProperties(
@@ -112,6 +137,13 @@ class App extends React.Component<{}, IAppState> {
     }));
   }
 
+  public updateDag(newProps: IAirflowDag) {
+    this.setState(prevState => ({
+      ...prevState,
+      dag: newProps
+    }));
+  }
+
   public render() {
     const stateActions = mapValues(actions, (func: any) => (...args: any) =>
       this.setState(func(...args))
@@ -125,9 +157,10 @@ class App extends React.Component<{}, IAppState> {
         <Page>
           <ResizablePanel>
             <SelectedSidebar
-              chart={this.state}
+              appState={this.state}
               onDeleteKey={stateActions.onDeleteKey}
               updateNodeProps={this.updateNodeProperties}
+              updateDag={this.updateDag}
             />
             <Content>
               <FlowChart

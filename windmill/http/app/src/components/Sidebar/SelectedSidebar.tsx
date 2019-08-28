@@ -1,8 +1,9 @@
 import * as React from "react";
 import styled from "styled-components";
-import { IChart, ISelectedOrHovered } from "@mrblenny/react-flow-chart";
-import { IAirflowNode, AirflowNodeForm } from "../";
+import { ISelectedOrHovered } from "@mrblenny/react-flow-chart";
+import { IAirflowNode, AirflowNodeForm, AirflowDagParams } from "../";
 import { BaseSidebar, SidebarTitle, Theme } from "../Theme";
+import { IAppState } from "../../App";
 
 const Button = styled.div`
   margin: 30px;
@@ -21,18 +22,23 @@ const Button = styled.div`
   }
 `;
 
+const P = styled.p`
+  margin-left: 15px;
+`;
+
 const PropertiesDiv = styled.div`
   flex: 1;
   overflow-y: auto;
 `;
 
 export class SelectedSidebar extends React.Component<{
-  chart: IChart;
+  appState: IAppState;
   onDeleteKey: Function;
   updateNodeProps: Function;
+  updateDag: Function;
 }> {
   public renderNode(selected: ISelectedOrHovered) {
-    const node: IAirflowNode = this.props.chart.nodes[selected.id];
+    const node: IAirflowNode = this.props.appState.nodes[selected.id];
     return (
       <BaseSidebar>
         <SidebarTitle>Operator Properties</SidebarTitle>
@@ -49,14 +55,20 @@ export class SelectedSidebar extends React.Component<{
   }
 
   public render() {
-    if (this.props.chart.selected.type === "node" || false) {
-      return this.renderNode(this.props.chart.selected);
+    if (this.props.appState.selected.type === "node" || false) {
+      return this.renderNode(this.props.appState.selected);
     }
     return (
-      <div>
+      <BaseSidebar>
         <SidebarTitle>DAG Properties</SidebarTitle>
-        <p>Click on an Operator Node to modify parameters</p>
-      </div>
+        <PropertiesDiv>
+          <P>Click on an Operator Node to modify parameters</P>
+          <AirflowDagParams
+            dagProps={this.props.appState.dag}
+            updateDagProps={this.props.updateDag}
+          />
+        </PropertiesDiv>
+      </BaseSidebar>
     );
   }
 }
