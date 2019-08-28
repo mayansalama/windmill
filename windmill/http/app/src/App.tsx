@@ -106,6 +106,12 @@ class App extends React.Component<{}, IAppState> {
 
   public refreshDag() {
     this.apiClient.getDagSpec().then(data => {
+      for (let i = 0; i < data.parameters.length; i++) {
+        if (data.parameters[i].default) {
+          data.parameters[i].value = data.parameters[i].default;
+        }
+      }
+
       this.setState(prevState => ({
         ...prevState,
         dag: data

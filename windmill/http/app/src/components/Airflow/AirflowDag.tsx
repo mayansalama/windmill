@@ -28,7 +28,7 @@ export class RenderedAirflowDagAsForm extends React.Component<{
   public render() {
     return (
       <Outer>
-        <SectionTitle>Dag Parameters</SectionTitle>
+        <SectionTitle>Parameters</SectionTitle>
         {[].concat(
           ...this.props.dagProps.parameters.map((p, i) => {
             return [
@@ -65,10 +65,14 @@ export class AirflowDagParams extends React.Component<{
   public render() {
     return (
       <div>
-        <RenderedAirflowDagAsForm
-          dagProps={this.props.dagProps}
-          updateParams={this.handleParameterUpdate}
-        />
+        {this.props.dagProps ? (
+          <RenderedAirflowDagAsForm
+            dagProps={this.props.dagProps}
+            updateParams={this.handleParameterUpdate}
+          />
+        ) : (
+          <p>Loading default DAG props</p>
+        )}
       </div>
     );
   }

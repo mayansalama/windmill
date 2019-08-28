@@ -16,9 +16,9 @@ synced to a remote repo
 - [x] Format operator display into classes
 - [x] Search functionality for operators
 - [x] Basic operator level properties
-- [ ] Implement DAG level properties
-- [ ] Render arbitrary viewport windows for New/Save/Load etc
+- [x] Implement DAG level properties
 - [ ] New DAG Functionality
+- [ ] Render arbitrary viewport windows for New/Save/Load etc
 - [ ] Parameter Tooltips
 - [ ] DAG renaming and save/load functionality
 - [ ] Icons
@@ -27,12 +27,13 @@ synced to a remote repo
 
 - [x] Generate Operator Lists
 - [x] CLI to start Web and Front End 
+- [x] Generate DAG Spec
 - [ ] Save/Load Windmill Files functionality
 - [ ] Generate YML Airflow Specs 
 - [ ] Integrate with Git
-- [ ] Get default values using inspect.getfullargspec
-- [ ] Pull parameters from parent classes 
-- [ ] Dedupe multi import operators
+- [x] Get default values 
+- [x] Pull parameters from parent classes 
+- [?] Dedupe multi import operators - nothing preventing this but underlying issue is fixed
 - [ ] Allow custom operators
 - [ ] Strategy for Python Opjects (e.g. callables) - maybe import statement?
 - [ ] Backport existing Python DAGs to WMLs

@@ -10,7 +10,7 @@ from ..schemas.app_schemas import (
     validate_parameter_type,
     VALID_PARAMETER_TYPES,
 )
-from ..utils import exceptions, docstring_parser
+from ..utils import exceptions, class_parser
 
 
 class OperatorHandler:
@@ -19,7 +19,7 @@ class OperatorHandler:
     """
 
     schema = OperatorSchema()
-    docstring_parser = docstring_parser.DocstringParser()
+    docstring_parser = class_parser.ClassParser()
 
     def __init__(self, type: str, properties: dict):
         """Should initialise using the from_marsh or from_operator method
@@ -47,9 +47,13 @@ class OperatorHandler:
             operator {BaseOperator} -- Airflow Operator Class
         """
         try:
-            return OperatorHandler(*cls.docstring_parser.parse_class_docstring(operator))
+            return OperatorHandler(
+                *cls.docstring_parser.parse_class(operator, inherit_until=BaseOperator)
+            )
         except exceptions.DocstringParseError as e:
-            raise exceptions.OperatorMarshallError(f"Unable to parse class {operator.__name__}") from e
+            raise exceptions.OperatorMarshallError(
+                f"Unable to parse class {operator.__name__}"
+            ) from e
 
     @staticmethod
     def from_dict(d: dict):

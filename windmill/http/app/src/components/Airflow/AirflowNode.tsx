@@ -261,7 +261,7 @@ export class RenderedAirflowParameter extends React.Component<{
             id={this.params.id}
             value={this.params.value || ""}
             onChange={this.handleChange}
-            placeholder="Enter timedelta in form 'XX units'"
+            placeholder="Enter timedelta in form HH:mm:ss. E.g. 0:05:00 for 5 minutes"
           />
         );
       }
@@ -272,7 +272,7 @@ export class RenderedAirflowParameter extends React.Component<{
             id={this.params.id}
             value={this.params.value || ""}
             onChange={this.handleChange}
-            placeholder="Enter comma seperated list"
+            placeholder="Enter JSON list"
           />
         );
       }
@@ -322,7 +322,7 @@ export class RenderedAirflowParametersAsForm extends React.Component<{
       <div>
         <Outer>
           <div>
-            <Tooltip>Name</Tooltip>
+            <Tooltip>Task ID</Tooltip>
             <Type>{this.props.type}</Type>
           </div>
           <NameInput

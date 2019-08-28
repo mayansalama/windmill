@@ -1,5 +1,6 @@
 import * as React from "react";
 import styled from "styled-components";
+import { cloneDeep } from "lodash";
 import { FaWindowMaximize } from "react-icons/fa";
 import { INode, REACT_FLOW_CHART } from "@mrblenny/react-flow-chart";
 import { Theme } from "../Theme";
@@ -74,6 +75,13 @@ export const AirflowOperator = ({
   if (!ports) {
     ports = DefaultPorts;
   }
+
+  for (let i = 0; i < properties.parameters.length; i++) {
+    if (properties.parameters[i].default) {
+      properties.parameters[i].value = properties.parameters[i].default;
+    }
+  }
+
   return (
     <Outer
       draggable={true}
@@ -85,7 +93,6 @@ export const AirflowOperator = ({
       }}
     >
       <FaWindowMaximize />
-      {" "}
       {type}
     </Outer>
   );

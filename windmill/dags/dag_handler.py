@@ -1,7 +1,7 @@
 from airflow.models.dag import DAG
 
 from ..schemas.app_schemas import DagSchema
-from ..utils.docstring_parser import DocstringParser
+from ..utils.class_parser import ClassParser
 
 
 class DagHandler:
@@ -9,8 +9,8 @@ class DagHandler:
     schemas
     """
 
-    docstring_parser = DocstringParser()
+    docstring_parser = ClassParser()
 
     @classmethod
     def marshall_dag_object(cls):
-        return DagSchema().dump(cls.docstring_parser.parse_class_docstring(DAG)[1])
+        return DagSchema().dump(cls.docstring_parser.parse_class(DAG)[1])

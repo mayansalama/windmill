@@ -9,7 +9,7 @@ from airflow.operators.sensors import S3KeySensor
 from windmill.schemas.app_schemas import OperatorSchema
 from windmill.operators.operator_handler import OperatorHandler
 from windmill.operators.operator_index import OperatorIndex
-from windmill.utils.docstring_parser import DocstringParser
+from windmill.utils.class_parser import ClassParser
 
 
 def test_fix_docstring():
@@ -17,7 +17,7 @@ def test_fix_docstring():
 
 :param str param1: some param
 :type param1: str
-""" == DocstringParser.fix_docstring(
+""" == ClassParser.fix_docstring(
         """Some description...
 
 :param param1: some param
@@ -30,7 +30,14 @@ class TestOperatorMarshalling(TestCase):
     test_input = {
         "type": "bool-param",
         "properties": {
-            "parameters": [{"id": "useLegacySql", "type": "bool", "default": "true"}]
+            "parameters": [
+                {
+                    "id": "useLegacySql",
+                    "type": "bool",
+                    "default": "true",
+                    "required": False,
+                }
+            ]
         },
     }
 
@@ -54,7 +61,11 @@ class TestOperatorMarshalling(TestCase):
         assert bash_data["type"] == "BashOperator"
         assert bash_data["properties"]["module"] == "airflow.operators.bash_operator"
         self.assertListEqual(
-            [p["id"] for p in bash_data["properties"]["parameters"]],
+            [
+                p["id"]
+                for p in bash_data["properties"]["parameters"]
+                if not p.get("inheritedFrom", False)
+            ],
             ["bash_command", "xcom_push", "env", "output_encoding"],
         )
 

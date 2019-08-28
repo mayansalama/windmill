@@ -23,9 +23,11 @@ def validate_parameter_type(typ):
 class OperatorParameterSchema(Schema):
     id = fields.Str(required=True)
     type = fields.Str(validator=validate_parameter_type, required=True)
-    default = fields.Str()
     value = fields.Str()
+    default = fields.Str(allow_none=True)
     description = fields.Str()
+    required = fields.Bool(default=False)
+    inheritedFrom = fields.Str(allow_none=True)
 
 
 class OperatorPropertiesSchema(Schema):
