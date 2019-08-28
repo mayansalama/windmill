@@ -1,24 +1,28 @@
 import * as React from "react";
 import styled from "styled-components";
-import { FaSync, FaCaretDown, FaCaretRight, FaSearch } from "react-icons/fa";
+import {
+  FaSync,
+  FaBars,
+  FaCaretDown,
+  FaCaretRight,
+  FaSearch,
+  FaTimes
+} from "react-icons/fa";
 import { AirflowOperator, IAirflowOperator } from ".";
 import { SidebarTitle, BaseSidebar, Theme } from "../Theme";
 
 const RefreshSplit = styled.div`
-  /* min-width: 250px; */
-  /* display: flex; */
-  min-width: 100%;
-  /* flex-direction: row; */
+  min-width: 300px;
 `;
 
-const RefreshText = styled.div`
+const FloatLeftText = styled.div`
   float: left;
 `;
 
-const RefreshButton = styled.div`
+const FloatRightButton = styled.div`
   color: ${Theme.colors.brand};
-  border-radius: 20px;
-  margin-right: 5px;
+  border-radius: 15px;
+  padding: 0px 5px;
   float: right;
   transition: 0.3s ease all;
   cursor: pointer;
@@ -26,7 +30,7 @@ const RefreshButton = styled.div`
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
   }
   &:active {
-    background: #5682d2;
+    background: ${Theme.colors.lightAccent2};
   }
 `;
 
@@ -67,7 +71,7 @@ const SearchIcon = styled.div`
 
 const ModuleDiv = styled.div`
   flex: 1;
-  overflow-y: scroll;
+  overflow-y: auto;
 `;
 
 const distinct = (value, index, self) => {
@@ -154,7 +158,7 @@ class AirflowModule extends React.Component<{
   }
 }
 
-export class AirflowPanel extends React.Component<
+export class OperatorSidebar extends React.Component<
   {
     operators: IAirflowOperator[];
     refreshOperators: Function;
@@ -162,6 +166,7 @@ export class AirflowPanel extends React.Component<
   {
     openComponent: AirflowModule;
     searchValue: string;
+    isOpen: boolean;
   }
 > {
   public constructor(props) {
@@ -175,7 +180,8 @@ export class AirflowPanel extends React.Component<
 
   state = {
     openComponent: null,
-    searchValue: ""
+    searchValue: "",
+    isOpen: true
   };
 
   public handleRefresh() {
@@ -189,6 +195,13 @@ export class AirflowPanel extends React.Component<
       searchValue: val
     }));
   }
+
+  public toggleSidebar = () => {
+    const open = !this.state.isOpen;
+    this.setState({
+      isOpen: open
+    });
+  };
 
   public isModuleOpen(moduleComponent: AirflowModule) {
     return this.state.searchValue.length > 0
@@ -209,15 +222,18 @@ export class AirflowPanel extends React.Component<
       .map(prettyName);
   }
 
-  public render() {
+  public renderContent() {
     return (
       <BaseSidebar>
         <SidebarTitle>
           <RefreshSplit>
-            <RefreshText>Operator Library</RefreshText>
-            <RefreshButton onClick={this.handleRefresh}>
+            <FloatLeftText>Operator Library</FloatLeftText>
+            <FloatRightButton onClick={this.toggleSidebar}>
+              <FaTimes />
+            </FloatRightButton>
+            <FloatRightButton onClick={this.handleRefresh}>
               <FaSync />
-            </RefreshButton>
+            </FloatRightButton>
           </RefreshSplit>
         </SidebarTitle>
         <SearchDiv>
@@ -270,6 +286,19 @@ export class AirflowPanel extends React.Component<
           )}
         </ModuleDiv>
       </BaseSidebar>
+    );
+  }
+
+  public render() {
+    return this.state.isOpen ? (
+      this.renderContent()
+    ) : (
+      <FloatRightButton
+        onClick={() => this.toggleSidebar()}
+        style={{ padding: `7.5px 10px` }}
+      >
+        <FaBars />
+      </FloatRightButton>
     );
   }
 }

@@ -17,13 +17,22 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
+const NavBarContent = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  background: ${Theme.colors.light};
+  max-width: 100vw;
+  height: 10vh;
+`;
+
 const PageContent = styled.div`
   display: flex;
   flex-direction: row;
   flex: 1;
   background: ${Theme.colors.light};
   max-width: 100vw;
-  max-height: 100vh;
+  height: 90vh;
 `;
 
 export const Page = ({ children }: { children: any }) => (
@@ -31,4 +40,11 @@ export const Page = ({ children }: { children: any }) => (
     {children}
     <GlobalStyle />
   </PageContent>
+);
+
+export const NavbarPage = ({ children }: { children: any }) => (
+  <NavBarContent>
+    {children}
+    <GlobalStyle />
+  </NavBarContent>
 );

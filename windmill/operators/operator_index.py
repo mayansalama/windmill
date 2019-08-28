@@ -6,6 +6,7 @@ from importlib import import_module
 from airflow import operators
 
 from .operator_handler import OperatorHandler
+from ..utils.exceptions import OperatorMarshallError
 
 
 class OperatorIndex:
@@ -22,12 +23,18 @@ class OperatorIndex:
         self.operator_list = self.get_operators()
 
     def marshall_operator_list(self):
-        """Return a JSON marshalled list of Operators as per OperatorHanlder schema
+        """Return a JSON marshalled list of Operators as per OperatorHandler schema
         
         Returns:
             List[Dict]: List of OperatorHandler Dict - see `schemas.app_schemas.OperatorSchema`
         """
-        handlers = [OperatorHandler.from_operator(o) for o in self.operator_list]
+        handlers = []
+        for operator in self.operator_list:
+            try:
+                handlers.append(OperatorHandler.from_operator(operator))
+            except OperatorMarshallError as e:
+                logging.exception(f"Unable to parse operator {operator.__name__}: {e}")
+
         return [h.dump() for h in handlers]
 
     def get_operators(self):
@@ -51,7 +58,7 @@ class OperatorIndex:
             try:
                 mod = import_module(f"airflow.operators.{modname}")
             except (ModuleNotFoundError, SyntaxError) as e:
-                # NOTE Some of the HDFS libraries in Airflow don't support Python 3 
+                # NOTE Some of the HDFS libraries in Airflow don't support Python 3
                 logging.info(f"Unable to import operator from {modname}: {e}")
 
             ops = ops.union(

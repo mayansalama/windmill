@@ -1,8 +1,9 @@
 from flask import Flask, make_response, jsonify
 from flask_cors import CORS
 
-from ...schemas.app_schemas import OperatorSchema
+from ...dags.dag_handler import DagHandler
 from ...operators.operator_index import OperatorIndex
+from ...schemas.app_schemas import OperatorSchema
 
 app = Flask(__name__)
 CORS(app)
@@ -25,3 +26,8 @@ def get_operators():
         List(OperatorIndex)
     """
     return jsonify(get_operator_index().marshall_operator_list()), 200
+
+
+@app.route("/v1/dag", methods=["GET"])
+def get_dagspec():
+    return jsonify(DagHandler.marshall_dag_object()), 200

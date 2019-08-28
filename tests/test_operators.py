@@ -7,8 +7,9 @@ from airflow.operators.python_operator import PythonVirtualenvOperator
 from airflow.operators.sensors import S3KeySensor
 
 from windmill.schemas.app_schemas import OperatorSchema
-from windmill.operators.operator_handler import fix_docstring, OperatorHandler
+from windmill.operators.operator_handler import OperatorHandler
 from windmill.operators.operator_index import OperatorIndex
+from windmill.utils.docstring_parser import DocstringParser
 
 
 def test_fix_docstring():
@@ -16,7 +17,7 @@ def test_fix_docstring():
 
 :param str param1: some param
 :type param1: str
-""" == fix_docstring(
+""" == DocstringParser.fix_docstring(
         """Some description...
 
 :param param1: some param

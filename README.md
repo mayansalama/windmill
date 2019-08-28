@@ -15,8 +15,8 @@ synced to a remote repo
 - [x] Load Operators from App
 - [x] Format operator display into classes
 - [x] Search functionality for operators
+- [x] Basic operator level properties
 - [ ] Implement DAG level properties
-- [ ] Finish operator level properties
 - [ ] Render arbitrary viewport windows for New/Save/Load etc
 - [ ] New DAG Functionality
 - [ ] Parameter Tooltips

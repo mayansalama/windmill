@@ -2,7 +2,7 @@ import * as React from "react";
 import ReactDOM from "react-dom";
 import styled from "styled-components";
 import { FaGripLinesVertical } from "react-icons/fa";
-import { Theme } from "../Theme";
+import { Theme, LeftPanelDefaultWidth } from "../Theme";
 
 const PanelContainer = styled.div`
   display: flex;
@@ -61,7 +61,7 @@ export class ResizablePanel extends React.Component<
   eventHandler = null;
 
   public get initWidth(): number {
-    return this.props.initialWidth | 300;
+    return this.props.initialWidth | LeftPanelDefaultWidth;
   }
 
   public state = {
@@ -88,7 +88,6 @@ export class ResizablePanel extends React.Component<
 
   public stopResize = () => {
     if (this.state.isDragging) {
-      console.log(this.state);
       this.setState(({ delta, initialPos }) => ({
         isDragging: false,
         delta: 0,

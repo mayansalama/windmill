@@ -38,3 +38,8 @@ class OperatorPropertiesSchema(Schema):
 class OperatorSchema(Schema):
     type = fields.Str()
     properties = fields.Nested(OperatorPropertiesSchema())
+
+
+class DagSchema(Schema):
+    description = fields.Str()
+    parameters = fields.List(fields.Nested(OperatorParameterSchema()), required=True)

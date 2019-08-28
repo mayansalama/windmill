@@ -27,3 +27,17 @@ class TestV1Operators(Fixture):
             except Exception as e:
                 logging.info(f"{operator}")
                 raise e
+
+
+class TestV1Dag(Fixture):
+    def test_get(self):
+        res: Response = self.client.get("/v1/dag")
+        assert res.status_code == 200
+        data = res.get_json()
+
+        assert data["description"]
+        assert len(data["parameters"]) >= 1
+        for param in data["parameters"]:
+            assert param["description"]
+            assert param["id"]
+            assert param["type"]

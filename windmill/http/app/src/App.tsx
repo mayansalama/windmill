@@ -1,8 +1,4 @@
-import {
-  FlowChart,
-  ICanvasOuterDefaultProps,
-  IChart
-} from "@mrblenny/react-flow-chart";
+import { FlowChart, IChart } from "@mrblenny/react-flow-chart";
 import * as actions from "@mrblenny/react-flow-chart/src/container/actions";
 import * as localStorage from "local-storage";
 import { cloneDeep, mapValues } from "lodash";
@@ -10,18 +6,20 @@ import * as React from "react";
 import { render } from "react-dom";
 import styled from "styled-components";
 import { APIClient } from "./ApiClient";
+import { CanvasStyle } from "./components/Theme";
 import {
   AirflowNode,
-  AirflowPanel,
   DropdownNavbar,
   IAirflowOperator,
   IAirflowOperatorProperties,
+  NavbarPage,
+  OperatorSidebar,
   Page,
   ResizablePanel,
   SelectedSidebar
 } from "./components";
 import * as MenuItems from "./components/Navbar/NavbarDropdowns";
-import { emptyChart } from "./misc/exampleChartState";
+import { defaultChart, IAppState } from "./misc/defaultChartState";
 import { Icon } from "./misc/icon";
 
 const AppLayout = styled.div`
@@ -39,32 +37,12 @@ const Content = styled.div`
   overflow: hidden;
 `;
 
-const CanvasStyle = styled.div<ICanvasOuterDefaultProps>`
-  position: relative;
-  background-size: 10px 10px;
-  background-color: white;
-  background-image: linear-gradient(
-      90deg,
-      hsla(0, 10%, 0%, 0.05) 1px,
-      transparent 0
-    ),
-    linear-gradient(180deg, hsla(0, 10%, 0%, 0.05) 1px, transparent 0);
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  cursor: not-allowed;
-` as any;
-
-export interface IAppState extends IChart {
-  operators?: IAirflowOperator[];
-}
-
 class App extends React.Component<{}, IAppState> {
   apiClient = new APIClient();
 
   constructor(props) {
     super(props);
-    this.state = localStorage.get("windmillChart") || cloneDeep(emptyChart);
+    this.state = localStorage.get("windmillChart") || cloneDeep(defaultChart);
 
     this.updateNodeProperties = this.updateNodeProperties.bind(this);
     this.refreshOperators = this.refreshOperators.bind(this);
@@ -141,14 +119,15 @@ class App extends React.Component<{}, IAppState> {
 
     return (
       <AppLayout>
-        <Page>
+        <NavbarPage>
           <DropdownNavbar {...this.Navigation} />
-        </Page>
+        </NavbarPage>
         <Page>
           <ResizablePanel>
-            <AirflowPanel
-              operators={this.operators}
-              refreshOperators={this.refreshOperators}
+            <SelectedSidebar
+              chart={this.state}
+              onDeleteKey={stateActions.onDeleteKey}
+              updateNodeProps={this.updateNodeProperties}
             />
             <Content>
               <FlowChart
@@ -160,10 +139,9 @@ class App extends React.Component<{}, IAppState> {
                 }}
               />
             </Content>
-            <SelectedSidebar
-              chart={this.state}
-              onDeleteKey={stateActions.onDeleteKey}
-              updateNodeProps={this.updateNodeProperties}
+            <OperatorSidebar
+              operators={this.operators}
+              refreshOperators={this.refreshOperators}
             />
           </ResizablePanel>
         </Page>

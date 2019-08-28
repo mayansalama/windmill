@@ -1,6 +1,7 @@
 import * as React from "react";
 import { cloneDeep } from "lodash";
 import styled, { css } from "styled-components";
+import Textarea from "react-textarea-autosize";
 import { INodeInnerDefaultProps, INode } from "@mrblenny/react-flow-chart";
 import { Theme } from "../Theme";
 import { IAirflowOperatorParameter, IAirflowOperatorProperties } from ".";
@@ -51,13 +52,145 @@ const OperatorType = styled.div`
   font-style: italic;
 `;
 
-const Input = styled.input`
-  padding: 10px;
-  border: 1px solid ${Theme.colors.brand};
+const SmartTextAreaBase = css`
+  border-radius: 5px;
+  height: 100%;
   width: 100%;
+  font-family: ${Theme.fonts.body};
+  background: white;
 `;
 
-export class RenderedAirflowParameterAsForm extends React.Component<{
+const SmartTextAreaInput = css`
+  border: none;
+  padding: 10px;
+
+  &:hover {
+    background: ${Theme.colors.light};
+    outline: none;
+  }
+  &:focus {
+    background: ${Theme.colors.light};
+    outline: none;
+  }
+`;
+
+const SmartTextAreaDiv = styled.div`
+  ${SmartTextAreaBase};
+  padding: 1px;
+  border: 1px solid ${Theme.colors.brand};
+`;
+
+const StyledSelect = styled.select`
+  ${SmartTextAreaBase};
+  ${SmartTextAreaInput};
+`;
+
+const StyledOption = styled.option`
+  ${SmartTextAreaBase};
+`;
+
+const StyledTextarea = styled(Textarea)`
+  ${SmartTextAreaBase};
+  ${SmartTextAreaInput};
+  resize: none;
+  overflow: hidden;
+`;
+
+const StyledLabel = styled.div`
+  ${SmartTextAreaBase};
+  font-size: ${Theme.fonts.normalSize};
+  padding: 4px 10px 0px 6px;
+  color: ${Theme.colors.darkAccent};
+`;
+
+interface ISmartTextAreaProps {
+  onChange: Function;
+  type: "text" | "bool" | "number";
+  value: string;
+  id: string;
+  placeholder?: string;
+}
+
+class SmartTextarea extends React.Component<ISmartTextAreaProps> {
+  constructor(props) {
+    super(props);
+
+    this.onChange = this.onChange.bind(this);
+  }
+
+  onChange(event) {
+    return this.props.onChange(event);
+  }
+
+  public get isValid(): boolean {
+    // if (this.props.validate) {
+    //   return this.props.validate(this.props.value);
+    // }
+    return true;
+  }
+
+  public renderText() {
+    const { id, value, placeholder } = this.props;
+
+    return (
+      <SmartTextAreaDiv>
+        <StyledLabel>{id}</StyledLabel>
+        <StyledTextarea
+          id={id}
+          value={value}
+          onChange={event => this.onChange(event.target.value)}
+          placeholder={placeholder || "Input string..."}
+        />
+      </SmartTextAreaDiv>
+    );
+  }
+
+  public renderInt() {
+    const { id, value, placeholder } = this.props;
+
+    return (
+      <SmartTextAreaDiv>
+        <StyledLabel>{id}</StyledLabel>
+        <StyledTextarea
+          id={id}
+          value={value}
+          onChange={event => this.onChange(event.target.value)}
+          placeholder={placeholder || "Input number..."}
+        />
+      </SmartTextAreaDiv>
+    );
+  }
+
+  public renderBool() {
+    const { id, value } = this.props;
+
+    return (
+      <SmartTextAreaDiv>
+        <StyledLabel>{id}</StyledLabel>
+        <StyledSelect
+          onChange={event => this.onChange(event.target.value)}
+          value={value}
+        >
+          <StyledOption>True</StyledOption>
+          <StyledOption>False</StyledOption>
+        </StyledSelect>
+      </SmartTextAreaDiv>
+    );
+  }
+
+  public render() {
+    switch (this.props.type) {
+      case "number":
+        return this.renderInt();
+      case "text":
+        return this.renderText();
+      case "bool":
+        return this.renderBool();
+    }
+  }
+}
+
+export class RenderedAirflowParameter extends React.Component<{
   params: IAirflowOperatorParameter;
   index: number;
   updateFunc: Function;
@@ -67,9 +200,9 @@ export class RenderedAirflowParameterAsForm extends React.Component<{
     this.handleChange = this.handleChange.bind(this);
   }
 
-  handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+  handleChange(value: any) {
     const newParams = cloneDeep(this.params);
-    newParams["value"] = event.target.value;
+    newParams["value"] = value;
     this.props.updateFunc(newParams, this.props.index);
   }
 
@@ -81,46 +214,87 @@ export class RenderedAirflowParameterAsForm extends React.Component<{
     switch (this.params.type) {
       case "str": {
         return (
-          <tr>
-            <td>
-              <Tooltip>{this.params.id}</Tooltip>
-            </td>
-            <td>
-              <Input
-                placeholder="Input field value..."
-                type={"text"}
-                value={this.params.value || ""}
-                onChange={this.handleChange}
-              />
-            </td>
-          </tr>
+          <SmartTextarea
+            type="text"
+            id={this.params.id}
+            value={this.params.value || ""}
+            onChange={this.handleChange}
+          />
         );
       }
       case "bool": {
         return (
-          <tr>
-            <td>
-              <Tooltip>{this.params.id}</Tooltip>
-            </td>
-            <td>
-              <Input
-                type={"checkbox"}
-                checked={this.params.default === "true" || false}
-                onClick={e => e.stopPropagation()}
-                onMouseUp={e => e.stopPropagation()}
-                onMouseDown={e => e.stopPropagation()}
-              />
-            </td>
-          </tr>
+          <SmartTextarea
+            type="bool"
+            id={this.params.id}
+            value={this.params.value || ""}
+            onChange={this.handleChange}
+          />
+        );
+      }
+      case "float":
+      case "int": {
+        return (
+          <SmartTextarea
+            type="number"
+            id={this.params.id}
+            value={this.params.value || ""}
+            onChange={this.handleChange}
+          />
+        );
+      }
+      case "datetime.datetime": {
+        return (
+          <SmartTextarea
+            type="text"
+            id={this.params.id}
+            value={this.params.value || ""}
+            onChange={this.handleChange}
+            placeholder="Enter datetime in form 'YYYY-MM-DD HH:mm:ss'"
+          />
+        );
+      }
+      case "datetime.timedelta": {
+        return (
+          <SmartTextarea
+            type="text"
+            id={this.params.id}
+            value={this.params.value || ""}
+            onChange={this.handleChange}
+            placeholder="Enter timedelta in form 'XX units'"
+          />
+        );
+      }
+      case "list": {
+        return (
+          <SmartTextarea
+            type="text"
+            id={this.params.id}
+            value={this.params.value || ""}
+            onChange={this.handleChange}
+            placeholder="Enter comma seperated list"
+          />
+        );
+      }
+      case "mapping":
+      case "dict": {
+        return (
+          <SmartTextarea
+            type="text"
+            id={this.params.id}
+            value={this.params.value || ""}
+            onChange={this.handleChange}
+            placeholder="Enter JSON dict"
+          />
         );
       }
       default:
-        return <p>{this.params.type} is not Implemented Yet</p>
+        return <p>{this.params.type} is not Implemented Yet</p>;
     }
   }
 }
 
-export class RenderedAirflowOperatorAsForm extends React.Component<{
+export class RenderedAirflowParametersAsForm extends React.Component<{
   operatorProps: IAirflowOperatorProperties;
   type: string;
   updateParams: Function;
@@ -152,7 +326,7 @@ export class RenderedAirflowOperatorAsForm extends React.Component<{
             <OperatorType>{this.props.type}</OperatorType>
           </div>
           <OperatorInput
-            placeholder="Input operator name..."
+            placeholder="Input name.."
             type={"text"}
             value={this.props.operatorProps.name || ""}
             onChange={this.handleNameChange}
@@ -160,22 +334,21 @@ export class RenderedAirflowOperatorAsForm extends React.Component<{
         </Outer>
         <Outer>
           <SectionTitle>Parameters</SectionTitle>
-          <table>
-            <tbody>
-              {[].concat(
-                ...this.props.operatorProps.parameters.map((p, i) => {
-                  return [
-                    <RenderedAirflowParameterAsForm
-                      params={p}
-                      key={`${p.id}-${i}`}
-                      updateFunc={this.handleChange}
-                      index={i}
-                    />
-                  ];
-                })
-              )}
-            </tbody>
-          </table>
+          {[].concat(
+            ...this.props.operatorProps.parameters.map((p, i) => {
+              return [
+                <div>
+                  <RenderedAirflowParameter
+                    params={p}
+                    key={`${p.id}-${i}`}
+                    updateFunc={this.handleChange}
+                    index={i}
+                  />
+                  <br key={`${p.id}-${i}-br`} />
+                </div>
+              ];
+            })
+          )}
         </Outer>
       </div>
     );
@@ -215,7 +388,7 @@ export class AirflowNodeForm extends React.Component<{
   public render() {
     return (
       <div>
-        <RenderedAirflowOperatorAsForm
+        <RenderedAirflowParametersAsForm
           operatorProps={this.props.node.properties}
           updateParams={this.handleParameterUpdate}
           type={this.props.node.type}

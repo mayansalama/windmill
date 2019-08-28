@@ -1,4 +1,5 @@
-import styled from "styled-components"
+import styled from "styled-components";
+import { ICanvasOuterDefaultProps } from "@mrblenny/react-flow-chart";
 
 export const Theme = {
   colors: {
@@ -34,3 +35,21 @@ export const BaseSidebar = styled.div`
   height: 100%;
   overflow: hidden;
 `;
+
+export const LeftPanelDefaultWidth = 400;
+
+export const CanvasStyle = styled.div<ICanvasOuterDefaultProps>`
+  position: relative;
+  background-size: 10px 10px;
+  background-color: white;
+  background-image: linear-gradient(
+      90deg,
+      hsla(0, 10%, 0%, 0.05) 1px,
+      transparent 0
+    ),
+    linear-gradient(180deg, hsla(0, 10%, 0%, 0.05) 1px, transparent 0);
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  cursor: not-allowed;
+` as any;
