@@ -1,4 +1,4 @@
-import { IChart } from "@mrblenny/react-flow-chart";
+import { IAppState } from "../App";
 
 export const defaultChart: IAppState = {
   offset: {
