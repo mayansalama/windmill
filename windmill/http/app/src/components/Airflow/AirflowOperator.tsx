@@ -1,6 +1,6 @@
 import * as React from "react";
 import styled from "styled-components";
-import { cloneDeep } from "lodash";
+import { cloneDeep, StringNullableChain } from "lodash";
 import { FaWindowMaximize } from "react-icons/fa";
 import { INode, REACT_FLOW_CHART } from "@mrblenny/react-flow-chart";
 import { Theme } from "../Theme";
@@ -52,6 +52,8 @@ export interface IAirflowOperatorParameter {
   value?: string;
   default?: string;
   description?: string;
+  required?: boolean;
+  inheritedFrom?: string;
 }
 
 export interface IAirflowOperatorProperties {
@@ -92,8 +94,7 @@ export const AirflowOperator = ({
         );
       }}
     >
-      <FaWindowMaximize />
-      {type}
+      <FaWindowMaximize /> {type}
     </Outer>
   );
 };

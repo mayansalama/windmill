@@ -93,6 +93,8 @@ class App extends React.Component<{}, IAppState> {
     this.setState({
       ...defaultChart
     });
+    this.refreshDag();
+    this.refreshOperators();
   }
 
   public refreshOperators() {
@@ -141,6 +143,8 @@ class App extends React.Component<{}, IAppState> {
         }
       }
     }));
+
+    localStorage.set("windmillChart", this.state);
   }
 
   public updateDag(newProps: IAirflowDag) {
@@ -148,6 +152,8 @@ class App extends React.Component<{}, IAppState> {
       ...prevState,
       dag: newProps
     }));
+
+    localStorage.set("windmillChart", this.state);
   }
 
   public render() {

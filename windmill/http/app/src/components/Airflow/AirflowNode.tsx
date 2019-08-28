@@ -40,6 +40,7 @@ const Name = styled.div`
 const NameInput = styled.input`
   padding: 7px;
   border: 1px solid ${Theme.colors.brand};
+  outline: none;
   &:hover {
     background: ${Theme.colors.light};
   }
@@ -96,18 +97,53 @@ const StyledTextarea = styled(Textarea)`
   overflow: hidden;
 `;
 
+const StyledLableDiv = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+`;
+
 const StyledLabel = styled.div`
   ${SmartTextAreaBase};
   font-size: ${Theme.fonts.normalSize};
   padding: 4px 10px 0px 6px;
   color: ${Theme.colors.darkAccent};
+  float: left;
 `;
+
+const StyledErrorMessage = styled.div`
+  ${SmartTextAreaBase};
+  font-size: ${Theme.fonts.normalSize};
+  font-style: italic;
+  padding: 4px 10px 0px 6px;
+  color: red;
+  float: right;
+  text-align: right;
+`;
+
+const isValid = (params: IAirflowOperatorParameter): string => {
+  const { value, required, type } = params;
+  let err_msg = "";
+
+  if (required && !value) {
+    err_msg = "required field";
+  } else if (value) {
+    if (type === "int" || type === "float") {
+      if (Number(value).toString() != value) {
+        err_msg = "Invalid number";
+      } else if (type === "int" && Number(value) % 1 != 0) {
+        err_msg = "Invalid integer";
+      }
+    }
+  }
+
+  return err_msg;
+};
 
 interface ISmartTextAreaProps {
   onChange: Function;
   type: "text" | "bool" | "number";
-  value: string;
-  id: string;
+  params: IAirflowOperatorParameter;
   placeholder?: string;
 }
 
@@ -122,63 +158,51 @@ class SmartTextarea extends React.Component<ISmartTextAreaProps> {
     return this.props.onChange(event);
   }
 
-  public get isValid(): boolean {
-    // if (this.props.validate) {
-    //   return this.props.validate(this.props.value);
-    // }
-    return true;
+  get isValid(): string {
+    return isValid(this.props.params);
   }
 
   public renderText() {
-    const { id, value, placeholder } = this.props;
+    const { params, placeholder } = this.props;
+    const { id, value } = params;
 
     return (
-      <SmartTextAreaDiv>
-        <StyledLabel>{id}</StyledLabel>
-        <StyledTextarea
-          id={id}
-          value={value}
-          onChange={event => this.onChange(event.target.value)}
-          placeholder={placeholder || "Input string..."}
-        />
-      </SmartTextAreaDiv>
+      <StyledTextarea
+        id={id}
+        value={value}
+        onChange={event => this.onChange(event.target.value)}
+        placeholder={placeholder || "Input string..."}
+      />
     );
   }
 
   public renderInt() {
-    const { id, value, placeholder } = this.props;
+    const { params, placeholder } = this.props;
+    const { id, value } = params;
 
     return (
-      <SmartTextAreaDiv>
-        <StyledLabel>{id}</StyledLabel>
-        <StyledTextarea
-          id={id}
-          value={value}
-          onChange={event => this.onChange(event.target.value)}
-          placeholder={placeholder || "Input number..."}
-        />
-      </SmartTextAreaDiv>
+      <StyledTextarea
+        id={id}
+        value={value}
+        onChange={event => this.onChange(event.target.value)}
+        placeholder={placeholder || "Input number..."}
+      />
     );
   }
 
   public renderBool() {
-    const { id, value } = this.props;
-
     return (
-      <SmartTextAreaDiv>
-        <StyledLabel>{id}</StyledLabel>
-        <StyledSelect
-          onChange={event => this.onChange(event.target.value)}
-          value={value}
-        >
-          <StyledOption>True</StyledOption>
-          <StyledOption>False</StyledOption>
-        </StyledSelect>
-      </SmartTextAreaDiv>
+      <StyledSelect
+        onChange={event => this.onChange(event.target.value)}
+        value={this.props.params.value}
+      >
+        <StyledOption>True</StyledOption>
+        <StyledOption>False</StyledOption>
+      </StyledSelect>
     );
   }
 
-  public render() {
+  public renderForm() {
     switch (this.props.type) {
       case "number":
         return this.renderInt();
@@ -187,6 +211,29 @@ class SmartTextarea extends React.Component<ISmartTextAreaProps> {
       case "bool":
         return this.renderBool();
     }
+  }
+
+  public render() {
+    const { id, required } = this.props.params;
+    const errmsg = this.isValid;
+
+    return (
+      <SmartTextAreaDiv
+        style={{
+          borderColor: errmsg
+            ? "red"
+            : required
+            ? Theme.colors.brand
+            : Theme.colors.lightAccent2
+        }}
+      >
+        <StyledLableDiv>
+          <StyledLabel>{id}</StyledLabel>
+          <StyledErrorMessage>{errmsg}</StyledErrorMessage>
+        </StyledLableDiv>
+        {this.renderForm()}
+      </SmartTextAreaDiv>
+    );
   }
 }
 
@@ -215,9 +262,8 @@ export class RenderedAirflowParameter extends React.Component<{
       case "str": {
         return (
           <SmartTextarea
+            params={this.params}
             type="text"
-            id={this.params.id}
-            value={this.params.value || ""}
             onChange={this.handleChange}
           />
         );
@@ -225,30 +271,36 @@ export class RenderedAirflowParameter extends React.Component<{
       case "bool": {
         return (
           <SmartTextarea
+            params={this.params}
             type="bool"
-            id={this.params.id}
-            value={this.params.value || ""}
             onChange={this.handleChange}
           />
         );
       }
-      case "float":
+      case "float": {
+        return (
+          <SmartTextarea
+            params={this.params}
+            type="number"
+            onChange={this.handleChange}
+          />
+        );
+      }
       case "int": {
         return (
           <SmartTextarea
+            params={this.params}
             type="number"
-            id={this.params.id}
-            value={this.params.value || ""}
             onChange={this.handleChange}
+            placeholder="Enter integer..."
           />
         );
       }
       case "datetime.datetime": {
         return (
           <SmartTextarea
+            params={this.params}
             type="text"
-            id={this.params.id}
-            value={this.params.value || ""}
             onChange={this.handleChange}
             placeholder="Enter datetime in form 'YYYY-MM-DD HH:mm:ss'"
           />
@@ -257,9 +309,8 @@ export class RenderedAirflowParameter extends React.Component<{
       case "datetime.timedelta": {
         return (
           <SmartTextarea
+            params={this.params}
             type="text"
-            id={this.params.id}
-            value={this.params.value || ""}
             onChange={this.handleChange}
             placeholder="Enter timedelta in form HH:mm:ss. E.g. 0:05:00 for 5 minutes"
           />
@@ -268,9 +319,8 @@ export class RenderedAirflowParameter extends React.Component<{
       case "list": {
         return (
           <SmartTextarea
+            params={this.params}
             type="text"
-            id={this.params.id}
-            value={this.params.value || ""}
             onChange={this.handleChange}
             placeholder="Enter JSON list"
           />
@@ -280,9 +330,8 @@ export class RenderedAirflowParameter extends React.Component<{
       case "dict": {
         return (
           <SmartTextarea
+            params={this.params}
             type="text"
-            id={this.params.id}
-            value={this.params.value || ""}
             onChange={this.handleChange}
             placeholder="Enter JSON dict"
           />
@@ -294,11 +343,16 @@ export class RenderedAirflowParameter extends React.Component<{
   }
 }
 
-export class RenderedAirflowParametersAsForm extends React.Component<{
-  operatorProps: IAirflowOperatorProperties;
-  type: string;
-  updateParams: Function;
-}> {
+export interface IRenderedAirflowParametersAsFormProps {
+  properties: IAirflowOperatorProperties;
+  updateFunc: Function;
+  nameField: string;
+  type?: string;
+}
+
+export class RenderedAirflowParametersAsForm extends React.Component<
+  IRenderedAirflowParametersAsFormProps
+> {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
@@ -306,15 +360,20 @@ export class RenderedAirflowParametersAsForm extends React.Component<{
   }
 
   handleChange(params: IAirflowOperatorParameter, index: number) {
-    const newProps = cloneDeep(this.props.operatorProps);
+    const newProps = cloneDeep(this.props.properties);
     newProps["parameters"][index] = params;
-    this.props.updateParams(newProps);
+    this.props.updateFunc(newProps);
   }
 
   handleNameChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const newProps = cloneDeep(this.props.operatorProps);
-    newProps["name"] = event.target.value;
-    this.props.updateParams(newProps);
+    const newProps = cloneDeep(this.props.properties);
+    newProps.name = event.target.value;
+    for (let i = 0; i < newProps.parameters.length; i++) {
+      if (newProps.parameters[i].id === this.props.nameField) {
+        newProps.parameters[i]["value"] = event.target.value;
+      }
+    }
+    this.props.updateFunc(newProps);
   }
 
   public render() {
@@ -322,32 +381,40 @@ export class RenderedAirflowParametersAsForm extends React.Component<{
       <div>
         <Outer>
           <div>
-            <Tooltip>Task ID</Tooltip>
-            <Type>{this.props.type}</Type>
+            <Tooltip>{this.props.nameField}</Tooltip>
+            {this.props.type ? <Type>{this.props.type}</Type> : null}
           </div>
           <NameInput
             placeholder="Input name.."
             type={"text"}
-            value={this.props.operatorProps.name || ""}
+            value={this.props.properties.name || ""}
             onChange={this.handleNameChange}
+            style={{
+              borderColor:
+                this.props.properties.name === "" || !this.props.properties.name
+                  ? "red"
+                  : Theme.colors.brand
+            }}
           />
         </Outer>
         <Outer>
           <SectionTitle>Parameters</SectionTitle>
           {[].concat(
-            ...this.props.operatorProps.parameters.map((p, i) => {
-              return [
-                <div>
-                  <RenderedAirflowParameter
-                    params={p}
-                    key={`${p.id}-${i}`}
-                    updateFunc={this.handleChange}
-                    index={i}
-                  />
-                  <br key={`${p.id}-${i}-br`} />
-                </div>
-              ];
-            })
+            ...this.props.properties.parameters
+              .filter(param => param.id != this.props.nameField)
+              .map((p, i) => {
+                return [
+                  <div key={`${p.id}-${i}-div`}>
+                    <RenderedAirflowParameter
+                      params={p}
+                      key={`${p.id}-${i}`}
+                      updateFunc={this.handleChange}
+                      index={i}
+                    />
+                    <br key={`${p.id}-${i}-br`} />
+                  </div>
+                ];
+              })
           )}
         </Outer>
       </div>
@@ -364,8 +431,9 @@ interface IAirflowNodeDefaultProps extends INodeInnerDefaultProps {
 }
 
 export const AirflowNode = ({ node }: IAirflowNodeDefaultProps) => {
+  const valid = node.properties.parameters.every(op => isValid(op) === "");
   return (
-    <Outer>
+    <Outer style={{ borderColor: valid ? Theme.colors.lightAccent : "red" }}>
       <Tooltip>{node.type}</Tooltip>
       <Name>{node.properties.name || "Unnamed"}</Name>
     </Outer>
@@ -389,8 +457,9 @@ export class AirflowNodeForm extends React.Component<{
     return (
       <div>
         <RenderedAirflowParametersAsForm
-          operatorProps={this.props.node.properties}
-          updateParams={this.handleParameterUpdate}
+          nameField="task_id"
+          properties={this.props.node.properties}
+          updateFunc={this.handleParameterUpdate}
           type={this.props.node.type}
         />
       </div>
