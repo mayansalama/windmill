@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import tempfile
@@ -30,8 +31,8 @@ class TestV1Operators(Fixture):
     def test_get(self):
         res: Response = self.client.get("/v1/operators")
         assert res.status_code == 200
-        data = res.get_json()
 
+        data = res.get_json()
         for operator in data:
             try:
                 op = OperatorHandler.from_dict(operator)
@@ -46,8 +47,8 @@ class TestV1Dag(Fixture):
     def test_get(self):
         res: Response = self.client.get("/v1/dag")
         assert res.status_code == 200
-        data = res.get_json()
 
+        data = res.get_json()
         assert data["description"]
         assert len(data["parameters"]) >= 1
         for param in data["parameters"]:
@@ -57,15 +58,41 @@ class TestV1Dag(Fixture):
 
 
 class TestV1Wmls(Fixture):
-    def test_get(self):
-        base_path = os.path.join(self.tmpdir.name, self.conf.wml_path)
-        assert os.path.exists(base_path)
+    def setUp(self):
+        res = super().setUp()
+        self.base_path = os.path.join(self.tmpdir.name, self.conf.wml_path)
+        assert os.path.exists(self.base_path)
+        return res
 
-        with open(os.path.join(base_path, "test1.wml"), "w+") as f:
+    def test_get_file_list(self):
+        with open(os.path.join(self.base_path, "test1.wml"), "w+") as f:
             f.write("")
 
-        res: Response = self.client.get("/v1/wml/list")
+        res: Response = self.client.get("/v1/wml/")
         assert res.status_code == 200
-        data = res.get_json()
 
+        data = res.get_json()
         assert data == ["test1.wml"]
+
+    def test_get_file(self):
+        with open(os.path.join(self.base_path, "test2.wml"), "w+") as f:
+            json.dump(["a", "list"], f)
+
+        res: Response = self.client.get("/v1/wml/test2.wml")
+        assert res.status_code == 200
+
+        data = res.get_json()
+        assert data == ["a", "list"]
+
+    def test_put_file(self):
+        data = {"name": "wml1", "nodes": "etc"}
+
+        res: Response = self.client.post(
+            "/v1/wml/test3.wml", data=json.dumps(data), content_type="application/json"
+        )
+
+        assert res.status_code == 201
+
+        with open(os.path.join(self.base_path, "test3.wml"), "r") as f:
+            self.assertDictEqual(json.load(f), data)
+

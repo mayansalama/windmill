@@ -36,8 +36,9 @@ synced to a remote repo
 - [x] CLI to create new windmill project
 - [x] CLI to start windmill from a windmill project
 - [ ] Implement windmill-dev start
-- [ ] Save/Load Windmill Files functionality
+- [x] Save/Load Windmill Files functionality
 - [ ] Generate YML Airflow Specs
+- [ ] Validate incoming WMLs (is there a need for this?)
 - [x] Get default values
 - [x] Pull parameters from parent classes
 - [?] Dedupe multi import operators - nothing preventing this but underlying issue is fixed

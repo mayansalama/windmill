@@ -1,6 +1,7 @@
+import json
 import os
 
-from flask import Flask, make_response, jsonify, send_from_directory
+from flask import Flask, jsonify, make_response, request, send_from_directory
 from flask_cors import CORS
 
 from ...config.project_config import ProjectConfig
@@ -48,9 +49,31 @@ def get_dagspec():
     return jsonify(DagHandler.marshall_dag_object()), 200
 
 
-@app.route("/v1/wml/list", methods=["GET"])
-def get_wmls():
-    return jsonify(os.listdir(app.config["project_conf"].wml_path)), 200
+@app.route("/v1/wml/", methods=["GET"])
+@app.route("/v1/wml/<name>", methods=["GET"])
+def get_wmls(name=None):
+    if name:
+        f_path = os.path.join(app.config["project_conf"].wml_path, name)
+        if os.path.exists(f_path):
+            with open(f_path, "r") as f:
+                data = json.load(f)
+            return jsonify(data), 200
+        else:
+            return f"File {f_path} not found", 404
+    else:
+        return jsonify(os.listdir(app.config["project_conf"].wml_path)), 200
+
+
+@app.route("/v1/wml/<name>", methods=["POST"])
+def post_wml(name):
+    content = request.json
+    # TODO: Validation
+
+    f_path = os.path.join(app.config["project_conf"].wml_path, name)
+    with open(f_path, "w") as f:
+        json.dump(content, f)
+
+    return "Created", 201
 
 
 #######################################################################
