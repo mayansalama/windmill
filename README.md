@@ -26,6 +26,7 @@ synced to a remote repo
 - [ ] DAG renaming and save/load functionality
 - [ ] Fix loss of state on refresh bug
 - [ ] Icons
+- [ ] Pull PORT from Flask host
 
 ### Back-End Features
 
@@ -33,7 +34,8 @@ synced to a remote repo
 - [x] CLI to start Web and Front End
 - [x] Generate DAG Spec
 - [x] CLI to create new windmill project
-- [ ] CLI to start windmill from a windmill project
+- [x] CLI to start windmill from a windmill project
+- [ ] Implement windmill-dev start
 - [ ] Save/Load Windmill Files functionality
 - [ ] Generate YML Airflow Specs
 - [x] Get default values
@@ -52,15 +54,14 @@ To run as a user:
 
 1. Install with `pip install airflow-windmill`
 2. Run `windmill init` to create a local Windmill project
-3. Run `windmill start` from this folder to run the app locally
+3. Run `windmill run` from this folder to run the app locally
 
 To run as a dev:
 
 1. Clone from git
 2. Run `poetry install`
 3. ?Run `windmill-dev install-node-depts`
-4. Run `windmill-dev start-backend`
-5. Run `windmill-dev start-frontend`
+4. Run `windmill-dev start` to start a flask server and use parcel to serve frontend
 
 ## Future Usage Patterns
 

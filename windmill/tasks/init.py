@@ -3,7 +3,7 @@ import os
 
 import yaml
 
-from ..config.project import Project
+from ..config.project_config import ProjectConfig
 from ..exceptions import InitError
 
 
@@ -12,7 +12,7 @@ def join(*args):
 
 
 class CreateProject:
-    def __init__(self, proj: Project):
+    def __init__(self, proj: ProjectConfig):
         """Creates a new project directory 
         
         Args:
