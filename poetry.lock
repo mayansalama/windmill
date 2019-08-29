@@ -1479,7 +1479,7 @@ docs = ["sphinx"]
 test = ["zope.testrunner"]
 
 [metadata]
-content-hash = "0de2b648fe2a14837efd4a439f98bc2c618cf22cda86544540b70782efa7a0c3"
+content-hash = "1150ef282e37db4bb1711b492fdfd7097aa37d5e3ec03b15b2471f153ac6eda7"
 python-versions = "^3.6"
 
 [metadata.hashes]

@@ -10,7 +10,8 @@ from ..schemas.app_schemas import (
     validate_parameter_type,
     VALID_PARAMETER_TYPES,
 )
-from ..utils import exceptions, class_parser
+from ...utils import class_parser
+from ... import exceptions
 
 
 class OperatorHandler:

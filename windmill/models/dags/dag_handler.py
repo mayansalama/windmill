@@ -1,7 +1,7 @@
 from airflow.models.dag import DAG
 
 from ..schemas.app_schemas import DagSchema
-from ..utils.class_parser import ClassParser
+from ...utils.class_parser import ClassParser
 
 
 class DagHandler:

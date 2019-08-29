@@ -20,7 +20,7 @@ synced to a remote repo
 - [x] Basic operator level properties
 - [x] Implement DAG level properties
 - [x] New DAG Functionality
-- [ ] Parameter Tooltips
+- [x] Parameter Tooltips
 - [ ] Render arbitrary viewport windows for New/Save/Load etc
 - [ ] Overwrite/Save prompt on New
 - [ ] DAG renaming and save/load functionality
@@ -32,13 +32,15 @@ synced to a remote repo
 - [x] Generate Operator Lists
 - [x] CLI to start Web and Front End
 - [x] Generate DAG Spec
-- [ ] CLI to create new windmill project
+- [x] CLI to create new windmill project
+- [ ] CLI to start windmill from a windmill project
 - [ ] Save/Load Windmill Files functionality
 - [ ] Generate YML Airflow Specs
 - [x] Get default values
 - [x] Pull parameters from parent classes
 - [?] Dedupe multi import operators - nothing preventing this but underlying issue is fixed
 - [ ] Allow custom operators
+- [ ] Add defaults to CLI --help commands
 - [ ] Strategy for Python Opjects (e.g. callables) - maybe import statement?
 - [ ] Backport existing Python DAGs to WMLs
 - [ ] Allow YML updates to propogate to WMLs
@@ -56,9 +58,9 @@ To run as a dev:
 
 1. Clone from git
 2. Run `poetry install`
-3. ?Run `windmill dev install-node-depts`
-4. Run `windmill dev start-backend`
-5. Run `windmill dev start-frontend`
+3. ?Run `windmill-dev install-node-depts`
+4. Run `windmill-dev start-backend`
+5. Run `windmill-dev start-frontend`
 
 ## Future Usage Patterns
 

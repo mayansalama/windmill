@@ -5,8 +5,8 @@ from copy import deepcopy
 
 from docstring_parser import parse
 
-from .exceptions import DocstringParseError
-from ..schemas.app_schemas import validate_parameter_type, VALID_PARAMETER_TYPES
+from ..exceptions import DocstringParseError
+from ..models.schemas.app_schemas import validate_parameter_type, VALID_PARAMETER_TYPES
 
 
 class ClassParser:

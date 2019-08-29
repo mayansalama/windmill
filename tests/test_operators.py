@@ -6,9 +6,9 @@ from airflow.operators.bash_operator import BaseOperator, BashOperator
 from airflow.operators.python_operator import PythonVirtualenvOperator
 from airflow.operators.sensors import S3KeySensor
 
-from windmill.schemas.app_schemas import OperatorSchema
-from windmill.operators.operator_handler import OperatorHandler
-from windmill.operators.operator_index import OperatorIndex
+from windmill.models.schemas.app_schemas import OperatorSchema
+from windmill.models.operators.operator_handler import OperatorHandler
+from windmill.models.operators.operator_index import OperatorIndex
 from windmill.utils.class_parser import ClassParser
 
 

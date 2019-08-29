@@ -6,7 +6,7 @@ from importlib import import_module
 from airflow import operators
 
 from .operator_handler import OperatorHandler
-from ..utils.exceptions import OperatorMarshallError
+from ...exceptions import OperatorMarshallError
 
 
 class OperatorIndex:

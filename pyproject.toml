@@ -12,6 +12,7 @@ marshmallow = "^3.0"
 docstring-parser = "^0.3.0"
 decli = "^0.5.0"
 flask-cors = "^3.0.8"
+pyyaml = "^5.1.2"
 
 [tool.poetry.dev-dependencies]
 pylint = "^2.3"
@@ -20,7 +21,8 @@ pytest = "5.0.1"
 rope = "^0.14.0"
 
 [tool.poetry.scripts]
-windmill = "windmill:bin.cli.run_cli"
+windmill = "windmill:cli.cli.Cli.run"
+windmill-dev = "windmill:cli.cli.DevCli.run"
 
 [build-system]
 requires = ["poetry>=0.12"]

@@ -24,6 +24,7 @@
     "@types/react-dom": "^16.9.0",
     "@types/react-resizable": "^1.7.1",
     "@types/react-textarea-autosize": "^4.3.4",
+    "@types/react-tooltip": "^3.9.3",
     "@types/styled-components": "^4.1.18",
     "axios": "^0.19.0",
     "gh-pages": "^2.1.1",
@@ -31,6 +32,7 @@
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-icons": "^3.7.0",
-    "react-textarea-autosize": "^7.1.0"
+    "react-textarea-autosize": "^7.1.0",
+    "react-tooltip": "^3.10.0"
   }
 }

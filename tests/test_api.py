@@ -4,7 +4,7 @@ from unittest import TestCase
 from flask import Response
 
 from windmill.http.api import endpoints
-from windmill.operators.operator_handler import OperatorHandler
+from windmill.models.operators.operator_handler import OperatorHandler
 
 
 class Fixture(TestCase):

@@ -1,9 +1,9 @@
 from flask import Flask, make_response, jsonify
 from flask_cors import CORS
 
-from ...dags.dag_handler import DagHandler
-from ...operators.operator_index import OperatorIndex
-from ...schemas.app_schemas import OperatorSchema
+from ...models.dags.dag_handler import DagHandler
+from ...models.operators.operator_index import OperatorIndex
+from ...models.schemas.app_schemas import OperatorSchema
 
 app = Flask(__name__)
 CORS(app)

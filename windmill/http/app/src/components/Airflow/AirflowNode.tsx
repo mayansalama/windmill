@@ -1,7 +1,9 @@
 import * as React from "react";
 import { cloneDeep } from "lodash";
 import styled, { css } from "styled-components";
+import ReactTooltip from "react-tooltip";
 import Textarea from "react-textarea-autosize";
+import { FaInfoCircle } from "react-icons/fa";
 import { INodeInnerDefaultProps, INode } from "@mrblenny/react-flow-chart";
 import { Theme } from "../Theme";
 import { IAirflowOperatorParameter, IAirflowOperatorProperties } from ".";
@@ -109,6 +111,18 @@ const StyledLabel = styled.div`
   padding: 4px 10px 0px 6px;
   color: ${Theme.colors.darkAccent};
   float: left;
+  width: auto;
+`;
+
+const StyledInfo = styled.div`
+  ${SmartTextAreaBase};
+  font-size: ${Theme.fonts.normalSize};
+  padding: 3px;
+  /* border-radius: 4px; */
+  color: ${Theme.colors.darkAccent};
+  float: right;
+  text-align: right;
+  width: 20px;
 `;
 
 const StyledErrorMessage = styled.div`
@@ -119,6 +133,10 @@ const StyledErrorMessage = styled.div`
   color: red;
   float: right;
   text-align: right;
+`;
+
+const StyledTooltip = styled(ReactTooltip)`
+  max-width: 300px;
 `;
 
 const isValid = (params: IAirflowOperatorParameter): string => {
@@ -214,7 +232,7 @@ class SmartTextarea extends React.Component<ISmartTextAreaProps> {
   }
 
   public render() {
-    const { id, required } = this.props.params;
+    const { description, id, required } = this.props.params;
     const errmsg = this.isValid;
 
     return (
@@ -230,8 +248,12 @@ class SmartTextarea extends React.Component<ISmartTextAreaProps> {
         <StyledLableDiv>
           <StyledLabel>{id}</StyledLabel>
           <StyledErrorMessage>{errmsg}</StyledErrorMessage>
+          <StyledInfo data-tip={description}>
+            <FaInfoCircle />
+          </StyledInfo>
         </StyledLableDiv>
         {this.renderForm()}
+        <StyledTooltip multiline={true} place="right" />
       </SmartTextAreaDiv>
     );
   }
@@ -382,7 +404,12 @@ export class RenderedAirflowParametersAsForm extends React.Component<
         <Outer>
           <div>
             <Tooltip>{this.props.nameField}</Tooltip>
+            <FaInfoCircle
+              data-tip={this.props.properties.description}
+              style={{ float: "right", marginLeft: "5px" }}
+            />
             {this.props.type ? <Type>{this.props.type}</Type> : null}
+            <StyledTooltip multiline={true} place="right" />
           </div>
           <NameInput
             placeholder="Input name.."
@@ -400,10 +427,9 @@ export class RenderedAirflowParametersAsForm extends React.Component<
         <Outer>
           <SectionTitle>Parameters</SectionTitle>
           {[].concat(
-            ...this.props.properties.parameters
-              .filter(param => param.id != this.props.nameField)
-              .map((p, i) => {
-                return [
+            ...this.props.properties.parameters.map((p, i) => {
+              return [
+                p.id != this.props.nameField ? (
                   <div key={`${p.id}-${i}-div`}>
                     <RenderedAirflowParameter
                       params={p}
@@ -413,8 +439,11 @@ export class RenderedAirflowParametersAsForm extends React.Component<
                     />
                     <br key={`${p.id}-${i}-br`} />
                   </div>
-                ];
-              })
+                ) : (
+                  <div key={`${p.id}-${i}-div-name-placeholder`} />
+                )
+              ];
+            })
           )}
         </Outer>
       </div>

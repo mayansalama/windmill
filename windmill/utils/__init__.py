@@ -1,1 +1,1 @@
-from . import exceptions
+from . import class_parser
