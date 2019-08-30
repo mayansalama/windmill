@@ -6,7 +6,9 @@
   "homepage": "https://github.com/mayansalama/windmill",
   "repository": "git@github.com:mayansalama/windmill.git",
   "scripts": {
-    "start": "parcel public/index.html"
+    "start": "parcel public/index.html",
+    "prebuild": "rm -rf dist",
+    "build": "parcel build public/index.html"
   },
   "keywords": [],
   "author": "",
