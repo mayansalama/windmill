@@ -123,6 +123,7 @@ export class FileDropdown extends React.Component<IDropdown> {
     super(props);
 
     this.handleNew = this.handleNew.bind(this);
+    this.handleOpen = this.handleOpen.bind(this);
   }
 
   public handleNew() {
@@ -130,7 +131,7 @@ export class FileDropdown extends React.Component<IDropdown> {
   }
 
   public handleOpen() {
-    alert("open is not implemented");
+    this.props.getApp().toggleFileBrowser();
   }
 
   public render() {

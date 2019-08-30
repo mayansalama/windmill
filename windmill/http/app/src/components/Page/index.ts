@@ -1,2 +1,3 @@
-export * from "./Page"
-export * from "./ResizablePanel"
+export * from "./MainPage";
+export * from "./Page";
+export * from "./ResizablePanel";

@@ -20,8 +20,13 @@ class BaseConfig(ABC):
         Returns:
             ProjectObj: Instantiated object with the same fields as the parent schema
         """
+        # Use schema to validate/translate
         data = cls.schema().load(kwargs, unknown="IGNORE")
-        return cls(**data)
+
+        # Pass on additional params that aren't in the schema
+        # This would include args that are not intended for the cli
+        full_params = {**data, **{k: v for k, v in kwargs.items() if k not in data}}
+        return cls(**full_params)
 
     @classmethod
     def to_cli_args(cls):

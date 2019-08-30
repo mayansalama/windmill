@@ -250,11 +250,12 @@ export class OperatorSidebar extends React.Component<
             [].concat(
               ...this.getModules()
                 .sort()
-                .map((mod: string) => (
+                .map((mod: string, mod_ind: number) => (
                   <AirflowModule
                     moduleName={mod}
                     isModuleOpen={this.isModuleOpen}
                     setModule={this.setOpenModule}
+                    key={`${mod}-${mod_ind}`}
                   >
                     {[].concat(
                       ...this.props.operators

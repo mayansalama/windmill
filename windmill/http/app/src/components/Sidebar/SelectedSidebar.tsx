@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { ISelectedOrHovered } from "@mrblenny/react-flow-chart";
 import { IAirflowNode, AirflowNodeForm, AirflowDagParams } from "../";
 import { BaseSidebar, SidebarTitle, Theme } from "../Theme";
-import { IAppState } from "../../App";
+import { IAppState } from "../..";
 
 const Button = styled.div`
   margin: 30px;

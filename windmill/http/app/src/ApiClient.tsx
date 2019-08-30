@@ -16,6 +16,10 @@ export class APIClient {
     return this.perform("GET", "/v1/dag")
   }
 
+  public getWmlList() {
+    return this.perform("GET", "/v1/wml/")
+  }
+
   async perform(method: Method, resource: string, data?: any) {
     return client({
       method,

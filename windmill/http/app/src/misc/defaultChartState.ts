@@ -1,4 +1,4 @@
-import { IAppState } from "../App";
+import { IAppState } from "..";
 
 export const defaultChart: IAppState = {
   offset: {
@@ -10,5 +10,6 @@ export const defaultChart: IAppState = {
   selected: {},
   hovered: {},
   dag: null,
-  operators: []
+  operators: [],
+  browser: false
 };

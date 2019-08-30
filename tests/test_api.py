@@ -20,6 +20,8 @@ class Fixture(TestCase):
         self.conf = ProjectConfig.load()
         CreateProject(self.conf)
 
+        os.chdir(os.path.join(self.tmpdir.name, self.conf.name))
+
         self.client = build_app(self.conf).test_client()
         return super().setUp()
 
@@ -60,7 +62,9 @@ class TestV1Dag(Fixture):
 class TestV1Wmls(Fixture):
     def setUp(self):
         res = super().setUp()
-        self.base_path = os.path.join(self.tmpdir.name, self.conf.wml_path)
+        self.base_path = os.path.join(
+            self.tmpdir.name, self.conf.name, self.conf.wml_dir
+        )
         assert os.path.exists(self.base_path)
         return res
 

@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 
 from flask import Flask, jsonify, make_response, request, send_from_directory
@@ -53,7 +54,7 @@ def get_dagspec():
 @app.route("/v1/wml/<name>", methods=["GET"])
 def get_wmls(name=None):
     if name:
-        f_path = os.path.join(app.config["project_conf"].wml_path, name)
+        f_path = os.path.join(app.config["project_conf"].wml_dir, name)
         if os.path.exists(f_path):
             with open(f_path, "r") as f:
                 data = json.load(f)
@@ -61,7 +62,7 @@ def get_wmls(name=None):
         else:
             return f"File {f_path} not found", 404
     else:
-        return jsonify(os.listdir(app.config["project_conf"].wml_path)), 200
+        return jsonify(os.listdir(app.config["project_conf"].wml_dir)), 200
 
 
 @app.route("/v1/wml/<name>", methods=["POST"])
@@ -69,7 +70,7 @@ def post_wml(name):
     content = request.json
     # TODO: Validation
 
-    f_path = os.path.join(app.config["project_conf"].wml_path, name)
+    f_path = os.path.join(app.config["project_conf"].wml_dir, name)
     with open(f_path, "w") as f:
         json.dump(content, f)
 
@@ -83,6 +84,7 @@ def build_app(proj_conf: ProjectConfig, dev_server=False):
     app.config["project_conf"] = proj_conf
 
     if dev_server:
+        logging.warning("Running a dev-build with CORS enabled")
         CORS(app)
 
     return app

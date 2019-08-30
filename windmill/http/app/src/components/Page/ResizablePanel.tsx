@@ -124,13 +124,16 @@ export class ResizablePanel extends React.Component<
           ...rest.map((child, i) => {
             return [
               i == 0 ? (
-                <Resizer onMouseDown={e => this.startResize(e)}>
-                  <GripLines>
-                    <FaGripLinesVertical />
+                <Resizer
+                  onMouseDown={e => this.startResize(e)}
+                  key={"resizer_" + i}
+                >
+                  <GripLines key={"grip_lines" + i}>
+                    <FaGripLinesVertical key={"grip_lines_ico" + i} />
                   </GripLines>
                 </Resizer>
               ) : (
-                <Divider />
+                <Divider key={"divider_" + i} />
               ),
               <div
                 key={"panel_" + i}

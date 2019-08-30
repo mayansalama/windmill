@@ -25,7 +25,7 @@ const DefaultPorts = {
     }
   },
   port2: {
-    id: "port1",
+    id: "port2",
     type: "bottom",
     properties: {
       custom: "property"

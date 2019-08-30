@@ -61,7 +61,3 @@ class ProjectConfig(BaseConfig):
                 return ProjectConfig(**yaml.load(f))
         except Exception as e:
             raise InitError("This directory is not a valid windmill project") from e
-
-    @property
-    def wml_path(self) -> str:
-        return os.path.join(self.name, self.wml_dir)

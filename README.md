@@ -21,11 +21,12 @@ synced to a remote repo
 - [x] Implement DAG level properties
 - [x] New DAG Functionality
 - [x] Parameter Tooltips
-- [ ] Render arbitrary viewport windows for New/Save/Load etc
+- [x] Render arbitrary viewport windows for New/Save/Load etc
 - [ ] Overwrite/Save prompt on New
 - [ ] DAG renaming and save/load functionality
 - [ ] Fix loss of state on refresh bug
 - [ ] Icons
+- [ ] Put File details in File Browser 
 - [ ] Pull PORT from Flask host
 
 ### Back-End Features
@@ -35,13 +36,13 @@ synced to a remote repo
 - [x] Generate DAG Spec
 - [x] CLI to create new windmill project
 - [x] CLI to start windmill from a windmill project
-- [ ] Implement windmill-dev start
+- [x] Implement windmill-dev start
 - [x] Save/Load Windmill Files functionality
-- [ ] Generate YML Airflow Specs
 - [ ] Validate incoming WMLs (is there a need for this?)
 - [x] Get default values
 - [x] Pull parameters from parent classes
 - [?] Dedupe multi import operators - nothing preventing this but underlying issue is fixed
+- [ ] Get WML owner and last-modified details during wml list
 - [ ] Allow custom operators
 - [ ] Add defaults to CLI --help commands
 - [ ] Strategy for Python Opjects (e.g. callables) - maybe import statement?

@@ -73,13 +73,13 @@ class DevCli:
                 "commands": [
                     {
                         "name": "start-backend",
-                        "help": "Starts the backend flask server",
+                        "help": "Starts the backend flask server with CORS enabled",
                         "func": DevCli.start_backend,
-                        "arguments": [{"name": "--port", "default": 8000, "type": int}],
+                        "arguments": RunConfig.to_cli_args(),
                     },
                     {
                         "name": "start-frontend",
-                        "help": "Starts the frontend react server",
+                        "help": "Starts the frontend react server using npm build",
                         "func": DevCli.start_frontend,
                         "arguments": [],
                     },
@@ -88,8 +88,12 @@ class DevCli:
         }
 
     @staticmethod
-    def start_backend(port, **kwargs):
-        app.run(port=port)
+    def start_backend(*args, **kwargs):
+        try:
+            run_config = RunConfig.load(run_dev_server=True, *args, **kwargs)
+            StartWebserver(run_config)
+        except Exception as e:
+            logging.error(f"Unable to start webserver ({e}) - aborting")
 
     @staticmethod
     def start_frontend(**kwargs):

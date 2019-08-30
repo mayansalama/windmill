@@ -1,49 +1,27 @@
-import { FlowChart, IChart } from "@mrblenny/react-flow-chart";
-import * as actions from "@mrblenny/react-flow-chart/src/container/actions";
+import { IChart, actions } from "@mrblenny/react-flow-chart";
 import * as localStorage from "local-storage";
 import { cloneDeep, mapValues } from "lodash";
 import * as React from "react";
 import { render } from "react-dom";
-import styled from "styled-components";
 import { APIClient } from "./ApiClient";
-import { CanvasStyle } from "./components/Theme";
 import {
-  AirflowNode,
-  DropdownNavbar,
   IAirflowDag,
   IAirflowOperator,
   IAirflowOperatorProperties,
-  NavbarPage,
-  OperatorSidebar,
-  Page,
-  ResizablePanel,
-  SelectedSidebar
+  MainPage
 } from "./components";
 import * as MenuItems from "./components/Navbar/NavbarDropdowns";
 import { defaultChart } from "./misc/defaultChartState";
 import { Icon } from "./misc/icon";
-
-const AppLayout = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  max-width: 100vw;
-  max-height: 100vh;
-`;
-
-const Content = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
-  overflow: hidden;
-`;
+import { FileBrowser } from "./components/Page/FileBrowser";
 
 export interface IAppState extends IChart {
   operators?: IAirflowOperator[];
   dag?: IAirflowDag;
+  browser?: boolean;
 }
 
-class App extends React.Component<{}, IAppState> {
+export class App extends React.Component<{}, IAppState> {
   apiClient = new APIClient();
 
   constructor(props) {
@@ -55,18 +33,70 @@ class App extends React.Component<{}, IAppState> {
     this.updateDag = this.updateDag.bind(this);
     this.refreshOperators = this.refreshOperators.bind(this);
     this.refreshDag = this.refreshDag.bind(this);
+    this.toggleFileBrowser = this.toggleFileBrowser.bind(this);
   }
 
   public componentDidMount() {
-    if (this.operators.length == 0) {
+    if (this.state.operators.length == 0) {
       this.refreshOperators();
     }
-    if (!this.dag) {
+    if (!this.state.dag) {
       this.refreshDag();
     }
   }
 
   public componentDidUpdate() {
+    localStorage.set("windmillChart", this.state);
+  }
+
+  public refreshOperators() {
+    this.apiClient.getOperators().then(data => {
+      this.setState(prevState => ({
+        ...prevState,
+        operators: data
+      }));
+    });
+  }
+
+  public refreshDag() {
+    this.apiClient.getDagSpec().then(data => {
+      // Set values to defaults where applicable
+      for (let i = 0; i < data.parameters.length; i++) {
+        if (data.parameters[i].default) {
+          data.parameters[i].value = data.parameters[i].default;
+        }
+      }
+      this.setState(prevState => ({
+        ...prevState,
+        dag: data
+      }));
+    });
+  }
+
+  public updateNodeProperties(
+    key: string,
+    newProps: IAirflowOperatorProperties
+  ) {
+    this.setState(prevState => ({
+      ...prevState,
+      nodes: {
+        ...prevState.nodes,
+        [key]: {
+          ...prevState.nodes[key],
+          ["properties"]: newProps
+        }
+      }
+    }));
+
+    localStorage.set("windmillChart", this.state);
+  }
+
+  public updateDag(newProps: IAirflowDag) {
+    this.setState(prevState => ({
+      ...prevState,
+      dag: newProps
+    }));
+
     localStorage.set("windmillChart", this.state);
   }
 
@@ -97,63 +127,11 @@ class App extends React.Component<{}, IAppState> {
     this.refreshOperators();
   }
 
-  public refreshOperators() {
-    this.apiClient.getOperators().then(data => {
-      this.setState(prevState => ({
-        ...prevState,
-        operators: data
-      }));
-    });
-  }
-
-  public refreshDag() {
-    this.apiClient.getDagSpec().then(data => {
-      for (let i = 0; i < data.parameters.length; i++) {
-        if (data.parameters[i].default) {
-          data.parameters[i].value = data.parameters[i].default;
-        }
-      }
-
-      this.setState(prevState => ({
-        ...prevState,
-        dag: data
-      }));
-    });
-  }
-
-  public get operators(): IAirflowOperator[] {
-    return this.state.operators;
-  }
-
-  public get dag(): IAirflowDag {
-    return this.state.dag;
-  }
-
-  public updateNodeProperties(
-    key: string,
-    newProps: IAirflowOperatorProperties
-  ) {
+  public toggleFileBrowser() {
     this.setState(prevState => ({
       ...prevState,
-      nodes: {
-        ...prevState.nodes,
-        [key]: {
-          ...prevState.nodes[key],
-          ["properties"]: newProps
-        }
-      }
+      browser: !prevState.browser
     }));
-
-    localStorage.set("windmillChart", this.state);
-  }
-
-  public updateDag(newProps: IAirflowDag) {
-    this.setState(prevState => ({
-      ...prevState,
-      dag: newProps
-    }));
-
-    localStorage.set("windmillChart", this.state);
   }
 
   public render() {
@@ -162,35 +140,19 @@ class App extends React.Component<{}, IAppState> {
     ) as typeof actions;
 
     return (
-      <AppLayout>
-        <NavbarPage>
-          <DropdownNavbar {...this.Navigation} />
-        </NavbarPage>
-        <Page>
-          <ResizablePanel>
-            <SelectedSidebar
-              appState={this.state}
-              onDeleteKey={stateActions.onDeleteKey}
-              updateNodeProps={this.updateNodeProperties}
-              updateDag={this.updateDag}
-            />
-            <Content>
-              <FlowChart
-                chart={this.state}
-                callbacks={stateActions}
-                Components={{
-                  NodeInner: AirflowNode,
-                  CanvasOuter: CanvasStyle
-                }}
-              />
-            </Content>
-            <OperatorSidebar
-              operators={this.operators}
-              refreshOperators={this.refreshOperators}
-            />
-          </ResizablePanel>
-        </Page>
-      </AppLayout>
+      <div>
+        {this.state.browser ? <FileBrowser getApp={() => this} /> : <div />}
+        <div style={{ filter: this.state.browser ? `blur(5px)` : "" }}>
+          <MainPage
+            actions={stateActions}
+            getAppState={() => this.state}
+            navigation={this.Navigation}
+            refreshOperators={this.refreshOperators}
+            updateDag={this.updateDag}
+            updateNodeProperties={this.updateNodeProperties}
+          />
+        </div>
+      </div>
     );
   }
 }
