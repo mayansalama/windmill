@@ -1,6 +1,7 @@
 **/__pycache__/
 **/.pytest_cache/
 .vscode/
-windmill.egg-info/
+windmill_airflow.egg-info/
 .VSCodeCounter/
 windmill-project/
+dist/

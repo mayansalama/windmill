@@ -7,6 +7,6 @@ class ProjectDefaults:
 
 
 class ServerDefaults:
-    HOST_ADDRESS = "127.0.0.1"
+    HOST_ADDRESS = "localhost"
     HOST_PORT = 8000
     PROJECT_CONF = ProjectDefaults.PROJECT_CONF

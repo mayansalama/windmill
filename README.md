@@ -74,5 +74,5 @@ To run as a dev:
 This package can be installed and run using Pip:
 
 ```
-pip install git+git://github.com/mayansalama/windmill.git
+pip install windmill-airflow
 ```

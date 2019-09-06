@@ -1,10 +1,13 @@
 [tool.poetry]
-name = "windmill"
+name = "windmill-airflow"
 version = "0.1.0"
 description = ""
 authors = ["mayansalama <micsalama@gmail.com>"]
 readme = "README.md"
 license = "Apache-2.0"
+packages = [
+    {include = "windmill"}
+]
 
 [tool.poetry.dependencies]
 python = "^3.6"
