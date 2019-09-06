@@ -22,12 +22,16 @@ synced to a remote repo
 - [x] New DAG Functionality
 - [x] Parameter Tooltips
 - [x] Render arbitrary viewport windows for New/Save/Load etc
-- [ ] Overwrite/Save prompt on New
-- [ ] DAG renaming and save/load functionality
+- [x] Overwrite/Save prompt on New
+- [x] DAG renaming and save functionality
+- [ ] Open dag from menu
+- [ ] Check if file already exists on rename
+- [ ] Prompt save if there are nodes on open
 - [ ] Fix loss of state on refresh bug
 - [ ] Icons
 - [ ] Put File details in File Browser 
 - [ ] Pull PORT from Flask host
+- [ ] Add a last saved time to NavBar
 
 ### Back-End Features
 

@@ -4,20 +4,14 @@ import onClickOutside from "react-onclickoutside";
 import { App } from "../../App";
 import { Theme } from "../Theme";
 import { FaSearch } from "react-icons/fa";
+import { OverlayBoxRootstyle } from "./Page";
 
 const OverlayBox = styled.div`
-  position: absolute;
-  float: none;
-  margin: 0 auto;
+  ${OverlayBoxRootstyle}
   left: 450px;
   top: 15%;
   width: 750px;
   height: 750px;
-  z-index: 100;
-  background: ${Theme.colors.light};
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-  border: 2px solid ${Theme.colors.lightAccent2};
-  border-radius: 10px;
 `;
 
 const SearchDiv = styled.div`

@@ -11,5 +11,7 @@ export const defaultChart: IAppState = {
   hovered: {},
   dag: null,
   operators: [],
-  browser: false
+  isFileBrowserOpen: false,
+  isRenameBoxOpen: false,
+  filename: "Untitled"
 };

@@ -124,6 +124,7 @@ export class FileDropdown extends React.Component<IDropdown> {
 
     this.handleNew = this.handleNew.bind(this);
     this.handleOpen = this.handleOpen.bind(this);
+    this.handleSave = this.handleSave.bind(this);
   }
 
   public handleNew() {
@@ -134,6 +135,10 @@ export class FileDropdown extends React.Component<IDropdown> {
     this.props.getApp().toggleFileBrowser();
   }
 
+  public handleSave() {
+    this.props.getApp().saveWml();
+  }
+
   public render() {
     return (
       <Dropdown
@@ -141,8 +146,7 @@ export class FileDropdown extends React.Component<IDropdown> {
         items={[
           { title: "New...", callback: this.handleNew },
           { title: "Open", callback: this.handleOpen },
-          { sep: true },
-          { title: "Sep!", callback: () => {} }
+          { title: "Save", callback: this.handleSave }
         ]}
       />
     );

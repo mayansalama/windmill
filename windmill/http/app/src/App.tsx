@@ -1,24 +1,28 @@
-import { IChart, actions } from "@mrblenny/react-flow-chart";
+import { actions, IChart } from "@mrblenny/react-flow-chart";
 import * as localStorage from "local-storage";
 import { cloneDeep, mapValues } from "lodash";
 import * as React from "react";
 import { render } from "react-dom";
 import { APIClient } from "./ApiClient";
 import {
+  FileBrowser,
+  RenameBox,
   IAirflowDag,
   IAirflowOperator,
   IAirflowOperatorProperties,
-  MainPage
+  MainPage,
+  IDropdownNavbarProps
 } from "./components";
 import * as MenuItems from "./components/Navbar/NavbarDropdowns";
 import { defaultChart } from "./misc/defaultChartState";
 import { Icon } from "./misc/icon";
-import { FileBrowser } from "./components/Page/FileBrowser";
 
 export interface IAppState extends IChart {
+  filename?: string;
   operators?: IAirflowOperator[];
   dag?: IAirflowDag;
-  browser?: boolean;
+  isFileBrowserOpen?: boolean;
+  isRenameBoxOpen?: boolean;
 }
 
 export class App extends React.Component<{}, IAppState> {
@@ -29,11 +33,14 @@ export class App extends React.Component<{}, IAppState> {
     this.state = localStorage.get("windmillChart") || cloneDeep(defaultChart);
 
     this.newDag = this.newDag.bind(this);
+    this.updateFilename = this.updateFilename.bind(this);
     this.updateNodeProperties = this.updateNodeProperties.bind(this);
     this.updateDag = this.updateDag.bind(this);
     this.refreshOperators = this.refreshOperators.bind(this);
     this.refreshDag = this.refreshDag.bind(this);
     this.toggleFileBrowser = this.toggleFileBrowser.bind(this);
+    this.toggleRenameBox = this.toggleRenameBox.bind(this);
+    this.saveWml = this.saveWml.bind(this);
   }
 
   public componentDidMount() {
@@ -73,6 +80,13 @@ export class App extends React.Component<{}, IAppState> {
     });
   }
 
+  public updateFilename(name: string) {
+    this.setState(prevState => ({
+      ...prevState,
+      filename: name
+    }));
+  }
+
   public updateNodeProperties(
     key: string,
     newProps: IAirflowOperatorProperties
@@ -100,9 +114,14 @@ export class App extends React.Component<{}, IAppState> {
     localStorage.set("windmillChart", this.state);
   }
 
-  public Navigation = {
+  //////////////////////////////////////////////////
+  // Navigation and event handlers
+  //////////////////////////////////////////////////
+
+  public Navigation: IDropdownNavbarProps = {
     icon: <Icon />,
     brand: { name: "Windmill", to: "/" },
+    renameHandler: () => this.toggleRenameBox(),
     dropdownHandlers: [
       {
         name: "File",
@@ -130,9 +149,24 @@ export class App extends React.Component<{}, IAppState> {
   public toggleFileBrowser() {
     this.setState(prevState => ({
       ...prevState,
-      browser: !prevState.browser
+      isFileBrowserOpen: !prevState.isFileBrowserOpen
     }));
   }
+
+  public toggleRenameBox() {
+    this.setState(prevState => ({
+      ...prevState,
+      isRenameBoxOpen: !prevState.isRenameBoxOpen
+    }));
+  }
+
+  public saveWml() {
+    this.apiClient.saveWml(`${this.state.filename}.wml`, this.state);
+  }
+
+  //////////////////////////////////////////////////
+  // Render Methods
+  //////////////////////////////////////////////////
 
   public render() {
     const stateActions = mapValues(actions, (func: any) => (...args: any) =>
@@ -141,16 +175,25 @@ export class App extends React.Component<{}, IAppState> {
 
     return (
       <div>
-        {this.state.browser ? <FileBrowser getApp={() => this} /> : <div />}
-        <div style={{ filter: this.state.browser ? `blur(5px)` : "" }}>
-          <MainPage
-            actions={stateActions}
-            getAppState={() => this.state}
-            navigation={this.Navigation}
-            refreshOperators={this.refreshOperators}
-            updateDag={this.updateDag}
-            updateNodeProperties={this.updateNodeProperties}
-          />
+        {this.state.isFileBrowserOpen ? (
+          <FileBrowser getApp={() => this} />
+        ) : (
+          <div />
+        )}
+        {this.state.isRenameBoxOpen ? (
+          <RenameBox getApp={() => this} />
+        ) : (
+          <div />
+        )}
+        <div
+          style={{
+            filter:
+              this.state.isFileBrowserOpen || this.state.isRenameBoxOpen
+                ? `blur(5px)`
+                : ""
+          }}
+        >
+          <MainPage actions={stateActions} getApp={() => this} />
         </div>
       </div>
     );

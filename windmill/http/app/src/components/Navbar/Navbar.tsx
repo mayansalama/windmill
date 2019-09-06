@@ -6,10 +6,12 @@ export interface IDropdownNavbarProps {
   icon: JSX.Element;
   brand: { name: string; to: any };
   dropdownHandlers: Array<{ name: string; callback: Function }>;
+  renameHandler: Function;
+  filename?: string;
 }
 
 export const DropdownNavbar = (props: IDropdownNavbarProps) => {
-  const { icon, brand, dropdownHandlers } = props;
+  const { filename, icon, brand, dropdownHandlers, renameHandler } = props;
   const DropdownButtons: any = () =>
     dropdownHandlers.map(link => link.callback());
   return (
@@ -17,7 +19,7 @@ export const DropdownNavbar = (props: IDropdownNavbarProps) => {
       <Brand href={brand.to}>{icon}</Brand>
       <DropDownSplit>
         <Ul>
-          <Filename>Untitled Dag.wml</Filename>
+          <Filename onClick={() => renameHandler()}>{filename}</Filename>
         </Ul>
         <Ul>
           <DropdownButtons />

@@ -1,5 +1,5 @@
 import * as React from "react";
-import styled, { createGlobalStyle } from "styled-components";
+import styled, { createGlobalStyle, css } from "styled-components";
 import { Theme } from "../Theme";
 
 const GlobalStyle = createGlobalStyle`
@@ -48,3 +48,14 @@ export const NavbarPage = ({ children }: { children: any }) => (
     <GlobalStyle />
   </NavBarContent>
 );
+
+export const OverlayBoxRootstyle = css`
+  position: absolute;
+  float: none;
+  margin: 0 auto;
+  z-index: 100;
+  background: ${Theme.colors.light};
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  border: 2px solid ${Theme.colors.lightAccent2};
+  border-radius: 10px;
+`;

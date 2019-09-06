@@ -20,6 +20,10 @@ export class APIClient {
     return this.perform("GET", "/v1/wml/")
   }
 
+  public saveWml(dagName: string, wml: any) {
+    return this.perform("POST", `/v1/wml/${dagName}`, wml)
+  }
+
   async perform(method: Method, resource: string, data?: any) {
     return client({
       method,

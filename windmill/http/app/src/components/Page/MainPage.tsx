@@ -9,7 +9,7 @@ import {
   SelectedSidebar,
   OperatorSidebar
 } from "..";
-import { IAppState } from "../../";
+import { App } from "../../";
 import { CanvasStyle } from "../Theme";
 import { FlowChart } from "@mrblenny/react-flow-chart";
 import styled from "styled-components";
@@ -29,45 +29,35 @@ const Content = styled.div`
   overflow: hidden;
 `;
 
-export class MainPage extends React.Component<
-  {
-    actions: any;
-    getAppState: Function;
-    navigation: IDropdownNavbarProps;
-    refreshOperators: Function;
-    updateNodeProperties: Function;
-    updateDag: Function;
-  },
-  {}
-> {
+export class MainPage extends React.Component<{
+  actions: any;
+  getApp: Function;
+}> {
   public render() {
-    const {
-      actions,
-      getAppState,
-      navigation,
-      refreshOperators,
-      updateNodeProperties,
-      updateDag
-    } = this.props;
+    const { actions, getApp } = this.props;
+    const app: App = getApp();
 
-    const appState: IAppState = getAppState();
+    const navigation: IDropdownNavbarProps = app.Navigation;
+    const refreshOperators: Function = app.refreshOperators;
+    const updateNodeProperties: Function = app.updateNodeProperties;
+    const updateDag: Function = app.updateDag;
 
     return (
       <AppLayout>
         <NavbarPage>
-          <DropdownNavbar {...navigation} />
+          <DropdownNavbar {...{...navigation, filename: app.state.filename}} />
         </NavbarPage>
         <Page>
           <ResizablePanel>
             <SelectedSidebar
-              appState={appState}
+              appState={app.state}
               onDeleteKey={actions.onDeleteKey}
               updateNodeProps={updateNodeProperties}
               updateDag={updateDag}
             />
             <Content>
               <FlowChart
-                chart={appState}
+                chart={app.state}
                 callbacks={actions}
                 Components={{
                   NodeInner: AirflowNode,
@@ -76,7 +66,7 @@ export class MainPage extends React.Component<
               />
             </Content>
             <OperatorSidebar
-              operators={appState.operators}
+              operators={app.state.operators}
               refreshOperators={refreshOperators}
             />
           </ResizablePanel>
