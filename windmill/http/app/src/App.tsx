@@ -186,12 +186,12 @@ export class App extends React.Component<{}, IAppState> {
           <div />
         )}
         <div
-          style={{
-            filter:
-              this.state.isFileBrowserOpen || this.state.isRenameBoxOpen
-                ? `blur(5px)`
-                : ""
-          }}
+          // style={{
+          //   filter:
+          //     this.state.isFileBrowserOpen || this.state.isRenameBoxOpen
+          //       ? "blur(1px)"
+          //       : ""
+          // }}
         >
           <MainPage actions={stateActions} getApp={() => this} />
         </div>
