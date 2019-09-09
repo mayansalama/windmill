@@ -4,3 +4,5 @@
 windmill_airflow.egg-info/
 .VSCodeCounter/
 windmill-project/
+
+dist/*
