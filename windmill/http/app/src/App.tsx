@@ -15,13 +15,13 @@ import {
 } from "./components";
 import * as MenuItems from "./components/Navbar/NavbarDropdowns";
 import { defaultChart } from "./misc/defaultChartState";
-import { Icon } from "./misc/icon";
+import { Icon, StyledSpinner } from "./misc/icon";
 
 export interface IAppState extends IChart {
   filename?: string;
   operators?: IAirflowOperator[];
   dag?: IAirflowDag;
-  isLoading?: boolean;
+  isLoading?: number;
   isFileBrowserOpen?: boolean;
   isRenameBoxOpen?: boolean;
 }
@@ -91,12 +91,15 @@ export class App extends React.Component<{}, IAppState> {
     localStorage.set("windmillChart", this.state);
   }
 
-  public openWml(filename: string) {
+  public incLoading(inc = 1) {
     this.setState(prevState => ({
       ...prevState,
-      isLoading: true
+      isLoading: prevState.isLoading + inc
     }));
+  }
 
+  public openWml(filename: string) {
+    this.incLoading();
     this.apiClient
       .getWml(filename)
       .then(data => {
@@ -105,36 +108,39 @@ export class App extends React.Component<{}, IAppState> {
           ...data
         }));
       })
-      .then(() =>
-        this.setState(prevState => ({
-          ...prevState,
-          isLoading: false
-        }))
-      );
+      .then(() => this.incLoading(-1));
   }
 
   public refreshOperators() {
-    this.apiClient.getOperators().then(data => {
-      this.setState(prevState => ({
-        ...prevState,
-        operators: data
-      }));
-    });
+    this.incLoading();
+    this.apiClient
+      .getOperators()
+      .then(data => {
+        this.setState(prevState => ({
+          ...prevState,
+          operators: data
+        }));
+      })
+      .then(() => this.incLoading(-1));
   }
 
   public refreshDag() {
-    this.apiClient.getDagSpec().then(data => {
-      // Set values to defaults where applicable
-      for (let i = 0; i < data.parameters.length; i++) {
-        if (data.parameters[i].default) {
-          data.parameters[i].value = data.parameters[i].default;
+    this.incLoading();
+    this.apiClient
+      .getDagSpec()
+      .then(data => {
+        // Set values to defaults where applicable
+        for (let i = 0; i < data.parameters.length; i++) {
+          if (data.parameters[i].default) {
+            data.parameters[i].value = data.parameters[i].default;
+          }
         }
-      }
-      this.setState(prevState => ({
-        ...prevState,
-        dag: data
-      }));
-    });
+        this.setState(prevState => ({
+          ...prevState,
+          dag: data
+        }));
+      })
+      .then(() => this.incLoading(-1));
   }
 
   //////////////////////////////////////////////////
@@ -196,10 +202,12 @@ export class App extends React.Component<{}, IAppState> {
       this.setState(func(...args))
     ) as typeof actions;
 
-    if (this.state.isLoading || false) {
+    if (this.state.isLoading > 0 || false) {
       return (
-        <div>
-          <Icon></Icon>
+        <div style={{ position: "absolute", top: "45%", left: "45%" }}>
+          <StyledSpinner style={{ width: "10vh", height: "10vh" }}>
+            <Icon />
+          </StyledSpinner>
         </div>
       );
     }

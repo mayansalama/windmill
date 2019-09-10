@@ -91164,7 +91164,7 @@ exports.DropdownNavbar = function (props) {
 };
 
 var Navbar = styled_components_1.default.nav(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n  background: ", ";\n  font-family: ", ";\n  color: ", ";\n  display: flex;\n  flex: 1;\n  align-items: center;\n  a {\n    color: ", ";\n    text-decoration: none;\n  }\n"], ["\n  background: ", ";\n  font-family: ", ";\n  color: ", ";\n  display: flex;\n  flex: 1;\n  align-items: center;\n  a {\n    color: ", ";\n    text-decoration: none;\n  }\n"])), Theme_1.Theme.colors.dark, Theme_1.Theme.fonts.heading, Theme_1.Theme.colors.light, Theme_1.Theme.colors.light);
-var Brand = styled_components_1.default.a(templateObject_2 || (templateObject_2 = __makeTemplateObject(["\n  font-weight: bold;\n  font-style: italic;\n  margin: 0.2rem 0.5rem 0.2rem 0.5rem;\n"], ["\n  font-weight: bold;\n  font-style: italic;\n  margin: 0.2rem 0.5rem 0.2rem 0.5rem;\n"])));
+var Brand = styled_components_1.default.a(templateObject_2 || (templateObject_2 = __makeTemplateObject(["\n  width: 7vh;\n  height: 7vh;\n  position: relative;\n  font-weight: bold;\n  font-style: italic;\n  margin: 0.2rem 0.5rem 0.2rem 0.5rem;\n"], ["\n  width: 7vh;\n  height: 7vh;\n  position: relative;\n  font-weight: bold;\n  font-style: italic;\n  margin: 0.2rem 0.5rem 0.2rem 0.5rem;\n"])));
 var DropDownSplit = styled_components_1.default.div(templateObject_3 || (templateObject_3 = __makeTemplateObject(["\n  display: flex;\n  flex-direction: column;\n  flex: 1;\n"], ["\n  display: flex;\n  flex-direction: column;\n  flex: 1;\n"])));
 var Filename = styled_components_1.default.div(templateObject_4 || (templateObject_4 = __makeTemplateObject(["\n  padding: 3px 12px;\n  color: white;\n  text-align: left;\n  font-size: ", ";\n  transition: 0.3s ease all;\n  border-radius: 3px;\n  cursor: pointer;\n  &:hover {\n    background: ", ";\n  }\n"], ["\n  padding: 3px 12px;\n  color: white;\n  text-align: left;\n  font-size: ", ";\n  transition: 0.3s ease all;\n  border-radius: 3px;\n  cursor: pointer;\n  &:hover {\n    background: ", ";\n  }\n"])), Theme_1.Theme.fonts.headingSize, Theme_1.Theme.colors.darkAccent);
 var Ul = styled_components_1.default.div(templateObject_5 || (templateObject_5 = __makeTemplateObject(["\n  margin: 0px 0px;\n  display: flex;\n  flex-wrap: nowrap;\n  -webkit-overflow-scrolling: touch;\n"], ["\n  margin: 0px 0px;\n  display: flex;\n  flex-wrap: nowrap;\n  -webkit-overflow-scrolling: touch;\n"])));
@@ -91487,7 +91487,7 @@ exports.defaultChart = {
   hovered: {},
   dag: null,
   operators: [],
-  isLoading: false,
+  isLoading: 0,
   isFileBrowserOpen: false,
   isRenameBoxOpen: false,
   filename: "Untitled"
@@ -91533,21 +91533,22 @@ var styled_components_1 = __importDefault(require("styled-components"));
 
 var Theme_1 = require("../components/Theme");
 
-var Svg = styled_components_1.default.svg(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n  padding: 7px 7px;\n  flex: 0 1;\n  width: 70px;\n  height: 65px;\n  margin-top: 2px;\n  background: white;\n  border-radius: 5px;\n"], ["\n  padding: 7px 7px;\n  flex: 0 1;\n  width: 70px;\n  height: 65px;\n  margin-top: 2px;\n  background: white;\n  border-radius: 5px;\n"])));
+var Svg = styled_components_1.default.svg(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n  position: absolute;\n  padding: 7px 7px;\n  flex: 0 1;\n  left: 0;\n  top: 0;\n  width: 100%;\n  height: 100%;\n  background: white;\n  border-radius: 5px;\n"], ["\n  position: absolute;\n  padding: 7px 7px;\n  flex: 0 1;\n  left: 0;\n  top: 0;\n  width: 100%;\n  height: 100%;\n  background: white;\n  border-radius: 5px;\n"])));
 var Path = styled_components_1.default.path(templateObject_2 || (templateObject_2 = __makeTemplateObject(["\n  fill: ", ";\n"], ["\n  fill: ", ";\n"])), Theme_1.Theme.colors.brand);
 
 exports.Icon = function () {
   return React.createElement(Svg, {
-    viewBox: "0, 0, 400,437.7245508982036"
+    viewBox: "0, 0, 400, 400"
   }, React.createElement(Path, {
     id: "path0",
-    d: "M52.947 0.698 C 50.395 1.653,48.145 3.762,25.688 26.252 C -0.728 52.707,0.499 51.280,0.499 55.539 C 0.499 59.775,-3.187 55.796,48.643 107.520 C 74.283 133.107,99.401 158.286,104.463 163.473 L 113.665 172.904 111.601 202.246 L 109.536 231.587 95.249 245.808 C 87.391 253.630,80.312 260.559,79.517 261.205 C 78.722 261.852,77.848 262.727,77.575 263.151 C 77.302 263.575,68.864 272.073,58.824 282.036 C 48.784 291.999,40.292 300.554,39.953 301.048 C 39.615 301.542,31.017 310.232,20.847 320.359 C -0.421 341.537,-0.298 341.380,0.599 346.109 C 1.177 349.158,1.319 349.314,25.981 374.009 C 52.827 400.890,51.270 399.551,55.689 399.550 C 60.071 399.549,58.817 400.602,80.751 378.516 C 91.489 367.704,100.340 358.923,100.420 359.003 C 100.500 359.083,99.422 374.639,98.025 393.571 C 96.627 412.504,95.557 428.589,95.647 429.317 C 96.028 432.394,98.043 435.201,100.983 436.752 L 102.545 437.575 199.543 437.652 C 308.006 437.737,298.313 437.940,301.270 435.529 C 305.379 432.179,305.335 433.785,302.450 392.814 C 301.157 374.454,300.158 359.364,300.231 359.281 C 300.303 359.199,309.139 367.973,319.867 378.778 C 341.740 400.810,340.415 399.701,344.847 399.700 C 348.883 399.700,347.641 400.783,374.589 373.759 C 401.440 346.832,399.864 348.661,399.836 344.461 C 399.809 340.336,400.615 341.305,379.284 319.760 C 368.768 309.139,359.688 299.978,359.108 299.401 C 358.278 298.577,325.237 265.536,321.170 261.463 C 320.642 260.934,313.606 253.963,305.535 245.972 L 290.860 231.443 288.797 202.119 L 286.734 172.795 303.023 156.282 C 311.981 147.199,337.064 122.097,358.761 100.498 C 402.769 56.690,399.848 59.888,399.848 55.539 C 399.848 51.261,401.174 52.794,374.038 25.710 C 347.033 -1.241,348.990 0.438,344.611 0.461 C 340.519 0.483,341.502 -0.339,320.555 20.594 C 310.222 30.922,301.238 39.738,300.592 40.186 C 299.946 40.634,299.003 41.577,298.497 42.282 C 297.305 43.941,264.108 77.143,262.585 78.198 C 261.947 78.640,260.888 79.718,260.230 80.594 C 259.573 81.469,252.771 88.437,245.115 96.078 L 231.195 109.971 230.157 109.102 C 229.586 108.624,223.839 103.585,217.385 97.904 C 204.790 86.817,203.957 86.218,200.827 85.993 C 196.671 85.694,197.319 85.252,181.449 99.239 L 169.335 109.916 153.305 93.968 C 144.489 85.197,129.241 69.931,119.422 60.043 C 109.603 50.156,101.264 41.796,100.892 41.467 C 100.520 41.138,91.443 32.102,80.721 21.387 C 65.020 5.695,60.936 1.770,59.731 1.208 C 57.886 0.349,54.552 0.099,52.947 0.698 M64.071 63.899 L 48.054 79.893 35.805 67.796 L 23.556 55.699 39.697 39.699 L 55.838 23.698 67.964 35.801 L 80.089 47.904 64.071 63.899 M360.778 39.830 L 376.796 55.690 364.521 67.804 L 352.246 79.918 336.303 63.987 L 320.360 48.056 332.409 36.004 C 339.036 29.376,344.526 23.956,344.609 23.961 C 344.692 23.966,351.969 31.107,360.778 39.830 M102.095 101.923 L 86.078 117.917 73.822 105.813 L 61.566 93.709 77.714 77.717 L 93.862 61.725 105.988 73.827 L 118.113 85.928 102.095 101.923 M322.754 77.851 L 338.772 93.712 326.497 105.827 L 314.222 117.942 298.279 102.011 L 282.336 86.080 294.385 74.028 C 301.012 67.399,306.502 61.979,306.585 61.983 C 306.669 61.987,313.945 69.127,322.754 77.851 M154.491 122.478 C 154.491 122.575,146.856 129.424,137.524 137.698 L 120.557 152.742 110.059 142.243 L 99.560 131.744 115.723 115.748 L 131.886 99.751 143.189 111.027 C 149.405 117.228,154.491 122.382,154.491 122.478 M284.731 115.848 L 300.749 131.688 290.264 142.196 L 279.779 152.705 262.805 137.655 L 245.830 122.605 257.120 111.302 C 263.330 105.086,268.478 100.002,268.561 100.004 C 268.645 100.006,275.921 107.136,284.731 115.848 M226.169 130.838 L 250.549 152.246 225.448 152.322 C 211.642 152.364,188.983 152.364,175.094 152.322 L 149.841 152.246 174.994 130.183 L 200.146 108.120 200.968 108.776 C 201.420 109.136,212.761 119.064,226.169 130.838 M267.365 172.490 C 267.365 173.004,271.340 228.522,276.198 295.864 C 281.055 363.206,285.030 418.362,285.030 418.434 C 285.030 418.505,274.527 418.563,261.690 418.563 L 238.351 418.563 238.239 392.290 C 238.142 369.566,238.062 365.729,237.648 363.880 C 229.122 325.864,177.367 322.147,164.265 358.610 C 162.131 364.548,162.179 363.821,162.055 392.590 L 161.943 418.563 138.612 418.563 L 115.281 418.563 115.430 417.290 C 115.511 416.591,119.489 361.452,124.268 294.760 C 129.047 228.069,133.025 173.065,133.109 172.530 L 133.261 171.557 200.313 171.557 L 267.365 171.557 267.365 172.490 M190.719 233.229 L 190.719 247.605 200.302 247.605 L 209.886 247.605 209.808 233.308 L 209.731 219.012 200.225 218.933 L 190.719 218.854 190.719 233.229 M107.014 267.365 C 106.794 270.741,106.608 273.838,106.600 274.246 C 106.589 274.889,106.142 274.547,103.293 271.706 L 99.999 268.423 103.653 264.760 C 105.662 262.746,107.330 261.127,107.360 261.163 C 107.389 261.198,107.234 263.990,107.014 267.365 M297.152 271.562 L 293.862 274.865 293.672 272.238 C 293.567 270.793,293.386 267.657,293.270 265.269 L 293.060 260.928 296.751 264.594 L 300.442 268.260 297.152 271.562 M95.580 291.542 L 104.778 300.749 103.727 315.120 L 102.676 329.491 98.272 333.909 L 93.867 338.326 77.922 322.383 L 61.976 306.440 74.026 294.387 C 80.653 287.759,86.144 282.335,86.228 282.335 C 86.312 282.335,90.520 286.478,95.580 291.542 M326.498 294.312 L 338.471 306.288 322.454 322.302 L 306.437 338.315 302.060 333.963 L 297.684 329.611 296.641 315.180 L 295.599 300.749 304.754 291.542 C 309.789 286.478,314.048 282.335,314.216 282.335 C 314.385 282.335,319.912 287.725,326.498 294.312 M64.221 336.227 L 80.087 352.095 67.964 364.222 L 55.841 376.348 39.897 360.406 L 23.952 344.463 36.002 332.411 C 42.629 325.783,48.120 320.359,48.203 320.359 C 48.287 320.359,55.495 327.500,64.221 336.227 M364.521 332.336 L 376.495 344.312 360.479 360.330 L 344.463 376.348 332.337 364.222 L 320.211 352.096 336.078 336.228 C 344.804 327.500,352.080 320.359,352.246 320.359 C 352.412 320.359,357.936 325.749,364.521 332.336 M204.641 352.736 C 209.347 353.741,214.596 357.784,216.829 362.126 C 219.141 366.623,218.990 364.549,219.092 393.039 L 219.184 418.563 200.161 418.563 L 181.138 418.563 181.140 395.135 C 181.141 381.980,181.269 370.601,181.432 369.185 C 182.768 357.561,193.064 350.264,204.641 352.736 ",
+    d: "M153.485 49.515 L 103.999 99.030 151.924 146.924 C 178.283 173.266,200.108 194.373,200.424 193.829 C 200.741 193.286,244.196 149.452,296.992 96.421 L 392.984 0.000 297.977 0.000 L 202.970 0.000 153.485 49.515 M-0.000 100.018 L -0.000 193.030 50.005 243.005 L 100.010 292.980 146.501 246.488 L 192.992 199.997 96.496 103.501 L 0.000 7.005 -0.000 100.018 M251.953 152.985 L 204.906 199.921 302.453 297.453 L 400.000 394.985 400.000 300.978 L 400.000 206.971 349.500 156.510 L 299.000 106.049 251.953 152.985 M101.043 303.307 L 5.086 400.000 99.058 400.000 L 193.030 400.000 242.940 350.060 L 292.851 300.120 247.925 254.560 C 202.307 208.297,199.771 205.848,198.000 206.337 C 197.450 206.489,153.819 250.126,101.043 303.307 ",
     stroke: "none",
     "fill-rule": "evenodd"
   }));
 };
 
-var templateObject_1, templateObject_2;
+exports.StyledSpinner = styled_components_1.default.svg(templateObject_3 || (templateObject_3 = __makeTemplateObject(["\n  animation: rotate 2s linear infinite;\n  margin: -25px 0 0 -25px;\n\n  & .path {\n    stroke: #5652bf;\n    stroke-linecap: round;\n    animation: dash 1.5s ease-in-out infinite;\n  }\n\n  @keyframes rotate {\n    100% {\n      transform: rotate(360deg);\n    }\n  }\n  @keyframes dash {\n    0% {\n      stroke-dasharray: 1, 150;\n      stroke-dashoffset: 0;\n    }\n    50% {\n      stroke-dasharray: 90, 150;\n      stroke-dashoffset: -35;\n    }\n    100% {\n      stroke-dasharray: 90, 150;\n      stroke-dashoffset: -124;\n    }\n  }\n"], ["\n  animation: rotate 2s linear infinite;\n  margin: -25px 0 0 -25px;\n\n  & .path {\n    stroke: #5652bf;\n    stroke-linecap: round;\n    animation: dash 1.5s ease-in-out infinite;\n  }\n\n  @keyframes rotate {\n    100% {\n      transform: rotate(360deg);\n    }\n  }\n  @keyframes dash {\n    0% {\n      stroke-dasharray: 1, 150;\n      stroke-dashoffset: 0;\n    }\n    50% {\n      stroke-dasharray: 90, 150;\n      stroke-dashoffset: -35;\n    }\n    100% {\n      stroke-dasharray: 90, 150;\n      stroke-dashoffset: -124;\n    }\n  }\n"])));
+var templateObject_1, templateObject_2, templateObject_3;
 },{"react":"../node_modules/react/index.js","styled-components":"../node_modules/styled-components/dist/styled-components.browser.esm.js","../components/Theme":"../src/components/Theme.tsx"}],"../src/App.tsx":[function(require,module,exports) {
 "use strict";
 
@@ -91732,42 +91733,50 @@ function (_super) {
     localStorage.set("windmillChart", this.state);
   };
 
-  App.prototype.openWml = function (filename) {
-    var _this = this;
+  App.prototype.incLoading = function (inc) {
+    if (inc === void 0) {
+      inc = 1;
+    }
 
     this.setState(function (prevState) {
       return __assign({}, prevState, {
-        isLoading: true
+        isLoading: prevState.isLoading + inc
       });
     });
+  };
+
+  App.prototype.openWml = function (filename) {
+    var _this = this;
+
+    this.incLoading();
     this.apiClient.getWml(filename).then(function (data) {
       _this.setState(function (prevState) {
         return __assign({}, prevState, data);
       });
     }).then(function () {
-      return _this.setState(function (prevState) {
-        return __assign({}, prevState, {
-          isLoading: false
-        });
-      });
+      return _this.incLoading(-1);
     });
   };
 
   App.prototype.refreshOperators = function () {
     var _this = this;
 
+    this.incLoading();
     this.apiClient.getOperators().then(function (data) {
       _this.setState(function (prevState) {
         return __assign({}, prevState, {
           operators: data
         });
       });
+    }).then(function () {
+      return _this.incLoading(-1);
     });
   };
 
   App.prototype.refreshDag = function () {
     var _this = this;
 
+    this.incLoading();
     this.apiClient.getDagSpec().then(function (data) {
       // Set values to defaults where applicable
       for (var i = 0; i < data.parameters.length; i++) {
@@ -91781,6 +91790,8 @@ function (_super) {
           dag: data
         });
       });
+    }).then(function () {
+      return _this.incLoading(-1);
     });
   };
 
@@ -91828,8 +91839,19 @@ function (_super) {
       };
     });
 
-    if (this.state.isLoading || false) {
-      return React.createElement("div", null, React.createElement(icon_1.Icon, null));
+    if (this.state.isLoading > 0 || false) {
+      return React.createElement("div", {
+        style: {
+          position: "absolute",
+          top: "45%",
+          left: "45%"
+        }
+      }, React.createElement(icon_1.StyledSpinner, {
+        style: {
+          width: "10vh",
+          height: "10vh"
+        }
+      }, React.createElement(icon_1.Icon, null)));
     }
 
     return React.createElement("div", null, this.state.isFileBrowserOpen ? React.createElement(components_1.FileBrowser, {

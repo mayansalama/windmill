@@ -43,6 +43,9 @@ const Navbar = styled.nav`
 `;
 
 const Brand = styled.a`
+  width: 7vh;
+  height: 7vh;
+  position: relative;
   font-weight: bold;
   font-style: italic;
   margin: 0.2rem 0.5rem 0.2rem 0.5rem;
