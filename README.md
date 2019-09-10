@@ -24,7 +24,8 @@ synced to a remote repo
 - [x] Render arbitrary viewport windows for New/Save/Load etc
 - [x] Overwrite/Save prompt on New
 - [x] DAG renaming and save functionality
-- [ ] Open dag from menu
+- [x] Open dag from menu
+- [ ] Make save/load more efficient by removing non-essential values
 - [ ] Check if file already exists on rename
 - [ ] Prompt save if there are nodes on open
 - [ ] Fix loss of state on refresh bug
@@ -46,6 +47,7 @@ synced to a remote repo
 - [x] Get default values
 - [x] Pull parameters from parent classes
 - [?] Dedupe multi import operators - nothing preventing this but underlying issue is fixed
+- [ ] Convert WML into Python DAG
 - [ ] Get WML owner and last-modified details during wml list
 - [ ] Allow custom operators
 - [ ] Add defaults to CLI --help commands

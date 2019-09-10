@@ -16,12 +16,16 @@ export class APIClient {
     return this.perform("GET", "/v1/dag")
   }
 
+  public getWml(wmlname: string) {
+    return this.perform("GET", `/v1/wml/${wmlname}`)
+  }
+
   public getWmlList() {
     return this.perform("GET", "/v1/wml/")
   }
 
-  public saveWml(dagName: string, wml: any) {
-    return this.perform("POST", `/v1/wml/${dagName}`, wml)
+  public saveWml(wmlname: string, wml: any) {
+    return this.perform("POST", `/v1/wml/${wmlname}`, wml)
   }
 
   async perform(method: Method, resource: string, data?: any) {

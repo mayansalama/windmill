@@ -128,7 +128,7 @@ export class FileDropdown extends React.Component<IDropdown> {
   }
 
   public handleNew() {
-    this.props.getApp().newDag();
+    this.props.getApp().newWml();
   }
 
   public handleOpen() {

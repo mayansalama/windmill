@@ -21,6 +21,7 @@ export interface IAppState extends IChart {
   filename?: string;
   operators?: IAirflowOperator[];
   dag?: IAirflowDag;
+  isLoading?: boolean;
   isFileBrowserOpen?: boolean;
   isRenameBoxOpen?: boolean;
 }
@@ -32,7 +33,7 @@ export class App extends React.Component<{}, IAppState> {
     super(props);
     this.state = localStorage.get("windmillChart") || cloneDeep(defaultChart);
 
-    this.newDag = this.newDag.bind(this);
+    this.newWml = this.newWml.bind(this);
     this.updateFilename = this.updateFilename.bind(this);
     this.updateNodeProperties = this.updateNodeProperties.bind(this);
     this.updateDag = this.updateDag.bind(this);
@@ -54,30 +55,6 @@ export class App extends React.Component<{}, IAppState> {
 
   public componentDidUpdate() {
     localStorage.set("windmillChart", this.state);
-  }
-
-  public refreshOperators() {
-    this.apiClient.getOperators().then(data => {
-      this.setState(prevState => ({
-        ...prevState,
-        operators: data
-      }));
-    });
-  }
-
-  public refreshDag() {
-    this.apiClient.getDagSpec().then(data => {
-      // Set values to defaults where applicable
-      for (let i = 0; i < data.parameters.length; i++) {
-        if (data.parameters[i].default) {
-          data.parameters[i].value = data.parameters[i].default;
-        }
-      }
-      this.setState(prevState => ({
-        ...prevState,
-        dag: data
-      }));
-    });
   }
 
   public updateFilename(name: string) {
@@ -114,6 +91,52 @@ export class App extends React.Component<{}, IAppState> {
     localStorage.set("windmillChart", this.state);
   }
 
+  public openWml(filename: string) {
+    this.setState(prevState => ({
+      ...prevState,
+      isLoading: true
+    }));
+
+    this.apiClient
+      .getWml(filename)
+      .then(data => {
+        this.setState(prevState => ({
+          ...prevState,
+          ...data
+        }));
+      })
+      .then(() =>
+        this.setState(prevState => ({
+          ...prevState,
+          isLoading: false
+        }))
+      );
+  }
+
+  public refreshOperators() {
+    this.apiClient.getOperators().then(data => {
+      this.setState(prevState => ({
+        ...prevState,
+        operators: data
+      }));
+    });
+  }
+
+  public refreshDag() {
+    this.apiClient.getDagSpec().then(data => {
+      // Set values to defaults where applicable
+      for (let i = 0; i < data.parameters.length; i++) {
+        if (data.parameters[i].default) {
+          data.parameters[i].value = data.parameters[i].default;
+        }
+      }
+      this.setState(prevState => ({
+        ...prevState,
+        dag: data
+      }));
+    });
+  }
+
   //////////////////////////////////////////////////
   // Navigation and event handlers
   //////////////////////////////////////////////////
@@ -138,7 +161,7 @@ export class App extends React.Component<{}, IAppState> {
     ]
   };
 
-  public newDag() {
+  public newWml() {
     this.setState({
       ...defaultChart
     });
@@ -173,6 +196,14 @@ export class App extends React.Component<{}, IAppState> {
       this.setState(func(...args))
     ) as typeof actions;
 
+    if (this.state.isLoading || false) {
+      return (
+        <div>
+          <Icon></Icon>
+        </div>
+      );
+    }
+
     return (
       <div>
         {this.state.isFileBrowserOpen ? (
@@ -186,12 +217,12 @@ export class App extends React.Component<{}, IAppState> {
           <div />
         )}
         <div
-          // style={{
-          //   filter:
-          //     this.state.isFileBrowserOpen || this.state.isRenameBoxOpen
-          //       ? "blur(1px)"
-          //       : ""
-          // }}
+          style={{
+            filter:
+              this.state.isFileBrowserOpen || this.state.isRenameBoxOpen
+                ? "opacity(0.3)"
+                : ""
+          }}
         >
           <MainPage actions={stateActions} getApp={() => this} />
         </div>

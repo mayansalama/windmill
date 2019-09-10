@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "windmill-airflow"
-version = "0.0.2"
+version = "0.0.3"
 description = ""
 authors = ["mayansalama <micsalama@gmail.com>"]
 readme = "README.md"
@@ -14,7 +14,7 @@ python = "^3.6"
 apache-airflow = {version = "1.10.4", extras = ["crypto","celery","postgres","hive","jdbc","mysql","ssh"]}
 marshmallow = "^3.0"
 docstring-parser = "^0.3.0"
-decli = "^0.5.0"
+decli = "^0.5.1"
 flask-cors = "^3.0.8"
 pyyaml = "^5.1.2"
 

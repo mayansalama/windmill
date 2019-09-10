@@ -49,6 +49,11 @@ const TdTh = css`
   padding: 8px;
 `;
 
+const CursorTd = styled.td`
+  ${TdTh}
+  cursor: pointer;
+`;
+
 const Td = styled.td`
   ${TdTh}
 `;
@@ -79,6 +84,10 @@ class _FileBrowser extends React.Component<
     super(props);
     this.handleSearch = this.handleSearch.bind(this);
   }
+
+  public handleClickOutside = () => {
+    this.app.toggleFileBrowser();
+  };
 
   public get app(): App {
     return this.props.getApp();
@@ -114,9 +123,9 @@ class _FileBrowser extends React.Component<
     }));
   }
 
-  public handleClickOutside = () => {
-    this.app.toggleFileBrowser();
-  };
+  public handleOpen(filename: string) {
+    this.app.openWml(filename)
+  }
 
   public render() {
     return (
@@ -131,8 +140,8 @@ class _FileBrowser extends React.Component<
           <tbody>
             <Tr>
               <Th>Name</Th>
-              <Th>Last Modified</Th>
-              <Th>Owner</Th>
+              {/* <Th>Last Modified</Th>
+              <Th>Owner</Th> */}
             </Tr>
             {[].concat(
               ...this.state.fileList
@@ -140,10 +149,15 @@ class _FileBrowser extends React.Component<
                   (val: string) => val.indexOf(this.state.searchValue) >= 0
                 )
                 .map((val: string, index: number) => (
-                  <Tr key={`Tr-{index}`}>
-                    <Td key={`Td-name-{index}`}>{val}</Td>
-                    <Td key={`Td-lm-{index}`}>TODO</Td>
-                    <Td key={`Tr-owner-{index}`}>TODO</Td>
+                  <Tr key={`Tr-${index}`}>
+                    <CursorTd
+                      key={`Td-name-${index}`}
+                      onClick={() => this.handleOpen(val)}
+                    >
+                      {val}
+                    </CursorTd>
+                    {/* <Td key={`Td-lm-${index}`}>TODO</Td>
+                    <Td key={`Tr-owner-${index}`}>TODO</Td> */}
                   </Tr>
                 ))
             )}
