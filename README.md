@@ -1,5 +1,7 @@
 # Windmill
 
+[![Build Status](https://travis-ci.org/mayansalama/windmill.svg?branch=master)](https://travis-ci.org/mayansalama/windmill)
+
 Drag'n'drop web app to manage and create Airflow DAGs. The goal is to
 have a Web UI that can generate YML Dag Definitions, integrating with
 custom operators and potentially existing DAGs. YML DAGs can then be
@@ -10,7 +12,9 @@ synced to a remote repo
 
 ## Getting Started
 
-1. Install with `pip install windmill-airflow`
+1. Install with `pip install airflow-windmill`
+   1. Airflow is expected to be installed on the system
+   2. Otherwise it can be packaged with windmill using `pip install airflow-windmill[airflow]`
 2. Run `windmill init` to create a local Windmill project
 3. `cd windmill-project`
 4. Run `windmill run` from this folder to run the app locally

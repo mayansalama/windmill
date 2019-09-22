@@ -15,8 +15,8 @@ script:
 - tox
 before_deploy:
 - poetry config http-basic.pypi $PYPI_USER $PYPI_PASSWORD
+- npm run-script build --prefix windmill/http/app/
 - poetry build
-- sh scripts/build.sh
 deploy:
   provider: script
   script: poetry publish
