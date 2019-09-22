@@ -7,8 +7,8 @@ import { Theme } from "../Theme";
 
 const OverlayBox = styled.div`
   ${OverlayBoxRootstyle}
-  left: 450px;
-  top: 15%;
+  left: 9vh;
+  top: 5%;
 `;
 
 const NameDiv = styled.div`
@@ -100,7 +100,7 @@ class _RenameBox extends React.Component<
   };
 
   public handleSave = () => {
-    if (this.app.state.filename === this.state.filename) {
+    if ((this.app.state.filename === this.state.filename) || (this.state.filename === ""))  {
       return this.handleClickOutside();
     }
     // TODO: Setup prompt if file already exists

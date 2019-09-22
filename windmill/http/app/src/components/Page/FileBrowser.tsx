@@ -129,7 +129,7 @@ class _FileBrowser extends React.Component<
 
   public render() {
     return (
-      <OverlayBox style={{ zIndex: this.state.loadingFileList ? -1 : 100 }}>
+      <OverlayBox style={{ zIndex: this.state.loadingFileList ? -100 : 100 }}>
         <SearchDiv>
           <SearchBar placeholder={"Search WMLs"} onChange={this.handleSearch} />
           <SearchIcon>

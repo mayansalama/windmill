@@ -1,8 +1,10 @@
 **/__pycache__/
 **/.pytest_cache/
+*.egg-info/
+.tox/
 .vscode/
-windmill_airflow.egg-info/
 .VSCodeCounter/
 windmill-project/
 
+# Ignore top level dist created by Poetry 
 dist/*

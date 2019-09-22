@@ -90755,7 +90755,7 @@ function (_super) {
 
     return react_1.default.createElement(OverlayBox, {
       style: {
-        zIndex: this.state.loadingFileList ? -1 : 100
+        zIndex: this.state.loadingFileList ? -100 : 100
       }
     }, react_1.default.createElement(SearchDiv, null, react_1.default.createElement(SearchBar, {
       placeholder: "Search WMLs",
@@ -90866,7 +90866,7 @@ var styled_components_1 = __importStar(require("styled-components"));
 
 var Theme_1 = require("../Theme");
 
-var OverlayBox = styled_components_1.default.div(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n  ", "\n  left: 450px;\n  top: 15%;\n"], ["\n  ", "\n  left: 450px;\n  top: 15%;\n"])), _1.OverlayBoxRootstyle);
+var OverlayBox = styled_components_1.default.div(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n  ", "\n  left: 9vh;\n  top: 5%;\n"], ["\n  ", "\n  left: 9vh;\n  top: 5%;\n"])), _1.OverlayBoxRootstyle);
 var NameDiv = styled_components_1.default.div(templateObject_2 || (templateObject_2 = __makeTemplateObject(["\n  display: flex;\n  flex-direction: column;\n"], ["\n  display: flex;\n  flex-direction: column;\n"])));
 var Tooltip = styled_components_1.default.div(templateObject_3 || (templateObject_3 = __makeTemplateObject(["\n  margin: 10px;\n  font-size: ", ";\n  font-weight: bold;\n"], ["\n  margin: 10px;\n  font-size: ", ";\n  font-weight: bold;\n"])), Theme_1.Theme.fonts.normalSize);
 var NameInput = styled_components_1.default.input(templateObject_4 || (templateObject_4 = __makeTemplateObject(["\n  margin: 0px 10px;\n  padding: 7px;\n  border: 1px solid ", ";\n  outline: none;\n  font-size: ", ";\n  border-radius: 3px;\n"], ["\n  margin: 0px 10px;\n  padding: 7px;\n  border: 1px solid ", ";\n  outline: none;\n  font-size: ", ";\n  border-radius: 3px;\n"])), Theme_1.Theme.colors.brand, Theme_1.Theme.fonts.subHeadingSize);
@@ -90888,7 +90888,7 @@ function (_super) {
     };
 
     _this.handleSave = function () {
-      if (_this.app.state.filename === _this.state.filename) {
+      if (_this.app.state.filename === _this.state.filename || _this.state.filename === "") {
         return _this.handleClickOutside();
       } // TODO: Setup prompt if file already exists
 
@@ -91818,6 +91818,7 @@ function (_super) {
   };
 
   App.prototype.saveWml = function () {
+    // console.log(`${this.state.filename}.wml`)
     this.apiClient.saveWml(this.state.filename + ".wml", this.state);
   }; //////////////////////////////////////////////////
   // Render Methods
@@ -91907,7 +91908,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54425" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51428" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

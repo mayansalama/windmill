@@ -190,6 +190,7 @@ export class App extends React.Component<{}, IAppState> {
   }
 
   public saveWml() {
+    // console.log(`${this.state.filename}.wml`)
     this.apiClient.saveWml(`${this.state.filename}.wml`, this.state);
   }
 
