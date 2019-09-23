@@ -18,15 +18,17 @@ docstring-parser = "^0.3.0"
 decli = "^0.5.1"
 flask-cors = "^3.0.8"
 pyyaml = "^5.1.2"
-apache-airflow = {version = "1.10.4", optional = true}
 networkx = "^2.3"
+jinja2 = "^2.10.1"
+inflection = "^0.3.1"
+black = {version = "^18.3-alpha.0"}
+apache-airflow = {version = "1.10.4", optional = true}
 
 [tool.poetry.extras]
 airflow = ["apache-airflow"]
 
 [tool.poetry.dev-dependencies]
 pylint = "^2.3"
-black = {version = "^18.3-alpha.0", allows-prereleases = true}
 pytest = "5.0.1"
 rope = "^0.14.0"
 

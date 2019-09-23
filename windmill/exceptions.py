@@ -10,5 +10,5 @@ class InitError(Exception):
     ...
 
 
-class DagInstanceValidationError(Exception):
+class DagHandlerValidationError(Exception):
     ...

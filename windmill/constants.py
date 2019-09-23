@@ -3,7 +3,7 @@ class ProjectDefaults:
     PROJECT_CONF = "windmill.conf"
     WML_FOLDER = "wmls"
     DAGS_FOLDER = "dags"
-    OPERATORS_FOLDER = "operators"
+    OPERATORS_FOLDER = "custom_operators"
 
 
 class ServerDefaults:

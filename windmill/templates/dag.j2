@@ -1,0 +1,26 @@
+from airflow.models.dag import DAG
+{% for task in dag.tasks -%}
+from {{ task.module }} import {{ task.operator_type}}
+{% endfor %}
+
+{% for func in dag.callables %}
+def {{ func.name }}(**kwargs):
+    {{ func.method }}
+{%- endfor %}
+
+{% for task in dag.tasks %}
+{% for func in task.callables %}
+def {{ func.name }}(**kwargs):
+    {{ func.method }}
+{% endfor %}
+{% endfor %}
+
+{{ dag.snake_name }} = DAG({{ dag.params_to_kwargs | safe }})
+
+{% for task in dag.tasks %}
+{{ task.snake_name }} = {{ task.operator_type}}({{ task.params_to_kwargs | safe }}, dag={{ dag.snake_name }})
+{%- endfor %}
+
+{% for path in dag.links.paths %}
+{{ path | safe }}
+{% endfor %}

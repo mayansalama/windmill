@@ -124,7 +124,7 @@ webhdfs = ["hdfs (>=2.0.4)"]
 winrm = ["pywinrm (0.2.2)"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "A small Python module for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
 name = "appdirs"
 optional = false
@@ -154,7 +154,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "1.3.0"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Classes Without Boilerplate"
 name = "attrs"
 optional = false
@@ -178,7 +178,7 @@ version = "2.7.0"
 pytz = ">=2015.7"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "The uncompromising code formatter."
 name = "black"
 optional = false
@@ -520,6 +520,14 @@ zipp = ">=0.5"
 [package.extras]
 docs = ["sphinx", "rst.linker"]
 testing = ["packaging", "importlib-resources"]
+
+[[package]]
+category = "main"
+description = "A port of Ruby on Rails inflector to Python"
+name = "inflection"
+optional = false
+python-versions = "*"
+version = "0.3.1"
 
 [[package]]
 category = "main"
@@ -1009,7 +1017,7 @@ tornado = ["tornado (>=4.0)"]
 twisted = ["twisted"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Python Library for Tom's Obvious, Minimal Language"
 name = "toml"
 optional = false
@@ -1131,7 +1139,7 @@ test = ["zope.testrunner"]
 airflow = ["apache-airflow"]
 
 [metadata]
-content-hash = "fd8fdab9ab8b1c841acd7b7f2981794718ca7acf3cce41232ac309d859eacbf2"
+content-hash = "f302d80deab9b0630685a18d6249d1204ea97d36d88adeaeb24ea1e6810b0df6"
 python-versions = "^3.6"
 
 [metadata.hashes]
@@ -1173,6 +1181,7 @@ future = ["e39ced1ab767b5936646cedba8bcce582398233d6a627067d4c6a454c90cfedb"]
 gunicorn = ["aa8e0b40b4157b36a5df5e599f45c9c76d6af43845ba3b3b0efe2c70473c2471", "fa2662097c66f920f53f70621c6c58ca4a3c4d3434205e608e121b5b3b71f4f3"]
 idna = ["c357b3f628cf53ae2c4c05627ecc484553142ca23264e593d327bcde5e9c3407", "ea8b7f6188e6fa117537c3df7da9fc686d485087abf6ac197f9c46432f7e4a3c"]
 importlib-metadata = ["aa18d7378b00b40847790e7c27e11673d7fed219354109d0e7b9e5b25dc3ad26", "d5f18a79777f3aa179c145737780282e27b508fc8fd688cb17c7a813e8bd39af"]
+inflection = ["18ea7fb7a7d152853386523def08736aa8c32636b047ade55f7578c4edeb16ca"]
 iso8601 = ["210e0134677cc0d02f6028087fee1df1e1d76d372ee1db0bf30bf66c5c1c89a3", "49c4b20e1f38aa5cf109ddcd39647ac419f928512c869dc01d5c7098eddede82", "bbbae5fb4a7abfe71d4688fd64bff70b91bbd74ef6a99d964bab18f7fdf286dd"]
 isort = ["54da7e92468955c4fceacd0c86bd0ec997b0e1ee80d97f67c35a78b719dccab1", "6e811fcb295968434526407adb8796944f1988c5b65e8139058f2014cbe100fd"]
 itsdangerous = ["321b033d07f2a4136d3ec762eac9f16a10ccd60f53c0c91af90217ace7ba1f19", "b12271b2047cb23eeb98c8b5622e2e5c5e9abd9784a153e9d8ef9cb4dd09d749"]
