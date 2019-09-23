@@ -8,3 +8,7 @@ class DocstringParseError(Exception):
 
 class InitError(Exception):
     ...
+
+
+class DagInstanceValidationError(Exception):
+    ...

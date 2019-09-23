@@ -12,5 +12,5 @@ class DagHandler:
     docstring_parser = ClassParser()
 
     @classmethod
-    def marshall_dag_object(cls):
+    def marshall_dag_docstring(cls):
         return DagSchema().dump(cls.docstring_parser.parse_class(DAG)[1])

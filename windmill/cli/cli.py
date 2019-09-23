@@ -90,6 +90,29 @@ class DevCli:
     @staticmethod
     def start_backend(*args, **kwargs):
         try:
+            wd = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+            print("Deleting existing windmill dev project")
+            p = subprocess.Popen(
+                ["rm", "-rf", ".windmill-temp-project/"], cwd=wd, stdout=subprocess.PIPE
+            )
+            p.communicate()
+
+            print("Creating new project")
+            p = subprocess.Popen(
+                ["windmill", "init", "--name", ".windmill-temp-project"],
+                cwd=wd,
+                stdout=subprocess.PIPE,
+            )
+            p.communicate()
+
+            print("Starting dev backend")
+            os.chdir(
+                os.path.abspath(
+                    os.path.join(
+                        os.path.dirname(__file__), "..", "..", ".windmill-temp-project/"
+                    )
+                )
+            )
             run_config = RunConfig.load(run_dev_server=True, *args, **kwargs)
             StartWebserver(run_config)
         except Exception as e:
@@ -100,7 +123,8 @@ class DevCli:
         wd = os.path.abspath(
             os.path.join(os.path.dirname(__file__), "..", "http", "app")
         )
-        subprocess.Popen(["npm", "start"], cwd=wd)
+        with subprocess.Popen(["npm", "start"], cwd=wd, stdout=subprocess.PIPE):
+            print("Running frontend on http://localhost:1234")
 
     @staticmethod
     def run_cli():

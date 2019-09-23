@@ -13,8 +13,8 @@ synced to a remote repo
 ## Getting Started
 
 1. Install with `pip install airflow-windmill`
-   1. Airflow is expected to be installed on the system
-   2. Otherwise it can be packaged with windmill using `pip install airflow-windmill[airflow]`
+   1. Airflow is expected to be installed on the system. This allows Windmill to run with arbitrary versions of Airflow
+   2. Otherwise it can be packaged with windmill using `pip install airflow-windmill[airflow]`. The version is defined in `pyproject.toml`
 2. Run `windmill init` to create a local Windmill project
 3. `cd windmill-project`
 4. Run `windmill run` from this folder to run the app locally
@@ -36,15 +36,19 @@ synced to a remote repo
 - [x] Overwrite/Save prompt on New
 - [x] DAG renaming and save functionality
 - [x] Open dag from menu
-- [ ] Switch nav menu to icons
+- [x] Make save/load more efficient by removing non-essential values
+- [ ] Switch nav menu to icons 
+- [ ] Add hotkeys to menu functions
 - [ ] Make input/output nodes more clear
-- [ ] Make save/load more efficient by removing non-essential values
 - [ ] Check if file already exists on rename
 - [ ] Prompt save if there are nodes on open
-- [ ] Fix loss of state on refresh bug
-- [ ] Put File details in File Browser
+- [x] Fix loss of state on refresh bug
+- [ ] Put File details in File Browse
 - [ ] Make Flask Backend URI configurable
 - [ ] Add a last saved time to NavBar
+- [ ] Add error handling to backend calls
+- [ ] Add tests
+- [ ] Get task descriptions from Operator list
 
 ### Back-End Features
 
@@ -57,8 +61,7 @@ synced to a remote repo
 - [x] Save/Load Windmill Files functionality
 - [x] Get default values
 - [x] Pull parameters from parent classes
-- [ ] Move airflow dependency as extra
-- [ ] ? Dedupe multi import operators - nothing preventing this but underlying issue is fixed
+- [x] Move airflow dependency as extra
 - [ ] Convert WML into Python DAG
 - [ ] Get WML owner and last-modified details during wml list
 - [ ] Allow custom operators
@@ -66,18 +69,20 @@ synced to a remote repo
 - [ ] Strategy for Python Opjects (e.g. callables) - maybe import statement?
 - [ ] Backport existing Python DAGs to WMLs
 - [ ] Allow YML updates to propogate to WMLs
+- [ ] Add tests for different airflow version
 
 ### Other features
 
 - [ ] Validate on backend or front end or both?
 - [ ] Doco
+- [ ] Add permission restrictions for valid tags 
 
 ## Dev User Guide
 
 To run as a dev:
 
 1. Clone from git
-2. Run `poetry install`
+2. Run `poetry install -E airflow`
 3. Run `windmill-dev start-backend`
 4. Run `windmill-dev start-frontend`
 
@@ -87,7 +92,11 @@ To run as a dev:
 
 ## Deployment
 
-```bash
-cd scripts
-sh build.sh {{PYPI_USER}} {{PYPI_PASS}}
-```
+Deployment to PyPi is managed using Travis and should be done in the following steps:
+
+1. Commit and merge code into the master branch
+2. Ensure that the travis build is green
+3. Run `poetry version {patch|minor|major}`
+4. Increment the version number in `windmill/__init__.py`
+5. Create a git tag for the new build
+6. Push the tag to origin

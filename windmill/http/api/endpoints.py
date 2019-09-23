@@ -47,7 +47,7 @@ def get_operators():
 
 @app.route("/v1/dag", methods=["GET"])
 def get_dagspec():
-    return jsonify(DagHandler.marshall_dag_object()), 200
+    return jsonify(DagHandler.marshall_dag_docstring()), 200
 
 
 @app.route("/v1/wml/", methods=["GET"])

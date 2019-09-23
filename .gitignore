@@ -5,6 +5,7 @@
 .vscode/
 .VSCodeCounter/
 windmill-project/
+.windmill-temp-project/
 
 # Ignore top level dist created by Poetry 
 dist/*

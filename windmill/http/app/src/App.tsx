@@ -53,8 +53,27 @@ export class App extends React.Component<{}, IAppState> {
     }
   }
 
+  cleanState = (state: IAppState) => {
+    return {
+      ...state,
+      nodes: mapValues(state.nodes, node => {
+        return {
+          ...node,
+          position: {
+            x: node.position.x,
+            y: node.position.y
+          }
+        };
+      })
+    };
+  };
+
+  public saveStateToLocal() {
+    localStorage.set("windmillChart", this.cleanState(this.state));
+  }
+
   public componentDidUpdate() {
-    localStorage.set("windmillChart", this.state);
+    this.saveStateToLocal();
   }
 
   public updateFilename(name: string) {
@@ -79,7 +98,7 @@ export class App extends React.Component<{}, IAppState> {
       }
     }));
 
-    localStorage.set("windmillChart", this.state);
+    this.saveStateToLocal();
   }
 
   public updateDag(newProps: IAirflowDag) {
@@ -88,7 +107,7 @@ export class App extends React.Component<{}, IAppState> {
       dag: newProps
     }));
 
-    localStorage.set("windmillChart", this.state);
+    this.saveStateToLocal();
   }
 
   public incLoading(inc = 1) {
@@ -108,7 +127,10 @@ export class App extends React.Component<{}, IAppState> {
           ...data
         }));
       })
-      .then(() => this.incLoading(-1));
+      .then(() => {
+        this.incLoading(-1);
+        this.toggleFileBrowser();
+      });
   }
 
   public refreshOperators() {
@@ -190,8 +212,10 @@ export class App extends React.Component<{}, IAppState> {
   }
 
   public saveWml() {
-    // console.log(`${this.state.filename}.wml`)
-    this.apiClient.saveWml(`${this.state.filename}.wml`, this.state);
+    const { offset, filename, dag, nodes, links } = this.cleanState(this.state);
+    const persistentState = { offset, filename, dag, nodes, links };
+
+    this.apiClient.saveWml(`${this.state.filename}.wml`, persistentState);
   }
 
   //////////////////////////////////////////////////

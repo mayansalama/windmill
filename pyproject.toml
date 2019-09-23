@@ -8,6 +8,8 @@ license = "Apache-2.0"
 packages = [
     {include = "windmill"}
 ]
+homepage = "https://github.com/mayansalama/windmill"
+repository = "https://github.com/mayansalama/windmill"
 
 [tool.poetry.dependencies]
 python = "^3.6"
@@ -17,6 +19,7 @@ decli = "^0.5.1"
 flask-cors = "^3.0.8"
 pyyaml = "^5.1.2"
 apache-airflow = {version = "1.10.4", optional = true}
+networkx = "^2.3"
 
 [tool.poetry.extras]
 airflow = ["apache-airflow"]
