@@ -3,6 +3,7 @@ import * as localStorage from "local-storage";
 import { cloneDeep, mapValues } from "lodash";
 import * as React from "react";
 import { render } from "react-dom";
+import { FaFile, FaSave, FaFolderOpen, FaProjectDiagram } from "react-icons/fa";
 import { APIClient } from "./ApiClient";
 import {
   FileBrowser,
@@ -173,19 +174,41 @@ export class App extends React.Component<{}, IAppState> {
     icon: <Icon />,
     brand: { name: "Windmill", to: "/" },
     renameHandler: () => this.toggleRenameBox(),
-    dropdownHandlers: [
+    buttons: [
       {
-        name: "File",
-        callback: () => <MenuItems.FileDropdown getApp={() => this} />
+        tooltip: "New WML",
+        icon: <FaFile />,
+        callback: () => this.newWml()
       },
       {
-        name: "View",
-        callback: () => <MenuItems.ViewDropdown getApp={() => this} />
+        tooltip: "Open WML",
+        icon: <FaFolderOpen />,
+        callback: () => this.toggleFileBrowser()
       },
       {
-        name: "Help",
-        callback: () => <MenuItems.HelpDropdown getApp={() => this} />
+        tooltip: "Save WML",
+        icon: <FaSave />,
+        callback: () => this.saveWml()
+      },
+      {
+        tooltip: "Covnert to Python DAG",
+        icon: <FaProjectDiagram />,
+        callback: () => console.log("Convert to Python")
       }
+    ],
+    dropdownHandlers: [
+      // {
+      //   name: "File",
+      //   callback: () => <MenuItems.FileDropdown getApp={() => this} />
+      // },
+      // {
+      //   name: "View",
+      //   callback: () => <MenuItems.ViewDropdown getApp={() => this} />
+      // },
+      // {
+      //   name: "Help",
+      //   callback: () => <MenuItems.HelpDropdown getApp={() => this} />
+      // }
     ]
   };
 

@@ -1,7 +1,6 @@
 import * as React from "react";
 import { cloneDeep } from "lodash";
 import styled, { css } from "styled-components";
-import ReactTooltip from "react-tooltip";
 import Textarea from "react-textarea-autosize";
 import { FaInfoCircle } from "react-icons/fa";
 import { INodeInnerDefaultProps, INode } from "@mrblenny/react-flow-chart";
@@ -135,9 +134,6 @@ const StyledErrorMessage = styled.div`
   text-align: right;
 `;
 
-const StyledTooltip = styled(ReactTooltip)`
-  max-width: 300px;
-`;
 
 const isValid = (params: IAirflowOperatorParameter): string => {
   const { value, required, type } = params;
@@ -253,7 +249,6 @@ class SmartTextarea extends React.Component<ISmartTextAreaProps> {
           </StyledInfo>
         </StyledLableDiv>
         {this.renderForm()}
-        <StyledTooltip multiline={true} place="right" />
       </SmartTextAreaDiv>
     );
   }
@@ -281,6 +276,7 @@ export class RenderedAirflowParameter extends React.Component<{
 
   public render() {
     switch (this.params.type) {
+      case "callable":
       case "str": {
         return (
           <SmartTextarea
@@ -348,7 +344,6 @@ export class RenderedAirflowParameter extends React.Component<{
           />
         );
       }
-      case "mapping":
       case "dict": {
         return (
           <SmartTextarea
@@ -409,7 +404,6 @@ export class RenderedAirflowParametersAsForm extends React.Component<
               style={{ float: "right", marginLeft: "5px" }}
             />
             {this.props.type ? <Type>{this.props.type}</Type> : null}
-            <StyledTooltip multiline={true} place="right" />
           </div>
           <NameInput
             placeholder="Input name.."

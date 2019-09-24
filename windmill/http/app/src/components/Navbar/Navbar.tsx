@@ -1,17 +1,26 @@
 import * as React from "react";
+import ReactTooltip from "react-tooltip";
 import styled from "styled-components";
 import { Theme } from "../Theme";
 
 export interface IDropdownNavbarProps {
   icon: JSX.Element;
   brand: { name: string; to: any };
+  buttons: Array<{ tooltip: string; icon: JSX.Element; callback: Function }>;
   dropdownHandlers: Array<{ name: string; callback: Function }>;
   renameHandler: Function;
   filename?: string;
 }
 
 export const DropdownNavbar = (props: IDropdownNavbarProps) => {
-  const { filename, icon, brand, dropdownHandlers, renameHandler } = props;
+  const {
+    filename,
+    icon,
+    brand,
+    buttons,
+    dropdownHandlers,
+    renameHandler
+  } = props;
   const DropdownButtons: any = () =>
     dropdownHandlers.map(link => link.callback());
   return (
@@ -19,10 +28,31 @@ export const DropdownNavbar = (props: IDropdownNavbarProps) => {
       <Brand href={brand.to}>{icon}</Brand>
       <DropDownSplit>
         <Ul>
-          <Filename onClick={() => renameHandler()}>{filename}</Filename>
+          <Filename
+            data-tip="Rename"
+            onClick={() => renameHandler()}
+          >
+            {filename}
+          </Filename>
         </Ul>
         <Ul>
           <DropdownButtons />
+        </Ul>
+        <Ul>
+          {[].concat(
+            ...buttons.map((b, i) => {
+              return (
+                <MenuItem
+                  data-tip={b.tooltip}
+                  data-place="bottom"
+                  key={`navbar-button-${i}`}
+                  onClick={() => b.callback()}
+                >
+                  {b.icon}
+                </MenuItem>
+              );
+            })
+          )}
         </Ul>
       </DropDownSplit>
     </Navbar>
@@ -67,6 +97,17 @@ const Filename = styled.div`
   cursor: pointer;
   &:hover {
     background: ${Theme.colors.darkAccent};
+  }
+`;
+
+const MenuItem = styled.div`
+  font-size: ${Theme.fonts.subHeadingSize};
+  padding: 3px 12px;
+  &:hover {
+    box-shadow: 30px 30px 30px rgba(0, 0, 0, 0.5) inset;
+  }
+  &:active {
+    background: #5682d2;
   }
 `;
 

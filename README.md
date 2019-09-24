@@ -37,7 +37,8 @@ synced to a remote repo
 - [x] DAG renaming and save functionality
 - [x] Open dag from menu
 - [x] Make save/load more efficient by removing non-essential values
-- [ ] Switch nav menu to icons 
+- [x] Switch nav menu to icons 
+- [ ] Add convert DAG call
 - [ ] Add hotkeys to menu functions
 - [ ] Make input/output nodes more clear
 - [ ] Check if file already exists on rename
@@ -62,13 +63,15 @@ synced to a remote repo
 - [x] Get default values
 - [x] Pull parameters from parent classes
 - [x] Move airflow dependency as extra
-- [ ] Convert WML into Python DAG
+- [x] Convert WML into Python DAG
+- [x] API Endpoint to trigger WML -> DAG
+- [ ] Edge cases for WML -> DAG
 - [ ] Get WML owner and last-modified details during wml list
 - [ ] Allow custom operators
 - [ ] Add defaults to CLI --help commands
-- [ ] Strategy for Python Opjects (e.g. callables) - maybe import statement?
+- [ ] Strategy for Python Opjects (e.g. callables) - allow either a import ref or an inline statement
 - [ ] Backport existing Python DAGs to WMLs
-- [ ] Allow YML updates to propogate to WMLs
+- [ ] Allow DAG updates to propogate to WMLs
 - [ ] Add tests for different airflow version
 
 ### Other features

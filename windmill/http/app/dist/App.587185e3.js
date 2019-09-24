@@ -57609,3748 +57609,7 @@ accessor.off = tracking.off;
 
 module.exports = accessor;
 
-},{"./stub":"../node_modules/local-storage/stub.js","./parse":"../node_modules/local-storage/parse.js","./tracking":"../node_modules/local-storage/tracking.js"}],"../node_modules/axios/lib/helpers/bind.js":[function(require,module,exports) {
-'use strict';
-
-module.exports = function bind(fn, thisArg) {
-  return function wrap() {
-    var args = new Array(arguments.length);
-    for (var i = 0; i < args.length; i++) {
-      args[i] = arguments[i];
-    }
-    return fn.apply(thisArg, args);
-  };
-};
-
-},{}],"../node_modules/axios/node_modules/is-buffer/index.js":[function(require,module,exports) {
-/*!
- * Determine if an object is a Buffer
- *
- * @author   Feross Aboukhadijeh <https://feross.org>
- * @license  MIT
- */
-module.exports = function isBuffer(obj) {
-  return obj != null && obj.constructor != null && typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj);
-};
-},{}],"../node_modules/axios/lib/utils.js":[function(require,module,exports) {
-'use strict';
-
-var bind = require('./helpers/bind');
-var isBuffer = require('is-buffer');
-
-/*global toString:true*/
-
-// utils is a library of generic helper functions non-specific to axios
-
-var toString = Object.prototype.toString;
-
-/**
- * Determine if a value is an Array
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is an Array, otherwise false
- */
-function isArray(val) {
-  return toString.call(val) === '[object Array]';
-}
-
-/**
- * Determine if a value is an ArrayBuffer
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is an ArrayBuffer, otherwise false
- */
-function isArrayBuffer(val) {
-  return toString.call(val) === '[object ArrayBuffer]';
-}
-
-/**
- * Determine if a value is a FormData
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is an FormData, otherwise false
- */
-function isFormData(val) {
-  return (typeof FormData !== 'undefined') && (val instanceof FormData);
-}
-
-/**
- * Determine if a value is a view on an ArrayBuffer
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a view on an ArrayBuffer, otherwise false
- */
-function isArrayBufferView(val) {
-  var result;
-  if ((typeof ArrayBuffer !== 'undefined') && (ArrayBuffer.isView)) {
-    result = ArrayBuffer.isView(val);
-  } else {
-    result = (val) && (val.buffer) && (val.buffer instanceof ArrayBuffer);
-  }
-  return result;
-}
-
-/**
- * Determine if a value is a String
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a String, otherwise false
- */
-function isString(val) {
-  return typeof val === 'string';
-}
-
-/**
- * Determine if a value is a Number
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Number, otherwise false
- */
-function isNumber(val) {
-  return typeof val === 'number';
-}
-
-/**
- * Determine if a value is undefined
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if the value is undefined, otherwise false
- */
-function isUndefined(val) {
-  return typeof val === 'undefined';
-}
-
-/**
- * Determine if a value is an Object
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is an Object, otherwise false
- */
-function isObject(val) {
-  return val !== null && typeof val === 'object';
-}
-
-/**
- * Determine if a value is a Date
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Date, otherwise false
- */
-function isDate(val) {
-  return toString.call(val) === '[object Date]';
-}
-
-/**
- * Determine if a value is a File
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a File, otherwise false
- */
-function isFile(val) {
-  return toString.call(val) === '[object File]';
-}
-
-/**
- * Determine if a value is a Blob
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Blob, otherwise false
- */
-function isBlob(val) {
-  return toString.call(val) === '[object Blob]';
-}
-
-/**
- * Determine if a value is a Function
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Function, otherwise false
- */
-function isFunction(val) {
-  return toString.call(val) === '[object Function]';
-}
-
-/**
- * Determine if a value is a Stream
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Stream, otherwise false
- */
-function isStream(val) {
-  return isObject(val) && isFunction(val.pipe);
-}
-
-/**
- * Determine if a value is a URLSearchParams object
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a URLSearchParams object, otherwise false
- */
-function isURLSearchParams(val) {
-  return typeof URLSearchParams !== 'undefined' && val instanceof URLSearchParams;
-}
-
-/**
- * Trim excess whitespace off the beginning and end of a string
- *
- * @param {String} str The String to trim
- * @returns {String} The String freed of excess whitespace
- */
-function trim(str) {
-  return str.replace(/^\s*/, '').replace(/\s*$/, '');
-}
-
-/**
- * Determine if we're running in a standard browser environment
- *
- * This allows axios to run in a web worker, and react-native.
- * Both environments support XMLHttpRequest, but not fully standard globals.
- *
- * web workers:
- *  typeof window -> undefined
- *  typeof document -> undefined
- *
- * react-native:
- *  navigator.product -> 'ReactNative'
- * nativescript
- *  navigator.product -> 'NativeScript' or 'NS'
- */
-function isStandardBrowserEnv() {
-  if (typeof navigator !== 'undefined' && (navigator.product === 'ReactNative' ||
-                                           navigator.product === 'NativeScript' ||
-                                           navigator.product === 'NS')) {
-    return false;
-  }
-  return (
-    typeof window !== 'undefined' &&
-    typeof document !== 'undefined'
-  );
-}
-
-/**
- * Iterate over an Array or an Object invoking a function for each item.
- *
- * If `obj` is an Array callback will be called passing
- * the value, index, and complete array for each item.
- *
- * If 'obj' is an Object callback will be called passing
- * the value, key, and complete object for each property.
- *
- * @param {Object|Array} obj The object to iterate
- * @param {Function} fn The callback to invoke for each item
- */
-function forEach(obj, fn) {
-  // Don't bother if no value provided
-  if (obj === null || typeof obj === 'undefined') {
-    return;
-  }
-
-  // Force an array if not already something iterable
-  if (typeof obj !== 'object') {
-    /*eslint no-param-reassign:0*/
-    obj = [obj];
-  }
-
-  if (isArray(obj)) {
-    // Iterate over array values
-    for (var i = 0, l = obj.length; i < l; i++) {
-      fn.call(null, obj[i], i, obj);
-    }
-  } else {
-    // Iterate over object keys
-    for (var key in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        fn.call(null, obj[key], key, obj);
-      }
-    }
-  }
-}
-
-/**
- * Accepts varargs expecting each argument to be an object, then
- * immutably merges the properties of each object and returns result.
- *
- * When multiple objects contain the same key the later object in
- * the arguments list will take precedence.
- *
- * Example:
- *
- * ```js
- * var result = merge({foo: 123}, {foo: 456});
- * console.log(result.foo); // outputs 456
- * ```
- *
- * @param {Object} obj1 Object to merge
- * @returns {Object} Result of all merge properties
- */
-function merge(/* obj1, obj2, obj3, ... */) {
-  var result = {};
-  function assignValue(val, key) {
-    if (typeof result[key] === 'object' && typeof val === 'object') {
-      result[key] = merge(result[key], val);
-    } else {
-      result[key] = val;
-    }
-  }
-
-  for (var i = 0, l = arguments.length; i < l; i++) {
-    forEach(arguments[i], assignValue);
-  }
-  return result;
-}
-
-/**
- * Function equal to merge with the difference being that no reference
- * to original objects is kept.
- *
- * @see merge
- * @param {Object} obj1 Object to merge
- * @returns {Object} Result of all merge properties
- */
-function deepMerge(/* obj1, obj2, obj3, ... */) {
-  var result = {};
-  function assignValue(val, key) {
-    if (typeof result[key] === 'object' && typeof val === 'object') {
-      result[key] = deepMerge(result[key], val);
-    } else if (typeof val === 'object') {
-      result[key] = deepMerge({}, val);
-    } else {
-      result[key] = val;
-    }
-  }
-
-  for (var i = 0, l = arguments.length; i < l; i++) {
-    forEach(arguments[i], assignValue);
-  }
-  return result;
-}
-
-/**
- * Extends object a by mutably adding to it the properties of object b.
- *
- * @param {Object} a The object to be extended
- * @param {Object} b The object to copy properties from
- * @param {Object} thisArg The object to bind function to
- * @return {Object} The resulting value of object a
- */
-function extend(a, b, thisArg) {
-  forEach(b, function assignValue(val, key) {
-    if (thisArg && typeof val === 'function') {
-      a[key] = bind(val, thisArg);
-    } else {
-      a[key] = val;
-    }
-  });
-  return a;
-}
-
-module.exports = {
-  isArray: isArray,
-  isArrayBuffer: isArrayBuffer,
-  isBuffer: isBuffer,
-  isFormData: isFormData,
-  isArrayBufferView: isArrayBufferView,
-  isString: isString,
-  isNumber: isNumber,
-  isObject: isObject,
-  isUndefined: isUndefined,
-  isDate: isDate,
-  isFile: isFile,
-  isBlob: isBlob,
-  isFunction: isFunction,
-  isStream: isStream,
-  isURLSearchParams: isURLSearchParams,
-  isStandardBrowserEnv: isStandardBrowserEnv,
-  forEach: forEach,
-  merge: merge,
-  deepMerge: deepMerge,
-  extend: extend,
-  trim: trim
-};
-
-},{"./helpers/bind":"../node_modules/axios/lib/helpers/bind.js","is-buffer":"../node_modules/axios/node_modules/is-buffer/index.js"}],"../node_modules/axios/lib/helpers/buildURL.js":[function(require,module,exports) {
-'use strict';
-
-var utils = require('./../utils');
-
-function encode(val) {
-  return encodeURIComponent(val).
-    replace(/%40/gi, '@').
-    replace(/%3A/gi, ':').
-    replace(/%24/g, '$').
-    replace(/%2C/gi, ',').
-    replace(/%20/g, '+').
-    replace(/%5B/gi, '[').
-    replace(/%5D/gi, ']');
-}
-
-/**
- * Build a URL by appending params to the end
- *
- * @param {string} url The base of the url (e.g., http://www.google.com)
- * @param {object} [params] The params to be appended
- * @returns {string} The formatted url
- */
-module.exports = function buildURL(url, params, paramsSerializer) {
-  /*eslint no-param-reassign:0*/
-  if (!params) {
-    return url;
-  }
-
-  var serializedParams;
-  if (paramsSerializer) {
-    serializedParams = paramsSerializer(params);
-  } else if (utils.isURLSearchParams(params)) {
-    serializedParams = params.toString();
-  } else {
-    var parts = [];
-
-    utils.forEach(params, function serialize(val, key) {
-      if (val === null || typeof val === 'undefined') {
-        return;
-      }
-
-      if (utils.isArray(val)) {
-        key = key + '[]';
-      } else {
-        val = [val];
-      }
-
-      utils.forEach(val, function parseValue(v) {
-        if (utils.isDate(v)) {
-          v = v.toISOString();
-        } else if (utils.isObject(v)) {
-          v = JSON.stringify(v);
-        }
-        parts.push(encode(key) + '=' + encode(v));
-      });
-    });
-
-    serializedParams = parts.join('&');
-  }
-
-  if (serializedParams) {
-    var hashmarkIndex = url.indexOf('#');
-    if (hashmarkIndex !== -1) {
-      url = url.slice(0, hashmarkIndex);
-    }
-
-    url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams;
-  }
-
-  return url;
-};
-
-},{"./../utils":"../node_modules/axios/lib/utils.js"}],"../node_modules/axios/lib/core/InterceptorManager.js":[function(require,module,exports) {
-'use strict';
-
-var utils = require('./../utils');
-
-function InterceptorManager() {
-  this.handlers = [];
-}
-
-/**
- * Add a new interceptor to the stack
- *
- * @param {Function} fulfilled The function to handle `then` for a `Promise`
- * @param {Function} rejected The function to handle `reject` for a `Promise`
- *
- * @return {Number} An ID used to remove interceptor later
- */
-InterceptorManager.prototype.use = function use(fulfilled, rejected) {
-  this.handlers.push({
-    fulfilled: fulfilled,
-    rejected: rejected
-  });
-  return this.handlers.length - 1;
-};
-
-/**
- * Remove an interceptor from the stack
- *
- * @param {Number} id The ID that was returned by `use`
- */
-InterceptorManager.prototype.eject = function eject(id) {
-  if (this.handlers[id]) {
-    this.handlers[id] = null;
-  }
-};
-
-/**
- * Iterate over all the registered interceptors
- *
- * This method is particularly useful for skipping over any
- * interceptors that may have become `null` calling `eject`.
- *
- * @param {Function} fn The function to call for each interceptor
- */
-InterceptorManager.prototype.forEach = function forEach(fn) {
-  utils.forEach(this.handlers, function forEachHandler(h) {
-    if (h !== null) {
-      fn(h);
-    }
-  });
-};
-
-module.exports = InterceptorManager;
-
-},{"./../utils":"../node_modules/axios/lib/utils.js"}],"../node_modules/axios/lib/core/transformData.js":[function(require,module,exports) {
-'use strict';
-
-var utils = require('./../utils');
-
-/**
- * Transform the data for a request or a response
- *
- * @param {Object|String} data The data to be transformed
- * @param {Array} headers The headers for the request or response
- * @param {Array|Function} fns A single function or Array of functions
- * @returns {*} The resulting transformed data
- */
-module.exports = function transformData(data, headers, fns) {
-  /*eslint no-param-reassign:0*/
-  utils.forEach(fns, function transform(fn) {
-    data = fn(data, headers);
-  });
-
-  return data;
-};
-
-},{"./../utils":"../node_modules/axios/lib/utils.js"}],"../node_modules/axios/lib/cancel/isCancel.js":[function(require,module,exports) {
-'use strict';
-
-module.exports = function isCancel(value) {
-  return !!(value && value.__CANCEL__);
-};
-
-},{}],"../node_modules/axios/lib/helpers/normalizeHeaderName.js":[function(require,module,exports) {
-'use strict';
-
-var utils = require('../utils');
-
-module.exports = function normalizeHeaderName(headers, normalizedName) {
-  utils.forEach(headers, function processHeader(value, name) {
-    if (name !== normalizedName && name.toUpperCase() === normalizedName.toUpperCase()) {
-      headers[normalizedName] = value;
-      delete headers[name];
-    }
-  });
-};
-
-},{"../utils":"../node_modules/axios/lib/utils.js"}],"../node_modules/axios/lib/core/enhanceError.js":[function(require,module,exports) {
-'use strict';
-
-/**
- * Update an Error with the specified config, error code, and response.
- *
- * @param {Error} error The error to update.
- * @param {Object} config The config.
- * @param {string} [code] The error code (for example, 'ECONNABORTED').
- * @param {Object} [request] The request.
- * @param {Object} [response] The response.
- * @returns {Error} The error.
- */
-module.exports = function enhanceError(error, config, code, request, response) {
-  error.config = config;
-  if (code) {
-    error.code = code;
-  }
-
-  error.request = request;
-  error.response = response;
-  error.isAxiosError = true;
-
-  error.toJSON = function() {
-    return {
-      // Standard
-      message: this.message,
-      name: this.name,
-      // Microsoft
-      description: this.description,
-      number: this.number,
-      // Mozilla
-      fileName: this.fileName,
-      lineNumber: this.lineNumber,
-      columnNumber: this.columnNumber,
-      stack: this.stack,
-      // Axios
-      config: this.config,
-      code: this.code
-    };
-  };
-  return error;
-};
-
-},{}],"../node_modules/axios/lib/core/createError.js":[function(require,module,exports) {
-'use strict';
-
-var enhanceError = require('./enhanceError');
-
-/**
- * Create an Error with the specified message, config, error code, request and response.
- *
- * @param {string} message The error message.
- * @param {Object} config The config.
- * @param {string} [code] The error code (for example, 'ECONNABORTED').
- * @param {Object} [request] The request.
- * @param {Object} [response] The response.
- * @returns {Error} The created error.
- */
-module.exports = function createError(message, config, code, request, response) {
-  var error = new Error(message);
-  return enhanceError(error, config, code, request, response);
-};
-
-},{"./enhanceError":"../node_modules/axios/lib/core/enhanceError.js"}],"../node_modules/axios/lib/core/settle.js":[function(require,module,exports) {
-'use strict';
-
-var createError = require('./createError');
-
-/**
- * Resolve or reject a Promise based on response status.
- *
- * @param {Function} resolve A function that resolves the promise.
- * @param {Function} reject A function that rejects the promise.
- * @param {object} response The response.
- */
-module.exports = function settle(resolve, reject, response) {
-  var validateStatus = response.config.validateStatus;
-  if (!validateStatus || validateStatus(response.status)) {
-    resolve(response);
-  } else {
-    reject(createError(
-      'Request failed with status code ' + response.status,
-      response.config,
-      null,
-      response.request,
-      response
-    ));
-  }
-};
-
-},{"./createError":"../node_modules/axios/lib/core/createError.js"}],"../node_modules/axios/lib/helpers/parseHeaders.js":[function(require,module,exports) {
-'use strict';
-
-var utils = require('./../utils');
-
-// Headers whose duplicates are ignored by node
-// c.f. https://nodejs.org/api/http.html#http_message_headers
-var ignoreDuplicateOf = [
-  'age', 'authorization', 'content-length', 'content-type', 'etag',
-  'expires', 'from', 'host', 'if-modified-since', 'if-unmodified-since',
-  'last-modified', 'location', 'max-forwards', 'proxy-authorization',
-  'referer', 'retry-after', 'user-agent'
-];
-
-/**
- * Parse headers into an object
- *
- * ```
- * Date: Wed, 27 Aug 2014 08:58:49 GMT
- * Content-Type: application/json
- * Connection: keep-alive
- * Transfer-Encoding: chunked
- * ```
- *
- * @param {String} headers Headers needing to be parsed
- * @returns {Object} Headers parsed into an object
- */
-module.exports = function parseHeaders(headers) {
-  var parsed = {};
-  var key;
-  var val;
-  var i;
-
-  if (!headers) { return parsed; }
-
-  utils.forEach(headers.split('\n'), function parser(line) {
-    i = line.indexOf(':');
-    key = utils.trim(line.substr(0, i)).toLowerCase();
-    val = utils.trim(line.substr(i + 1));
-
-    if (key) {
-      if (parsed[key] && ignoreDuplicateOf.indexOf(key) >= 0) {
-        return;
-      }
-      if (key === 'set-cookie') {
-        parsed[key] = (parsed[key] ? parsed[key] : []).concat([val]);
-      } else {
-        parsed[key] = parsed[key] ? parsed[key] + ', ' + val : val;
-      }
-    }
-  });
-
-  return parsed;
-};
-
-},{"./../utils":"../node_modules/axios/lib/utils.js"}],"../node_modules/axios/lib/helpers/isURLSameOrigin.js":[function(require,module,exports) {
-'use strict';
-
-var utils = require('./../utils');
-
-module.exports = (
-  utils.isStandardBrowserEnv() ?
-
-  // Standard browser envs have full support of the APIs needed to test
-  // whether the request URL is of the same origin as current location.
-    (function standardBrowserEnv() {
-      var msie = /(msie|trident)/i.test(navigator.userAgent);
-      var urlParsingNode = document.createElement('a');
-      var originURL;
-
-      /**
-    * Parse a URL to discover it's components
-    *
-    * @param {String} url The URL to be parsed
-    * @returns {Object}
-    */
-      function resolveURL(url) {
-        var href = url;
-
-        if (msie) {
-        // IE needs attribute set twice to normalize properties
-          urlParsingNode.setAttribute('href', href);
-          href = urlParsingNode.href;
-        }
-
-        urlParsingNode.setAttribute('href', href);
-
-        // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
-        return {
-          href: urlParsingNode.href,
-          protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
-          host: urlParsingNode.host,
-          search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
-          hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
-          hostname: urlParsingNode.hostname,
-          port: urlParsingNode.port,
-          pathname: (urlParsingNode.pathname.charAt(0) === '/') ?
-            urlParsingNode.pathname :
-            '/' + urlParsingNode.pathname
-        };
-      }
-
-      originURL = resolveURL(window.location.href);
-
-      /**
-    * Determine if a URL shares the same origin as the current location
-    *
-    * @param {String} requestURL The URL to test
-    * @returns {boolean} True if URL shares the same origin, otherwise false
-    */
-      return function isURLSameOrigin(requestURL) {
-        var parsed = (utils.isString(requestURL)) ? resolveURL(requestURL) : requestURL;
-        return (parsed.protocol === originURL.protocol &&
-            parsed.host === originURL.host);
-      };
-    })() :
-
-  // Non standard browser envs (web workers, react-native) lack needed support.
-    (function nonStandardBrowserEnv() {
-      return function isURLSameOrigin() {
-        return true;
-      };
-    })()
-);
-
-},{"./../utils":"../node_modules/axios/lib/utils.js"}],"../node_modules/axios/lib/helpers/cookies.js":[function(require,module,exports) {
-'use strict';
-
-var utils = require('./../utils');
-
-module.exports = (
-  utils.isStandardBrowserEnv() ?
-
-  // Standard browser envs support document.cookie
-    (function standardBrowserEnv() {
-      return {
-        write: function write(name, value, expires, path, domain, secure) {
-          var cookie = [];
-          cookie.push(name + '=' + encodeURIComponent(value));
-
-          if (utils.isNumber(expires)) {
-            cookie.push('expires=' + new Date(expires).toGMTString());
-          }
-
-          if (utils.isString(path)) {
-            cookie.push('path=' + path);
-          }
-
-          if (utils.isString(domain)) {
-            cookie.push('domain=' + domain);
-          }
-
-          if (secure === true) {
-            cookie.push('secure');
-          }
-
-          document.cookie = cookie.join('; ');
-        },
-
-        read: function read(name) {
-          var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
-          return (match ? decodeURIComponent(match[3]) : null);
-        },
-
-        remove: function remove(name) {
-          this.write(name, '', Date.now() - 86400000);
-        }
-      };
-    })() :
-
-  // Non standard browser env (web workers, react-native) lack needed support.
-    (function nonStandardBrowserEnv() {
-      return {
-        write: function write() {},
-        read: function read() { return null; },
-        remove: function remove() {}
-      };
-    })()
-);
-
-},{"./../utils":"../node_modules/axios/lib/utils.js"}],"../node_modules/axios/lib/adapters/xhr.js":[function(require,module,exports) {
-'use strict';
-
-var utils = require('./../utils');
-var settle = require('./../core/settle');
-var buildURL = require('./../helpers/buildURL');
-var parseHeaders = require('./../helpers/parseHeaders');
-var isURLSameOrigin = require('./../helpers/isURLSameOrigin');
-var createError = require('../core/createError');
-
-module.exports = function xhrAdapter(config) {
-  return new Promise(function dispatchXhrRequest(resolve, reject) {
-    var requestData = config.data;
-    var requestHeaders = config.headers;
-
-    if (utils.isFormData(requestData)) {
-      delete requestHeaders['Content-Type']; // Let the browser set it
-    }
-
-    var request = new XMLHttpRequest();
-
-    // HTTP basic authentication
-    if (config.auth) {
-      var username = config.auth.username || '';
-      var password = config.auth.password || '';
-      requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
-    }
-
-    request.open(config.method.toUpperCase(), buildURL(config.url, config.params, config.paramsSerializer), true);
-
-    // Set the request timeout in MS
-    request.timeout = config.timeout;
-
-    // Listen for ready state
-    request.onreadystatechange = function handleLoad() {
-      if (!request || request.readyState !== 4) {
-        return;
-      }
-
-      // The request errored out and we didn't get a response, this will be
-      // handled by onerror instead
-      // With one exception: request that using file: protocol, most browsers
-      // will return status as 0 even though it's a successful request
-      if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
-        return;
-      }
-
-      // Prepare the response
-      var responseHeaders = 'getAllResponseHeaders' in request ? parseHeaders(request.getAllResponseHeaders()) : null;
-      var responseData = !config.responseType || config.responseType === 'text' ? request.responseText : request.response;
-      var response = {
-        data: responseData,
-        status: request.status,
-        statusText: request.statusText,
-        headers: responseHeaders,
-        config: config,
-        request: request
-      };
-
-      settle(resolve, reject, response);
-
-      // Clean up request
-      request = null;
-    };
-
-    // Handle browser request cancellation (as opposed to a manual cancellation)
-    request.onabort = function handleAbort() {
-      if (!request) {
-        return;
-      }
-
-      reject(createError('Request aborted', config, 'ECONNABORTED', request));
-
-      // Clean up request
-      request = null;
-    };
-
-    // Handle low level network errors
-    request.onerror = function handleError() {
-      // Real errors are hidden from us by the browser
-      // onerror should only fire if it's a network error
-      reject(createError('Network Error', config, null, request));
-
-      // Clean up request
-      request = null;
-    };
-
-    // Handle timeout
-    request.ontimeout = function handleTimeout() {
-      reject(createError('timeout of ' + config.timeout + 'ms exceeded', config, 'ECONNABORTED',
-        request));
-
-      // Clean up request
-      request = null;
-    };
-
-    // Add xsrf header
-    // This is only done if running in a standard browser environment.
-    // Specifically not if we're in a web worker, or react-native.
-    if (utils.isStandardBrowserEnv()) {
-      var cookies = require('./../helpers/cookies');
-
-      // Add xsrf header
-      var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
-        cookies.read(config.xsrfCookieName) :
-        undefined;
-
-      if (xsrfValue) {
-        requestHeaders[config.xsrfHeaderName] = xsrfValue;
-      }
-    }
-
-    // Add headers to the request
-    if ('setRequestHeader' in request) {
-      utils.forEach(requestHeaders, function setRequestHeader(val, key) {
-        if (typeof requestData === 'undefined' && key.toLowerCase() === 'content-type') {
-          // Remove Content-Type if data is undefined
-          delete requestHeaders[key];
-        } else {
-          // Otherwise add header to the request
-          request.setRequestHeader(key, val);
-        }
-      });
-    }
-
-    // Add withCredentials to request if needed
-    if (config.withCredentials) {
-      request.withCredentials = true;
-    }
-
-    // Add responseType to request if needed
-    if (config.responseType) {
-      try {
-        request.responseType = config.responseType;
-      } catch (e) {
-        // Expected DOMException thrown by browsers not compatible XMLHttpRequest Level 2.
-        // But, this can be suppressed for 'json' type as it can be parsed by default 'transformResponse' function.
-        if (config.responseType !== 'json') {
-          throw e;
-        }
-      }
-    }
-
-    // Handle progress if needed
-    if (typeof config.onDownloadProgress === 'function') {
-      request.addEventListener('progress', config.onDownloadProgress);
-    }
-
-    // Not all browsers support upload events
-    if (typeof config.onUploadProgress === 'function' && request.upload) {
-      request.upload.addEventListener('progress', config.onUploadProgress);
-    }
-
-    if (config.cancelToken) {
-      // Handle cancellation
-      config.cancelToken.promise.then(function onCanceled(cancel) {
-        if (!request) {
-          return;
-        }
-
-        request.abort();
-        reject(cancel);
-        // Clean up request
-        request = null;
-      });
-    }
-
-    if (requestData === undefined) {
-      requestData = null;
-    }
-
-    // Send the request
-    request.send(requestData);
-  });
-};
-
-},{"./../utils":"../node_modules/axios/lib/utils.js","./../core/settle":"../node_modules/axios/lib/core/settle.js","./../helpers/buildURL":"../node_modules/axios/lib/helpers/buildURL.js","./../helpers/parseHeaders":"../node_modules/axios/lib/helpers/parseHeaders.js","./../helpers/isURLSameOrigin":"../node_modules/axios/lib/helpers/isURLSameOrigin.js","../core/createError":"../node_modules/axios/lib/core/createError.js","./../helpers/cookies":"../node_modules/axios/lib/helpers/cookies.js"}],"../node_modules/axios/lib/defaults.js":[function(require,module,exports) {
-var process = require("process");
-'use strict';
-
-var utils = require('./utils');
-var normalizeHeaderName = require('./helpers/normalizeHeaderName');
-
-var DEFAULT_CONTENT_TYPE = {
-  'Content-Type': 'application/x-www-form-urlencoded'
-};
-
-function setContentTypeIfUnset(headers, value) {
-  if (!utils.isUndefined(headers) && utils.isUndefined(headers['Content-Type'])) {
-    headers['Content-Type'] = value;
-  }
-}
-
-function getDefaultAdapter() {
-  var adapter;
-  // Only Node.JS has a process variable that is of [[Class]] process
-  if (typeof process !== 'undefined' && Object.prototype.toString.call(process) === '[object process]') {
-    // For node use HTTP adapter
-    adapter = require('./adapters/http');
-  } else if (typeof XMLHttpRequest !== 'undefined') {
-    // For browsers use XHR adapter
-    adapter = require('./adapters/xhr');
-  }
-  return adapter;
-}
-
-var defaults = {
-  adapter: getDefaultAdapter(),
-
-  transformRequest: [function transformRequest(data, headers) {
-    normalizeHeaderName(headers, 'Accept');
-    normalizeHeaderName(headers, 'Content-Type');
-    if (utils.isFormData(data) ||
-      utils.isArrayBuffer(data) ||
-      utils.isBuffer(data) ||
-      utils.isStream(data) ||
-      utils.isFile(data) ||
-      utils.isBlob(data)
-    ) {
-      return data;
-    }
-    if (utils.isArrayBufferView(data)) {
-      return data.buffer;
-    }
-    if (utils.isURLSearchParams(data)) {
-      setContentTypeIfUnset(headers, 'application/x-www-form-urlencoded;charset=utf-8');
-      return data.toString();
-    }
-    if (utils.isObject(data)) {
-      setContentTypeIfUnset(headers, 'application/json;charset=utf-8');
-      return JSON.stringify(data);
-    }
-    return data;
-  }],
-
-  transformResponse: [function transformResponse(data) {
-    /*eslint no-param-reassign:0*/
-    if (typeof data === 'string') {
-      try {
-        data = JSON.parse(data);
-      } catch (e) { /* Ignore */ }
-    }
-    return data;
-  }],
-
-  /**
-   * A timeout in milliseconds to abort a request. If set to 0 (default) a
-   * timeout is not created.
-   */
-  timeout: 0,
-
-  xsrfCookieName: 'XSRF-TOKEN',
-  xsrfHeaderName: 'X-XSRF-TOKEN',
-
-  maxContentLength: -1,
-
-  validateStatus: function validateStatus(status) {
-    return status >= 200 && status < 300;
-  }
-};
-
-defaults.headers = {
-  common: {
-    'Accept': 'application/json, text/plain, */*'
-  }
-};
-
-utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
-  defaults.headers[method] = {};
-});
-
-utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
-  defaults.headers[method] = utils.merge(DEFAULT_CONTENT_TYPE);
-});
-
-module.exports = defaults;
-
-},{"./utils":"../node_modules/axios/lib/utils.js","./helpers/normalizeHeaderName":"../node_modules/axios/lib/helpers/normalizeHeaderName.js","./adapters/http":"../node_modules/axios/lib/adapters/xhr.js","./adapters/xhr":"../node_modules/axios/lib/adapters/xhr.js","process":"../node_modules/process/browser.js"}],"../node_modules/axios/lib/helpers/isAbsoluteURL.js":[function(require,module,exports) {
-'use strict';
-
-/**
- * Determines whether the specified URL is absolute
- *
- * @param {string} url The URL to test
- * @returns {boolean} True if the specified URL is absolute, otherwise false
- */
-module.exports = function isAbsoluteURL(url) {
-  // A URL is considered absolute if it begins with "<scheme>://" or "//" (protocol-relative URL).
-  // RFC 3986 defines scheme name as a sequence of characters beginning with a letter and followed
-  // by any combination of letters, digits, plus, period, or hyphen.
-  return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
-};
-
-},{}],"../node_modules/axios/lib/helpers/combineURLs.js":[function(require,module,exports) {
-'use strict';
-
-/**
- * Creates a new URL by combining the specified URLs
- *
- * @param {string} baseURL The base URL
- * @param {string} relativeURL The relative URL
- * @returns {string} The combined URL
- */
-module.exports = function combineURLs(baseURL, relativeURL) {
-  return relativeURL
-    ? baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '')
-    : baseURL;
-};
-
-},{}],"../node_modules/axios/lib/core/dispatchRequest.js":[function(require,module,exports) {
-'use strict';
-
-var utils = require('./../utils');
-var transformData = require('./transformData');
-var isCancel = require('../cancel/isCancel');
-var defaults = require('../defaults');
-var isAbsoluteURL = require('./../helpers/isAbsoluteURL');
-var combineURLs = require('./../helpers/combineURLs');
-
-/**
- * Throws a `Cancel` if cancellation has been requested.
- */
-function throwIfCancellationRequested(config) {
-  if (config.cancelToken) {
-    config.cancelToken.throwIfRequested();
-  }
-}
-
-/**
- * Dispatch a request to the server using the configured adapter.
- *
- * @param {object} config The config that is to be used for the request
- * @returns {Promise} The Promise to be fulfilled
- */
-module.exports = function dispatchRequest(config) {
-  throwIfCancellationRequested(config);
-
-  // Support baseURL config
-  if (config.baseURL && !isAbsoluteURL(config.url)) {
-    config.url = combineURLs(config.baseURL, config.url);
-  }
-
-  // Ensure headers exist
-  config.headers = config.headers || {};
-
-  // Transform request data
-  config.data = transformData(
-    config.data,
-    config.headers,
-    config.transformRequest
-  );
-
-  // Flatten headers
-  config.headers = utils.merge(
-    config.headers.common || {},
-    config.headers[config.method] || {},
-    config.headers || {}
-  );
-
-  utils.forEach(
-    ['delete', 'get', 'head', 'post', 'put', 'patch', 'common'],
-    function cleanHeaderConfig(method) {
-      delete config.headers[method];
-    }
-  );
-
-  var adapter = config.adapter || defaults.adapter;
-
-  return adapter(config).then(function onAdapterResolution(response) {
-    throwIfCancellationRequested(config);
-
-    // Transform response data
-    response.data = transformData(
-      response.data,
-      response.headers,
-      config.transformResponse
-    );
-
-    return response;
-  }, function onAdapterRejection(reason) {
-    if (!isCancel(reason)) {
-      throwIfCancellationRequested(config);
-
-      // Transform response data
-      if (reason && reason.response) {
-        reason.response.data = transformData(
-          reason.response.data,
-          reason.response.headers,
-          config.transformResponse
-        );
-      }
-    }
-
-    return Promise.reject(reason);
-  });
-};
-
-},{"./../utils":"../node_modules/axios/lib/utils.js","./transformData":"../node_modules/axios/lib/core/transformData.js","../cancel/isCancel":"../node_modules/axios/lib/cancel/isCancel.js","../defaults":"../node_modules/axios/lib/defaults.js","./../helpers/isAbsoluteURL":"../node_modules/axios/lib/helpers/isAbsoluteURL.js","./../helpers/combineURLs":"../node_modules/axios/lib/helpers/combineURLs.js"}],"../node_modules/axios/lib/core/mergeConfig.js":[function(require,module,exports) {
-'use strict';
-
-var utils = require('../utils');
-
-/**
- * Config-specific merge-function which creates a new config-object
- * by merging two configuration objects together.
- *
- * @param {Object} config1
- * @param {Object} config2
- * @returns {Object} New object resulting from merging config2 to config1
- */
-module.exports = function mergeConfig(config1, config2) {
-  // eslint-disable-next-line no-param-reassign
-  config2 = config2 || {};
-  var config = {};
-
-  utils.forEach(['url', 'method', 'params', 'data'], function valueFromConfig2(prop) {
-    if (typeof config2[prop] !== 'undefined') {
-      config[prop] = config2[prop];
-    }
-  });
-
-  utils.forEach(['headers', 'auth', 'proxy'], function mergeDeepProperties(prop) {
-    if (utils.isObject(config2[prop])) {
-      config[prop] = utils.deepMerge(config1[prop], config2[prop]);
-    } else if (typeof config2[prop] !== 'undefined') {
-      config[prop] = config2[prop];
-    } else if (utils.isObject(config1[prop])) {
-      config[prop] = utils.deepMerge(config1[prop]);
-    } else if (typeof config1[prop] !== 'undefined') {
-      config[prop] = config1[prop];
-    }
-  });
-
-  utils.forEach([
-    'baseURL', 'transformRequest', 'transformResponse', 'paramsSerializer',
-    'timeout', 'withCredentials', 'adapter', 'responseType', 'xsrfCookieName',
-    'xsrfHeaderName', 'onUploadProgress', 'onDownloadProgress', 'maxContentLength',
-    'validateStatus', 'maxRedirects', 'httpAgent', 'httpsAgent', 'cancelToken',
-    'socketPath'
-  ], function defaultToConfig2(prop) {
-    if (typeof config2[prop] !== 'undefined') {
-      config[prop] = config2[prop];
-    } else if (typeof config1[prop] !== 'undefined') {
-      config[prop] = config1[prop];
-    }
-  });
-
-  return config;
-};
-
-},{"../utils":"../node_modules/axios/lib/utils.js"}],"../node_modules/axios/lib/core/Axios.js":[function(require,module,exports) {
-'use strict';
-
-var utils = require('./../utils');
-var buildURL = require('../helpers/buildURL');
-var InterceptorManager = require('./InterceptorManager');
-var dispatchRequest = require('./dispatchRequest');
-var mergeConfig = require('./mergeConfig');
-
-/**
- * Create a new instance of Axios
- *
- * @param {Object} instanceConfig The default config for the instance
- */
-function Axios(instanceConfig) {
-  this.defaults = instanceConfig;
-  this.interceptors = {
-    request: new InterceptorManager(),
-    response: new InterceptorManager()
-  };
-}
-
-/**
- * Dispatch a request
- *
- * @param {Object} config The config specific for this request (merged with this.defaults)
- */
-Axios.prototype.request = function request(config) {
-  /*eslint no-param-reassign:0*/
-  // Allow for axios('example/url'[, config]) a la fetch API
-  if (typeof config === 'string') {
-    config = arguments[1] || {};
-    config.url = arguments[0];
-  } else {
-    config = config || {};
-  }
-
-  config = mergeConfig(this.defaults, config);
-  config.method = config.method ? config.method.toLowerCase() : 'get';
-
-  // Hook up interceptors middleware
-  var chain = [dispatchRequest, undefined];
-  var promise = Promise.resolve(config);
-
-  this.interceptors.request.forEach(function unshiftRequestInterceptors(interceptor) {
-    chain.unshift(interceptor.fulfilled, interceptor.rejected);
-  });
-
-  this.interceptors.response.forEach(function pushResponseInterceptors(interceptor) {
-    chain.push(interceptor.fulfilled, interceptor.rejected);
-  });
-
-  while (chain.length) {
-    promise = promise.then(chain.shift(), chain.shift());
-  }
-
-  return promise;
-};
-
-Axios.prototype.getUri = function getUri(config) {
-  config = mergeConfig(this.defaults, config);
-  return buildURL(config.url, config.params, config.paramsSerializer).replace(/^\?/, '');
-};
-
-// Provide aliases for supported request methods
-utils.forEach(['delete', 'get', 'head', 'options'], function forEachMethodNoData(method) {
-  /*eslint func-names:0*/
-  Axios.prototype[method] = function(url, config) {
-    return this.request(utils.merge(config || {}, {
-      method: method,
-      url: url
-    }));
-  };
-});
-
-utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
-  /*eslint func-names:0*/
-  Axios.prototype[method] = function(url, data, config) {
-    return this.request(utils.merge(config || {}, {
-      method: method,
-      url: url,
-      data: data
-    }));
-  };
-});
-
-module.exports = Axios;
-
-},{"./../utils":"../node_modules/axios/lib/utils.js","../helpers/buildURL":"../node_modules/axios/lib/helpers/buildURL.js","./InterceptorManager":"../node_modules/axios/lib/core/InterceptorManager.js","./dispatchRequest":"../node_modules/axios/lib/core/dispatchRequest.js","./mergeConfig":"../node_modules/axios/lib/core/mergeConfig.js"}],"../node_modules/axios/lib/cancel/Cancel.js":[function(require,module,exports) {
-'use strict';
-
-/**
- * A `Cancel` is an object that is thrown when an operation is canceled.
- *
- * @class
- * @param {string=} message The message.
- */
-function Cancel(message) {
-  this.message = message;
-}
-
-Cancel.prototype.toString = function toString() {
-  return 'Cancel' + (this.message ? ': ' + this.message : '');
-};
-
-Cancel.prototype.__CANCEL__ = true;
-
-module.exports = Cancel;
-
-},{}],"../node_modules/axios/lib/cancel/CancelToken.js":[function(require,module,exports) {
-'use strict';
-
-var Cancel = require('./Cancel');
-
-/**
- * A `CancelToken` is an object that can be used to request cancellation of an operation.
- *
- * @class
- * @param {Function} executor The executor function.
- */
-function CancelToken(executor) {
-  if (typeof executor !== 'function') {
-    throw new TypeError('executor must be a function.');
-  }
-
-  var resolvePromise;
-  this.promise = new Promise(function promiseExecutor(resolve) {
-    resolvePromise = resolve;
-  });
-
-  var token = this;
-  executor(function cancel(message) {
-    if (token.reason) {
-      // Cancellation has already been requested
-      return;
-    }
-
-    token.reason = new Cancel(message);
-    resolvePromise(token.reason);
-  });
-}
-
-/**
- * Throws a `Cancel` if cancellation has been requested.
- */
-CancelToken.prototype.throwIfRequested = function throwIfRequested() {
-  if (this.reason) {
-    throw this.reason;
-  }
-};
-
-/**
- * Returns an object that contains a new `CancelToken` and a function that, when called,
- * cancels the `CancelToken`.
- */
-CancelToken.source = function source() {
-  var cancel;
-  var token = new CancelToken(function executor(c) {
-    cancel = c;
-  });
-  return {
-    token: token,
-    cancel: cancel
-  };
-};
-
-module.exports = CancelToken;
-
-},{"./Cancel":"../node_modules/axios/lib/cancel/Cancel.js"}],"../node_modules/axios/lib/helpers/spread.js":[function(require,module,exports) {
-'use strict';
-
-/**
- * Syntactic sugar for invoking a function and expanding an array for arguments.
- *
- * Common use case would be to use `Function.prototype.apply`.
- *
- *  ```js
- *  function f(x, y, z) {}
- *  var args = [1, 2, 3];
- *  f.apply(null, args);
- *  ```
- *
- * With `spread` this example can be re-written.
- *
- *  ```js
- *  spread(function(x, y, z) {})([1, 2, 3]);
- *  ```
- *
- * @param {Function} callback
- * @returns {Function}
- */
-module.exports = function spread(callback) {
-  return function wrap(arr) {
-    return callback.apply(null, arr);
-  };
-};
-
-},{}],"../node_modules/axios/lib/axios.js":[function(require,module,exports) {
-'use strict';
-
-var utils = require('./utils');
-var bind = require('./helpers/bind');
-var Axios = require('./core/Axios');
-var mergeConfig = require('./core/mergeConfig');
-var defaults = require('./defaults');
-
-/**
- * Create an instance of Axios
- *
- * @param {Object} defaultConfig The default config for the instance
- * @return {Axios} A new instance of Axios
- */
-function createInstance(defaultConfig) {
-  var context = new Axios(defaultConfig);
-  var instance = bind(Axios.prototype.request, context);
-
-  // Copy axios.prototype to instance
-  utils.extend(instance, Axios.prototype, context);
-
-  // Copy context to instance
-  utils.extend(instance, context);
-
-  return instance;
-}
-
-// Create the default instance to be exported
-var axios = createInstance(defaults);
-
-// Expose Axios class to allow class inheritance
-axios.Axios = Axios;
-
-// Factory for creating new instances
-axios.create = function create(instanceConfig) {
-  return createInstance(mergeConfig(axios.defaults, instanceConfig));
-};
-
-// Expose Cancel & CancelToken
-axios.Cancel = require('./cancel/Cancel');
-axios.CancelToken = require('./cancel/CancelToken');
-axios.isCancel = require('./cancel/isCancel');
-
-// Expose all/spread
-axios.all = function all(promises) {
-  return Promise.all(promises);
-};
-axios.spread = require('./helpers/spread');
-
-module.exports = axios;
-
-// Allow use of default import syntax in TypeScript
-module.exports.default = axios;
-
-},{"./utils":"../node_modules/axios/lib/utils.js","./helpers/bind":"../node_modules/axios/lib/helpers/bind.js","./core/Axios":"../node_modules/axios/lib/core/Axios.js","./core/mergeConfig":"../node_modules/axios/lib/core/mergeConfig.js","./defaults":"../node_modules/axios/lib/defaults.js","./cancel/Cancel":"../node_modules/axios/lib/cancel/Cancel.js","./cancel/CancelToken":"../node_modules/axios/lib/cancel/CancelToken.js","./cancel/isCancel":"../node_modules/axios/lib/cancel/isCancel.js","./helpers/spread":"../node_modules/axios/lib/helpers/spread.js"}],"../node_modules/axios/index.js":[function(require,module,exports) {
-module.exports = require('./lib/axios');
-},{"./lib/axios":"../node_modules/axios/lib/axios.js"}],"../src/ApiClient.tsx":[function(require,module,exports) {
-"use strict";
-
-var __awaiter = this && this.__awaiter || function (thisArg, _arguments, P, generator) {
-  return new (P || (P = Promise))(function (resolve, reject) {
-    function fulfilled(value) {
-      try {
-        step(generator.next(value));
-      } catch (e) {
-        reject(e);
-      }
-    }
-
-    function rejected(value) {
-      try {
-        step(generator["throw"](value));
-      } catch (e) {
-        reject(e);
-      }
-    }
-
-    function step(result) {
-      result.done ? resolve(result.value) : new P(function (resolve) {
-        resolve(result.value);
-      }).then(fulfilled, rejected);
-    }
-
-    step((generator = generator.apply(thisArg, _arguments || [])).next());
-  });
-};
-
-var __generator = this && this.__generator || function (thisArg, body) {
-  var _ = {
-    label: 0,
-    sent: function sent() {
-      if (t[0] & 1) throw t[1];
-      return t[1];
-    },
-    trys: [],
-    ops: []
-  },
-      f,
-      y,
-      t,
-      g;
-  return g = {
-    next: verb(0),
-    "throw": verb(1),
-    "return": verb(2)
-  }, typeof Symbol === "function" && (g[Symbol.iterator] = function () {
-    return this;
-  }), g;
-
-  function verb(n) {
-    return function (v) {
-      return step([n, v]);
-    };
-  }
-
-  function step(op) {
-    if (f) throw new TypeError("Generator is already executing.");
-
-    while (_) {
-      try {
-        if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-        if (y = 0, t) op = [op[0] & 2, t.value];
-
-        switch (op[0]) {
-          case 0:
-          case 1:
-            t = op;
-            break;
-
-          case 4:
-            _.label++;
-            return {
-              value: op[1],
-              done: false
-            };
-
-          case 5:
-            _.label++;
-            y = op[1];
-            op = [0];
-            continue;
-
-          case 7:
-            op = _.ops.pop();
-
-            _.trys.pop();
-
-            continue;
-
-          default:
-            if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
-              _ = 0;
-              continue;
-            }
-
-            if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
-              _.label = op[1];
-              break;
-            }
-
-            if (op[0] === 6 && _.label < t[1]) {
-              _.label = t[1];
-              t = op;
-              break;
-            }
-
-            if (t && _.label < t[2]) {
-              _.label = t[2];
-
-              _.ops.push(op);
-
-              break;
-            }
-
-            if (t[2]) _.ops.pop();
-
-            _.trys.pop();
-
-            continue;
-        }
-
-        op = body.call(thisArg, _);
-      } catch (e) {
-        op = [6, e];
-        y = 0;
-      } finally {
-        f = t = 0;
-      }
-    }
-
-    if (op[0] & 5) throw op[1];
-    return {
-      value: op[0] ? op[1] : void 0,
-      done: true
-    };
-  }
-};
-
-var __importDefault = this && this.__importDefault || function (mod) {
-  return mod && mod.__esModule ? mod : {
-    "default": mod
-  };
-};
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var axios_1 = __importDefault(require("axios"));
-
-var BaseURI = "http://localhost:8000";
-var client = axios_1.default.create({
-  baseURL: BaseURI,
-  data: JSON
-});
-
-var APIClient =
-/** @class */
-function () {
-  function APIClient() {}
-
-  APIClient.prototype.getOperators = function () {
-    return this.perform("GET", "/v1/operators");
-  };
-
-  APIClient.prototype.getDagSpec = function () {
-    return this.perform("GET", "/v1/dag");
-  };
-
-  APIClient.prototype.getWml = function (wmlname) {
-    return this.perform("GET", "/v1/wml/" + wmlname);
-  };
-
-  APIClient.prototype.getWmlList = function () {
-    return this.perform("GET", "/v1/wml/");
-  };
-
-  APIClient.prototype.saveWml = function (wmlname, wml) {
-    return this.perform("POST", "/v1/wml/" + wmlname, wml);
-  };
-
-  APIClient.prototype.perform = function (method, resource, data) {
-    return __awaiter(this, void 0, void 0, function () {
-      return __generator(this, function (_a) {
-        return [2
-        /*return*/
-        , client({
-          method: method,
-          url: resource,
-          data: data //   headers: {
-          //     Authorization: `Bearer ${this.accessToken}`
-          //   }
-
-        }).then(function (resp) {
-          return resp.data ? resp.data : [];
-        })];
-      });
-    });
-  };
-
-  return APIClient;
-}();
-
-exports.APIClient = APIClient;
-},{"axios":"../node_modules/axios/index.js"}],"../node_modules/classnames/index.js":[function(require,module,exports) {
-var define;
-/*!
-  Copyright (c) 2017 Jed Watson.
-  Licensed under the MIT License (MIT), see
-  http://jedwatson.github.io/classnames
-*/
-/* global define */
-
-(function () {
-	'use strict';
-
-	var hasOwn = {}.hasOwnProperty;
-
-	function classNames () {
-		var classes = [];
-
-		for (var i = 0; i < arguments.length; i++) {
-			var arg = arguments[i];
-			if (!arg) continue;
-
-			var argType = typeof arg;
-
-			if (argType === 'string' || argType === 'number') {
-				classes.push(arg);
-			} else if (Array.isArray(arg) && arg.length) {
-				var inner = classNames.apply(null, arg);
-				if (inner) {
-					classes.push(inner);
-				}
-			} else if (argType === 'object') {
-				for (var key in arg) {
-					if (hasOwn.call(arg, key) && arg[key]) {
-						classes.push(key);
-					}
-				}
-			}
-		}
-
-		return classes.join(' ');
-	}
-
-	if (typeof module !== 'undefined' && module.exports) {
-		classNames.default = classNames;
-		module.exports = classNames;
-	} else if (typeof define === 'function' && typeof define.amd === 'object' && define.amd) {
-		// register as 'classnames', consistent with npm package name
-		define('classnames', [], function () {
-			return classNames;
-		});
-	} else {
-		window.classNames = classNames;
-	}
-}());
-
-},{}],"../node_modules/react-tooltip/dist/constant.js":[function(require,module,exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = {
-  GLOBAL: {
-    HIDE: '__react_tooltip_hide_event',
-    REBUILD: '__react_tooltip_rebuild_event',
-    SHOW: '__react_tooltip_show_event'
-  }
-};
-},{}],"../node_modules/react-tooltip/dist/decorators/staticMethods.js":[function(require,module,exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-exports.default = function (target) {
-  /**
-   * Hide all tooltip
-   * @trigger ReactTooltip.hide()
-   */
-  target.hide = function (target) {
-    dispatchGlobalEvent(_constant2.default.GLOBAL.HIDE, {
-      target: target
-    });
-  };
-  /**
-   * Rebuild all tooltip
-   * @trigger ReactTooltip.rebuild()
-   */
-
-
-  target.rebuild = function () {
-    dispatchGlobalEvent(_constant2.default.GLOBAL.REBUILD);
-  };
-  /**
-   * Show specific tooltip
-   * @trigger ReactTooltip.show()
-   */
-
-
-  target.show = function (target) {
-    dispatchGlobalEvent(_constant2.default.GLOBAL.SHOW, {
-      target: target
-    });
-  };
-
-  target.prototype.globalRebuild = function () {
-    if (this.mount) {
-      this.unbindListener();
-      this.bindListener();
-    }
-  };
-
-  target.prototype.globalShow = function (event) {
-    if (this.mount) {
-      // Create a fake event, specific show will limit the type to `solid`
-      // only `float` type cares e.clientX e.clientY
-      var e = {
-        currentTarget: event.detail.target
-      };
-      this.showTooltip(e, true);
-    }
-  };
-
-  target.prototype.globalHide = function (event) {
-    if (this.mount) {
-      var hasTarget = event && event.detail && event.detail.target && true || false;
-      this.hideTooltip({
-        currentTarget: hasTarget && event.detail.target
-      }, hasTarget);
-    }
-  };
-};
-
-var _constant = require('../constant');
-
-var _constant2 = _interopRequireDefault(_constant);
-
-function _interopRequireDefault(obj) {
-  return obj && obj.__esModule ? obj : {
-    default: obj
-  };
-}
-
-var dispatchGlobalEvent = function dispatchGlobalEvent(eventName, opts) {
-  // Compatibale with IE
-  // @see http://stackoverflow.com/questions/26596123/internet-explorer-9-10-11-event-constructor-doesnt-work
-  var event = void 0;
-
-  if (typeof window.CustomEvent === 'function') {
-    event = new window.CustomEvent(eventName, {
-      detail: opts
-    });
-  } else {
-    event = document.createEvent('Event');
-    event.initEvent(eventName, false, true);
-    event.detail = opts;
-  }
-
-  window.dispatchEvent(event);
-};
-/**
- * Static methods for react-tooltip
- */
-},{"../constant":"../node_modules/react-tooltip/dist/constant.js"}],"../node_modules/react-tooltip/dist/decorators/windowListener.js":[function(require,module,exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-exports.default = function (target) {
-  target.prototype.bindWindowEvents = function (resizeHide) {
-    // ReactTooltip.hide
-    window.removeEventListener(_constant2.default.GLOBAL.HIDE, this.globalHide);
-    window.addEventListener(_constant2.default.GLOBAL.HIDE, this.globalHide, false); // ReactTooltip.rebuild
-
-    window.removeEventListener(_constant2.default.GLOBAL.REBUILD, this.globalRebuild);
-    window.addEventListener(_constant2.default.GLOBAL.REBUILD, this.globalRebuild, false); // ReactTooltip.show
-
-    window.removeEventListener(_constant2.default.GLOBAL.SHOW, this.globalShow);
-    window.addEventListener(_constant2.default.GLOBAL.SHOW, this.globalShow, false); // Resize
-
-    if (resizeHide) {
-      window.removeEventListener('resize', this.onWindowResize);
-      window.addEventListener('resize', this.onWindowResize, false);
-    }
-  };
-
-  target.prototype.unbindWindowEvents = function () {
-    window.removeEventListener(_constant2.default.GLOBAL.HIDE, this.globalHide);
-    window.removeEventListener(_constant2.default.GLOBAL.REBUILD, this.globalRebuild);
-    window.removeEventListener(_constant2.default.GLOBAL.SHOW, this.globalShow);
-    window.removeEventListener('resize', this.onWindowResize);
-  };
-  /**
-   * invoked by resize event of window
-   */
-
-
-  target.prototype.onWindowResize = function () {
-    if (!this.mount) return;
-    this.hideTooltip();
-  };
-};
-
-var _constant = require('../constant');
-
-var _constant2 = _interopRequireDefault(_constant);
-
-function _interopRequireDefault(obj) {
-  return obj && obj.__esModule ? obj : {
-    default: obj
-  };
-}
-},{"../constant":"../node_modules/react-tooltip/dist/constant.js"}],"../node_modules/react-tooltip/dist/decorators/customEvent.js":[function(require,module,exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-exports.default = function (target) {
-  target.prototype.isCustomEvent = function (ele) {
-    var event = this.state.event;
-    return event || !!ele.getAttribute('data-event');
-  };
-  /* Bind listener for custom event */
-
-
-  target.prototype.customBindListener = function (ele) {
-    var _this = this;
-
-    var _state = this.state,
-        event = _state.event,
-        eventOff = _state.eventOff;
-    var dataEvent = ele.getAttribute('data-event') || event;
-    var dataEventOff = ele.getAttribute('data-event-off') || eventOff;
-    dataEvent.split(' ').forEach(function (event) {
-      ele.removeEventListener(event, customListeners.get(ele, event));
-      var customListener = checkStatus.bind(_this, dataEventOff);
-      customListeners.set(ele, event, customListener);
-      ele.addEventListener(event, customListener, false);
-    });
-
-    if (dataEventOff) {
-      dataEventOff.split(' ').forEach(function (event) {
-        ele.removeEventListener(event, _this.hideTooltip);
-        ele.addEventListener(event, _this.hideTooltip, false);
-      });
-    }
-  };
-  /* Unbind listener for custom event */
-
-
-  target.prototype.customUnbindListener = function (ele) {
-    var _state2 = this.state,
-        event = _state2.event,
-        eventOff = _state2.eventOff;
-    var dataEvent = event || ele.getAttribute('data-event');
-    var dataEventOff = eventOff || ele.getAttribute('data-event-off');
-    ele.removeEventListener(dataEvent, customListeners.get(ele, event));
-    if (dataEventOff) ele.removeEventListener(dataEventOff, this.hideTooltip);
-  };
-};
-
-function _defineProperty(obj, key, value) {
-  if (key in obj) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-
-  return obj;
-}
-/**
- * Custom events to control showing and hiding of tooltip
- *
- * @attributes
- * - `event` {String}
- * - `eventOff` {String}
- */
-
-
-var checkStatus = function checkStatus(dataEventOff, e) {
-  var show = this.state.show;
-  var id = this.props.id;
-  var dataIsCapture = e.currentTarget.getAttribute('data-iscapture');
-  var isCapture = dataIsCapture && dataIsCapture === 'true' || this.props.isCapture;
-  var currentItem = e.currentTarget.getAttribute('currentItem');
-  if (!isCapture) e.stopPropagation();
-
-  if (show && currentItem === 'true') {
-    if (!dataEventOff) this.hideTooltip(e);
-  } else {
-    e.currentTarget.setAttribute('currentItem', 'true');
-    setUntargetItems(e.currentTarget, this.getTargetArray(id));
-    this.showTooltip(e);
-  }
-};
-
-var setUntargetItems = function setUntargetItems(currentTarget, targetArray) {
-  for (var i = 0; i < targetArray.length; i++) {
-    if (currentTarget !== targetArray[i]) {
-      targetArray[i].setAttribute('currentItem', 'false');
-    } else {
-      targetArray[i].setAttribute('currentItem', 'true');
-    }
-  }
-};
-
-var customListeners = {
-  id: '9b69f92e-d3fe-498b-b1b4-c5e63a51b0cf',
-  set: function set(target, event, listener) {
-    if (this.id in target) {
-      var map = target[this.id];
-      map[event] = listener;
-    } else {
-      // this is workaround for WeakMap, which is not supported in older browsers, such as IE
-      Object.defineProperty(target, this.id, {
-        configurable: true,
-        value: _defineProperty({}, event, listener)
-      });
-    }
-  },
-  get: function get(target, event) {
-    var map = target[this.id];
-
-    if (map !== undefined) {
-      return map[event];
-    }
-  }
-};
-},{}],"../node_modules/react-tooltip/dist/decorators/isCapture.js":[function(require,module,exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-exports.default = function (target) {
-  target.prototype.isCapture = function (currentTarget) {
-    return currentTarget && currentTarget.getAttribute('data-iscapture') === 'true' || this.props.isCapture || false;
-  };
-};
-},{}],"../node_modules/react-tooltip/dist/decorators/getEffect.js":[function(require,module,exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-exports.default = function (target) {
-  target.prototype.getEffect = function (currentTarget) {
-    var dataEffect = currentTarget.getAttribute('data-effect');
-    return dataEffect || this.props.effect || 'float';
-  };
-};
-},{}],"../node_modules/react-tooltip/dist/decorators/trackRemoval.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-exports.default = function (target) {
-  target.prototype.bindRemovalTracker = function () {
-    var _this = this;
-
-    var MutationObserver = getMutationObserverClass();
-    if (MutationObserver == null) return;
-    var observer = new MutationObserver(function (mutations) {
-      for (var m1 = 0; m1 < mutations.length; m1++) {
-        var mutation = mutations[m1];
-
-        for (var m2 = 0; m2 < mutation.removedNodes.length; m2++) {
-          var element = mutation.removedNodes[m2];
-
-          if (element === _this.state.currentTarget) {
-            _this.hideTooltip();
-
-            return;
-          }
-        }
-      }
-    });
-    observer.observe(window.document, {
-      childList: true,
-      subtree: true
-    });
-    this.removalTracker = observer;
-  };
-
-  target.prototype.unbindRemovalTracker = function () {
-    if (this.removalTracker) {
-      this.removalTracker.disconnect();
-      this.removalTracker = null;
-    }
-  };
-};
-/**
- * Tracking target removing from DOM.
- * It's nessesary to hide tooltip when it's target disappears.
- * Otherwise, the tooltip would be shown forever until another target
- * is triggered.
- *
- * If MutationObserver is not available, this feature just doesn't work.
- */
-// https://hacks.mozilla.org/2012/05/dom-mutationobserver-reacting-to-dom-changes-without-killing-browser-performance/
-
-
-var getMutationObserverClass = function getMutationObserverClass() {
-  return window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
-};
-},{}],"../node_modules/react-tooltip/dist/utils/getPosition.js":[function(require,module,exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-exports.default = function (e, target, node, place, desiredPlace, effect, offset) {
-  var _getDimensions = getDimensions(node),
-      tipWidth = _getDimensions.width,
-      tipHeight = _getDimensions.height;
-
-  var _getDimensions2 = getDimensions(target),
-      targetWidth = _getDimensions2.width,
-      targetHeight = _getDimensions2.height;
-
-  var _getCurrentOffset = getCurrentOffset(e, target, effect),
-      mouseX = _getCurrentOffset.mouseX,
-      mouseY = _getCurrentOffset.mouseY;
-
-  var defaultOffset = getDefaultPosition(effect, targetWidth, targetHeight, tipWidth, tipHeight);
-
-  var _calculateOffset = calculateOffset(offset),
-      extraOffset_X = _calculateOffset.extraOffset_X,
-      extraOffset_Y = _calculateOffset.extraOffset_Y;
-
-  var windowWidth = window.innerWidth;
-  var windowHeight = window.innerHeight;
-
-  var _getParent = getParent(node),
-      parentTop = _getParent.parentTop,
-      parentLeft = _getParent.parentLeft; // Get the edge offset of the tooltip
-
-
-  var getTipOffsetLeft = function getTipOffsetLeft(place) {
-    var offset_X = defaultOffset[place].l;
-    return mouseX + offset_X + extraOffset_X;
-  };
-
-  var getTipOffsetRight = function getTipOffsetRight(place) {
-    var offset_X = defaultOffset[place].r;
-    return mouseX + offset_X + extraOffset_X;
-  };
-
-  var getTipOffsetTop = function getTipOffsetTop(place) {
-    var offset_Y = defaultOffset[place].t;
-    return mouseY + offset_Y + extraOffset_Y;
-  };
-
-  var getTipOffsetBottom = function getTipOffsetBottom(place) {
-    var offset_Y = defaultOffset[place].b;
-    return mouseY + offset_Y + extraOffset_Y;
-  }; //
-  // Functions to test whether the tooltip's sides are inside
-  // the client window for a given orientation p
-  //
-  //  _____________
-  // |             | <-- Right side
-  // | p = 'left'  |\
-  // |             |/  |\
-  // |_____________|   |_\  <-- Mouse
-  //      / \           |
-  //       |
-  //       |
-  //  Bottom side
-  //
-
-
-  var outsideLeft = function outsideLeft(p) {
-    return getTipOffsetLeft(p) < 0;
-  };
-
-  var outsideRight = function outsideRight(p) {
-    return getTipOffsetRight(p) > windowWidth;
-  };
-
-  var outsideTop = function outsideTop(p) {
-    return getTipOffsetTop(p) < 0;
-  };
-
-  var outsideBottom = function outsideBottom(p) {
-    return getTipOffsetBottom(p) > windowHeight;
-  }; // Check whether the tooltip with orientation p is completely inside the client window
-
-
-  var outside = function outside(p) {
-    return outsideLeft(p) || outsideRight(p) || outsideTop(p) || outsideBottom(p);
-  };
-
-  var inside = function inside(p) {
-    return !outside(p);
-  };
-
-  var placesList = ['top', 'bottom', 'left', 'right'];
-  var insideList = [];
-
-  for (var i = 0; i < 4; i++) {
-    var p = placesList[i];
-
-    if (inside(p)) {
-      insideList.push(p);
-    }
-  }
-
-  var isNewState = false;
-  var newPlace = void 0;
-
-  if (inside(desiredPlace) && desiredPlace !== place) {
-    isNewState = true;
-    newPlace = desiredPlace;
-  } else if (insideList.length > 0 && outside(desiredPlace) && outside(place)) {
-    isNewState = true;
-    newPlace = insideList[0];
-  }
-
-  if (isNewState) {
-    return {
-      isNewState: true,
-      newState: {
-        place: newPlace
-      }
-    };
-  }
-
-  return {
-    isNewState: false,
-    position: {
-      left: parseInt(getTipOffsetLeft(place) - parentLeft, 10),
-      top: parseInt(getTipOffsetTop(place) - parentTop, 10)
-    }
-  };
-};
-
-var getDimensions = function getDimensions(node) {
-  var _node$getBoundingClie = node.getBoundingClientRect(),
-      height = _node$getBoundingClie.height,
-      width = _node$getBoundingClie.width;
-
-  return {
-    height: parseInt(height, 10),
-    width: parseInt(width, 10)
-  };
-}; // Get current mouse offset
-
-/**
- * Calculate the position of tooltip
- *
- * @params
- * - `e` {Event} the event of current mouse
- * - `target` {Element} the currentTarget of the event
- * - `node` {DOM} the react-tooltip object
- * - `place` {String} top / right / bottom / left
- * - `effect` {String} float / solid
- * - `offset` {Object} the offset to default position
- *
- * @return {Object}
- * - `isNewState` {Bool} required
- * - `newState` {Object}
- * - `position` {Object} {left: {Number}, top: {Number}}
- */
-
-
-var getCurrentOffset = function getCurrentOffset(e, currentTarget, effect) {
-  var boundingClientRect = currentTarget.getBoundingClientRect();
-  var targetTop = boundingClientRect.top;
-  var targetLeft = boundingClientRect.left;
-
-  var _getDimensions3 = getDimensions(currentTarget),
-      targetWidth = _getDimensions3.width,
-      targetHeight = _getDimensions3.height;
-
-  if (effect === 'float') {
-    return {
-      mouseX: e.clientX,
-      mouseY: e.clientY
-    };
-  }
-
-  return {
-    mouseX: targetLeft + targetWidth / 2,
-    mouseY: targetTop + targetHeight / 2
-  };
-}; // List all possibility of tooltip final offset
-// This is useful in judging if it is necessary for tooltip to switch position when out of window
-
-
-var getDefaultPosition = function getDefaultPosition(effect, targetWidth, targetHeight, tipWidth, tipHeight) {
-  var top = void 0;
-  var right = void 0;
-  var bottom = void 0;
-  var left = void 0;
-  var disToMouse = 3;
-  var triangleHeight = 2;
-  var cursorHeight = 12; // Optimize for float bottom only, cause the cursor will hide the tooltip
-
-  if (effect === 'float') {
-    top = {
-      l: -(tipWidth / 2),
-      r: tipWidth / 2,
-      t: -(tipHeight + disToMouse + triangleHeight),
-      b: -disToMouse
-    };
-    bottom = {
-      l: -(tipWidth / 2),
-      r: tipWidth / 2,
-      t: disToMouse + cursorHeight,
-      b: tipHeight + disToMouse + triangleHeight + cursorHeight
-    };
-    left = {
-      l: -(tipWidth + disToMouse + triangleHeight),
-      r: -disToMouse,
-      t: -(tipHeight / 2),
-      b: tipHeight / 2
-    };
-    right = {
-      l: disToMouse,
-      r: tipWidth + disToMouse + triangleHeight,
-      t: -(tipHeight / 2),
-      b: tipHeight / 2
-    };
-  } else if (effect === 'solid') {
-    top = {
-      l: -(tipWidth / 2),
-      r: tipWidth / 2,
-      t: -(targetHeight / 2 + tipHeight + triangleHeight),
-      b: -(targetHeight / 2)
-    };
-    bottom = {
-      l: -(tipWidth / 2),
-      r: tipWidth / 2,
-      t: targetHeight / 2,
-      b: targetHeight / 2 + tipHeight + triangleHeight
-    };
-    left = {
-      l: -(tipWidth + targetWidth / 2 + triangleHeight),
-      r: -(targetWidth / 2),
-      t: -(tipHeight / 2),
-      b: tipHeight / 2
-    };
-    right = {
-      l: targetWidth / 2,
-      r: tipWidth + targetWidth / 2 + triangleHeight,
-      t: -(tipHeight / 2),
-      b: tipHeight / 2
-    };
-  }
-
-  return {
-    top: top,
-    bottom: bottom,
-    left: left,
-    right: right
-  };
-}; // Consider additional offset into position calculation
-
-
-var calculateOffset = function calculateOffset(offset) {
-  var extraOffset_X = 0;
-  var extraOffset_Y = 0;
-
-  if (Object.prototype.toString.apply(offset) === '[object String]') {
-    offset = JSON.parse(offset.toString().replace(/\'/g, '\"'));
-  }
-
-  for (var key in offset) {
-    if (key === 'top') {
-      extraOffset_Y -= parseInt(offset[key], 10);
-    } else if (key === 'bottom') {
-      extraOffset_Y += parseInt(offset[key], 10);
-    } else if (key === 'left') {
-      extraOffset_X -= parseInt(offset[key], 10);
-    } else if (key === 'right') {
-      extraOffset_X += parseInt(offset[key], 10);
-    }
-  }
-
-  return {
-    extraOffset_X: extraOffset_X,
-    extraOffset_Y: extraOffset_Y
-  };
-}; // Get the offset of the parent elements
-
-
-var getParent = function getParent(currentTarget) {
-  var currentParent = currentTarget;
-
-  while (currentParent) {
-    if (window.getComputedStyle(currentParent).getPropertyValue('transform') !== 'none') break;
-    currentParent = currentParent.parentElement;
-  }
-
-  var parentTop = currentParent && currentParent.getBoundingClientRect().top || 0;
-  var parentLeft = currentParent && currentParent.getBoundingClientRect().left || 0;
-  return {
-    parentTop: parentTop,
-    parentLeft: parentLeft
-  };
-};
-},{}],"../node_modules/react-tooltip/dist/utils/getTipContent.js":[function(require,module,exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-exports.default = function (tip, children, getContent, multiline) {
-  if (children) return children;
-  if (getContent !== undefined && getContent !== null) return getContent; // getContent can be 0, '', etc.
-
-  if (getContent === null) return null; // Tip not exist and childern is null or undefined
-
-  var regexp = /<br\s*\/?>/;
-
-  if (!multiline || multiline === 'false' || !regexp.test(tip)) {
-    // No trim(), so that user can keep their input
-    return tip;
-  } // Multiline tooltip content
-
-
-  return tip.split(regexp).map(function (d, i) {
-    return _react2.default.createElement('span', {
-      key: i,
-      className: 'multi-line'
-    }, d);
-  });
-};
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-function _interopRequireDefault(obj) {
-  return obj && obj.__esModule ? obj : {
-    default: obj
-  };
-}
-},{"react":"../node_modules/react/index.js"}],"../node_modules/react-tooltip/dist/utils/aria.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.parseAria = parseAria;
-/**
- * Support aria- and role in ReactTooltip
- *
- * @params props {Object}
- * @return {Object}
- */
-
-function parseAria(props) {
-  var ariaObj = {};
-  Object.keys(props).filter(function (prop) {
-    // aria-xxx and role is acceptable
-    return /(^aria-\w+$|^role$)/.test(prop);
-  }).forEach(function (prop) {
-    ariaObj[prop] = props[prop];
-  });
-  return ariaObj;
-}
-},{}],"../node_modules/react-tooltip/dist/utils/nodeListToArray.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-exports.default = function (nodeList) {
-  var length = nodeList.length;
-
-  if (nodeList.hasOwnProperty) {
-    return Array.prototype.slice.call(nodeList);
-  }
-
-  return new Array(length).fill().map(function (index) {
-    return nodeList[index];
-  });
-};
-},{}],"../node_modules/react-tooltip/dist/style.js":[function(require,module,exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = '.__react_component_tooltip{border-radius:3px;display:inline-block;font-size:13px;left:-999em;opacity:0;padding:8px 21px;position:fixed;pointer-events:none;transition:opacity 0.3s ease-out;top:-999em;visibility:hidden;z-index:999}.__react_component_tooltip.allow_hover,.__react_component_tooltip.allow_click{pointer-events:auto}.__react_component_tooltip:before,.__react_component_tooltip:after{content:"";width:0;height:0;position:absolute}.__react_component_tooltip.show{opacity:0.9;margin-top:0px;margin-left:0px;visibility:visible}.__react_component_tooltip.type-dark{color:#fff;background-color:#222}.__react_component_tooltip.type-dark.place-top:after{border-top-color:#222;border-top-style:solid;border-top-width:6px}.__react_component_tooltip.type-dark.place-bottom:after{border-bottom-color:#222;border-bottom-style:solid;border-bottom-width:6px}.__react_component_tooltip.type-dark.place-left:after{border-left-color:#222;border-left-style:solid;border-left-width:6px}.__react_component_tooltip.type-dark.place-right:after{border-right-color:#222;border-right-style:solid;border-right-width:6px}.__react_component_tooltip.type-dark.border{border:1px solid #fff}.__react_component_tooltip.type-dark.border.place-top:before{border-top:8px solid #fff}.__react_component_tooltip.type-dark.border.place-bottom:before{border-bottom:8px solid #fff}.__react_component_tooltip.type-dark.border.place-left:before{border-left:8px solid #fff}.__react_component_tooltip.type-dark.border.place-right:before{border-right:8px solid #fff}.__react_component_tooltip.type-success{color:#fff;background-color:#8DC572}.__react_component_tooltip.type-success.place-top:after{border-top-color:#8DC572;border-top-style:solid;border-top-width:6px}.__react_component_tooltip.type-success.place-bottom:after{border-bottom-color:#8DC572;border-bottom-style:solid;border-bottom-width:6px}.__react_component_tooltip.type-success.place-left:after{border-left-color:#8DC572;border-left-style:solid;border-left-width:6px}.__react_component_tooltip.type-success.place-right:after{border-right-color:#8DC572;border-right-style:solid;border-right-width:6px}.__react_component_tooltip.type-success.border{border:1px solid #fff}.__react_component_tooltip.type-success.border.place-top:before{border-top:8px solid #fff}.__react_component_tooltip.type-success.border.place-bottom:before{border-bottom:8px solid #fff}.__react_component_tooltip.type-success.border.place-left:before{border-left:8px solid #fff}.__react_component_tooltip.type-success.border.place-right:before{border-right:8px solid #fff}.__react_component_tooltip.type-warning{color:#fff;background-color:#F0AD4E}.__react_component_tooltip.type-warning.place-top:after{border-top-color:#F0AD4E;border-top-style:solid;border-top-width:6px}.__react_component_tooltip.type-warning.place-bottom:after{border-bottom-color:#F0AD4E;border-bottom-style:solid;border-bottom-width:6px}.__react_component_tooltip.type-warning.place-left:after{border-left-color:#F0AD4E;border-left-style:solid;border-left-width:6px}.__react_component_tooltip.type-warning.place-right:after{border-right-color:#F0AD4E;border-right-style:solid;border-right-width:6px}.__react_component_tooltip.type-warning.border{border:1px solid #fff}.__react_component_tooltip.type-warning.border.place-top:before{border-top:8px solid #fff}.__react_component_tooltip.type-warning.border.place-bottom:before{border-bottom:8px solid #fff}.__react_component_tooltip.type-warning.border.place-left:before{border-left:8px solid #fff}.__react_component_tooltip.type-warning.border.place-right:before{border-right:8px solid #fff}.__react_component_tooltip.type-error{color:#fff;background-color:#BE6464}.__react_component_tooltip.type-error.place-top:after{border-top-color:#BE6464;border-top-style:solid;border-top-width:6px}.__react_component_tooltip.type-error.place-bottom:after{border-bottom-color:#BE6464;border-bottom-style:solid;border-bottom-width:6px}.__react_component_tooltip.type-error.place-left:after{border-left-color:#BE6464;border-left-style:solid;border-left-width:6px}.__react_component_tooltip.type-error.place-right:after{border-right-color:#BE6464;border-right-style:solid;border-right-width:6px}.__react_component_tooltip.type-error.border{border:1px solid #fff}.__react_component_tooltip.type-error.border.place-top:before{border-top:8px solid #fff}.__react_component_tooltip.type-error.border.place-bottom:before{border-bottom:8px solid #fff}.__react_component_tooltip.type-error.border.place-left:before{border-left:8px solid #fff}.__react_component_tooltip.type-error.border.place-right:before{border-right:8px solid #fff}.__react_component_tooltip.type-info{color:#fff;background-color:#337AB7}.__react_component_tooltip.type-info.place-top:after{border-top-color:#337AB7;border-top-style:solid;border-top-width:6px}.__react_component_tooltip.type-info.place-bottom:after{border-bottom-color:#337AB7;border-bottom-style:solid;border-bottom-width:6px}.__react_component_tooltip.type-info.place-left:after{border-left-color:#337AB7;border-left-style:solid;border-left-width:6px}.__react_component_tooltip.type-info.place-right:after{border-right-color:#337AB7;border-right-style:solid;border-right-width:6px}.__react_component_tooltip.type-info.border{border:1px solid #fff}.__react_component_tooltip.type-info.border.place-top:before{border-top:8px solid #fff}.__react_component_tooltip.type-info.border.place-bottom:before{border-bottom:8px solid #fff}.__react_component_tooltip.type-info.border.place-left:before{border-left:8px solid #fff}.__react_component_tooltip.type-info.border.place-right:before{border-right:8px solid #fff}.__react_component_tooltip.type-light{color:#222;background-color:#fff}.__react_component_tooltip.type-light.place-top:after{border-top-color:#fff;border-top-style:solid;border-top-width:6px}.__react_component_tooltip.type-light.place-bottom:after{border-bottom-color:#fff;border-bottom-style:solid;border-bottom-width:6px}.__react_component_tooltip.type-light.place-left:after{border-left-color:#fff;border-left-style:solid;border-left-width:6px}.__react_component_tooltip.type-light.place-right:after{border-right-color:#fff;border-right-style:solid;border-right-width:6px}.__react_component_tooltip.type-light.border{border:1px solid #222}.__react_component_tooltip.type-light.border.place-top:before{border-top:8px solid #222}.__react_component_tooltip.type-light.border.place-bottom:before{border-bottom:8px solid #222}.__react_component_tooltip.type-light.border.place-left:before{border-left:8px solid #222}.__react_component_tooltip.type-light.border.place-right:before{border-right:8px solid #222}.__react_component_tooltip.place-top{margin-top:-10px}.__react_component_tooltip.place-top:before{border-left:10px solid transparent;border-right:10px solid transparent;bottom:-8px;left:50%;margin-left:-10px}.__react_component_tooltip.place-top:after{border-left:8px solid transparent;border-right:8px solid transparent;bottom:-6px;left:50%;margin-left:-8px}.__react_component_tooltip.place-bottom{margin-top:10px}.__react_component_tooltip.place-bottom:before{border-left:10px solid transparent;border-right:10px solid transparent;top:-8px;left:50%;margin-left:-10px}.__react_component_tooltip.place-bottom:after{border-left:8px solid transparent;border-right:8px solid transparent;top:-6px;left:50%;margin-left:-8px}.__react_component_tooltip.place-left{margin-left:-10px}.__react_component_tooltip.place-left:before{border-top:6px solid transparent;border-bottom:6px solid transparent;right:-8px;top:50%;margin-top:-5px}.__react_component_tooltip.place-left:after{border-top:5px solid transparent;border-bottom:5px solid transparent;right:-6px;top:50%;margin-top:-4px}.__react_component_tooltip.place-right{margin-left:10px}.__react_component_tooltip.place-right:before{border-top:6px solid transparent;border-bottom:6px solid transparent;left:-8px;top:50%;margin-top:-5px}.__react_component_tooltip.place-right:after{border-top:5px solid transparent;border-bottom:5px solid transparent;left:-6px;top:50%;margin-top:-4px}.__react_component_tooltip .multi-line{display:block;padding:2px 0px;text-align:center}';
-},{}],"../node_modules/react-tooltip/dist/index.js":[function(require,module,exports) {
-'use strict';
-
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function (obj) { return typeof obj; }; } else { _typeof = function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-var _extends = Object.assign || function (target) {
-  for (var i = 1; i < arguments.length; i++) {
-    var source = arguments[i];
-
-    for (var key in source) {
-      if (Object.prototype.hasOwnProperty.call(source, key)) {
-        target[key] = source[key];
-      }
-    }
-  }
-
-  return target;
-};
-
-var _createClass = function () {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];
-      descriptor.enumerable = descriptor.enumerable || false;
-      descriptor.configurable = true;
-      if ("value" in descriptor) descriptor.writable = true;
-      Object.defineProperty(target, descriptor.key, descriptor);
-    }
-  }
-
-  return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) defineProperties(Constructor, staticProps);
-    return Constructor;
-  };
-}();
-
-var _class, _class2, _temp;
-/* Decoraters */
-
-/* Utils */
-
-/* CSS */
-
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _propTypes = require('prop-types');
-
-var _propTypes2 = _interopRequireDefault(_propTypes);
-
-var _reactDom = require('react-dom');
-
-var _reactDom2 = _interopRequireDefault(_reactDom);
-
-var _classnames = require('classnames');
-
-var _classnames2 = _interopRequireDefault(_classnames);
-
-var _staticMethods = require('./decorators/staticMethods');
-
-var _staticMethods2 = _interopRequireDefault(_staticMethods);
-
-var _windowListener = require('./decorators/windowListener');
-
-var _windowListener2 = _interopRequireDefault(_windowListener);
-
-var _customEvent = require('./decorators/customEvent');
-
-var _customEvent2 = _interopRequireDefault(_customEvent);
-
-var _isCapture = require('./decorators/isCapture');
-
-var _isCapture2 = _interopRequireDefault(_isCapture);
-
-var _getEffect = require('./decorators/getEffect');
-
-var _getEffect2 = _interopRequireDefault(_getEffect);
-
-var _trackRemoval = require('./decorators/trackRemoval');
-
-var _trackRemoval2 = _interopRequireDefault(_trackRemoval);
-
-var _getPosition = require('./utils/getPosition');
-
-var _getPosition2 = _interopRequireDefault(_getPosition);
-
-var _getTipContent = require('./utils/getTipContent');
-
-var _getTipContent2 = _interopRequireDefault(_getTipContent);
-
-var _aria = require('./utils/aria');
-
-var _nodeListToArray = require('./utils/nodeListToArray');
-
-var _nodeListToArray2 = _interopRequireDefault(_nodeListToArray);
-
-var _style = require('./style');
-
-var _style2 = _interopRequireDefault(_style);
-
-function _interopRequireDefault(obj) {
-  return obj && obj.__esModule ? obj : {
-    default: obj
-  };
-}
-
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-}
-
-function _possibleConstructorReturn(self, call) {
-  if (!self) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-
-  return call && (_typeof(call) === "object" || typeof call === "function") ? call : self;
-}
-
-function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + _typeof(superClass));
-  }
-
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      enumerable: false,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-}
-
-var ReactTooltip = (0, _staticMethods2.default)(_class = (0, _windowListener2.default)(_class = (0, _customEvent2.default)(_class = (0, _isCapture2.default)(_class = (0, _getEffect2.default)(_class = (0, _trackRemoval2.default)(_class = (_temp = _class2 = function (_React$Component) {
-  _inherits(ReactTooltip, _React$Component);
-
-  function ReactTooltip(props) {
-    _classCallCheck(this, ReactTooltip);
-
-    var _this = _possibleConstructorReturn(this, (ReactTooltip.__proto__ || Object.getPrototypeOf(ReactTooltip)).call(this, props));
-
-    _this.state = {
-      place: props.place || 'top',
-      // Direction of tooltip
-      desiredPlace: props.place || 'top',
-      type: 'dark',
-      // Color theme of tooltip
-      effect: 'float',
-      // float or fixed
-      show: false,
-      border: false,
-      offset: {},
-      extraClass: '',
-      html: false,
-      delayHide: 0,
-      delayShow: 0,
-      event: props.event || null,
-      eventOff: props.eventOff || null,
-      currentEvent: null,
-      // Current mouse event
-      currentTarget: null,
-      // Current target of mouse event
-      ariaProps: (0, _aria.parseAria)(props),
-      // aria- and role attributes
-      isEmptyTip: false,
-      disable: false,
-      originTooltip: null,
-      isMultiline: false
-    };
-
-    _this.bind(['showTooltip', 'updateTooltip', 'hideTooltip', 'getTooltipContent', 'globalRebuild', 'globalShow', 'globalHide', 'onWindowResize', 'mouseOnToolTip']);
-
-    _this.mount = true;
-    _this.delayShowLoop = null;
-    _this.delayHideLoop = null;
-    _this.delayReshow = null;
-    _this.intervalUpdateContent = null;
-    return _this;
-  }
-  /**
-   * For unify the bind and unbind listener
-   */
-
-
-  _createClass(ReactTooltip, [{
-    key: 'bind',
-    value: function bind(methodArray) {
-      var _this2 = this;
-
-      methodArray.forEach(function (method) {
-        _this2[method] = _this2[method].bind(_this2);
-      });
-    }
-  }, {
-    key: 'componentDidMount',
-    value: function componentDidMount() {
-      var _props = this.props,
-          insecure = _props.insecure,
-          resizeHide = _props.resizeHide;
-
-      if (insecure) {
-        this.setStyleHeader(); // Set the style to the <link>
-      }
-
-      this.bindListener(); // Bind listener for tooltip
-
-      this.bindWindowEvents(resizeHide); // Bind global event for static method
-    }
-  }, {
-    key: 'componentWillReceiveProps',
-    value: function componentWillReceiveProps(props) {
-      var ariaProps = this.state.ariaProps;
-      var newAriaProps = (0, _aria.parseAria)(props);
-      var isChanged = Object.keys(newAriaProps).some(function (props) {
-        return newAriaProps[props] !== ariaProps[props];
-      });
-
-      if (isChanged) {
-        this.setState({
-          ariaProps: newAriaProps
-        });
-      }
-    }
-  }, {
-    key: 'componentWillUnmount',
-    value: function componentWillUnmount() {
-      this.mount = false;
-      this.clearTimer();
-      this.unbindListener();
-      this.removeScrollListener();
-      this.unbindWindowEvents();
-    }
-    /**
-     * Return if the mouse is on the tooltip.
-     * @returns {boolean} true - mouse is on the tooltip
-     */
-
-  }, {
-    key: 'mouseOnToolTip',
-    value: function mouseOnToolTip() {
-      var show = this.state.show;
-
-      if (show && this.tooltipRef) {
-        /* old IE or Firefox work around */
-        if (!this.tooltipRef.matches) {
-          /* old IE work around */
-          if (this.tooltipRef.msMatchesSelector) {
-            this.tooltipRef.matches = this.tooltipRef.msMatchesSelector;
-          } else {
-            /* old Firefox work around */
-            this.tooltipRef.matches = this.tooltipRef.mozMatchesSelector;
-          }
-        }
-
-        return this.tooltipRef.matches(':hover');
-      }
-
-      return false;
-    }
-    /**
-     * Pick out corresponded target elements
-     */
-
-  }, {
-    key: 'getTargetArray',
-    value: function getTargetArray(id) {
-      var targetArray = void 0;
-
-      if (!id) {
-        targetArray = document.querySelectorAll('[data-tip]:not([data-for])');
-      } else {
-        var escaped = id.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-        targetArray = document.querySelectorAll('[data-tip][data-for="' + escaped + '"]');
-      } // targetArray is a NodeList, convert it to a real array
-
-
-      return (0, _nodeListToArray2.default)(targetArray);
-    }
-    /**
-     * Bind listener to the target elements
-     * These listeners used to trigger showing or hiding the tooltip
-     */
-
-  }, {
-    key: 'bindListener',
-    value: function bindListener() {
-      var _this3 = this;
-
-      var _props2 = this.props,
-          id = _props2.id,
-          globalEventOff = _props2.globalEventOff,
-          isCapture = _props2.isCapture;
-      var targetArray = this.getTargetArray(id);
-      targetArray.forEach(function (target) {
-        var isCaptureMode = _this3.isCapture(target);
-
-        var effect = _this3.getEffect(target);
-
-        if (target.getAttribute('currentItem') === null) {
-          target.setAttribute('currentItem', 'false');
-        }
-
-        _this3.unbindBasicListener(target);
-
-        if (_this3.isCustomEvent(target)) {
-          _this3.customBindListener(target);
-
-          return;
-        }
-
-        target.addEventListener('mouseenter', _this3.showTooltip, isCaptureMode);
-
-        if (effect === 'float') {
-          target.addEventListener('mousemove', _this3.updateTooltip, isCaptureMode);
-        }
-
-        target.addEventListener('mouseleave', _this3.hideTooltip, isCaptureMode);
-      }); // Global event to hide tooltip
-
-      if (globalEventOff) {
-        window.removeEventListener(globalEventOff, this.hideTooltip);
-        window.addEventListener(globalEventOff, this.hideTooltip, isCapture);
-      } // Track removal of targetArray elements from DOM
-
-
-      this.bindRemovalTracker();
-    }
-    /**
-     * Unbind listeners on target elements
-     */
-
-  }, {
-    key: 'unbindListener',
-    value: function unbindListener() {
-      var _this4 = this;
-
-      var _props3 = this.props,
-          id = _props3.id,
-          globalEventOff = _props3.globalEventOff;
-      var targetArray = this.getTargetArray(id);
-      targetArray.forEach(function (target) {
-        _this4.unbindBasicListener(target);
-
-        if (_this4.isCustomEvent(target)) _this4.customUnbindListener(target);
-      });
-      if (globalEventOff) window.removeEventListener(globalEventOff, this.hideTooltip);
-      this.unbindRemovalTracker();
-    }
-    /**
-     * Invoke this before bind listener and ummount the compont
-     * it is necessary to invloke this even when binding custom event
-     * so that the tooltip can switch between custom and default listener
-     */
-
-  }, {
-    key: 'unbindBasicListener',
-    value: function unbindBasicListener(target) {
-      var isCaptureMode = this.isCapture(target);
-      target.removeEventListener('mouseenter', this.showTooltip, isCaptureMode);
-      target.removeEventListener('mousemove', this.updateTooltip, isCaptureMode);
-      target.removeEventListener('mouseleave', this.hideTooltip, isCaptureMode);
-    }
-  }, {
-    key: 'getTooltipContent',
-    value: function getTooltipContent() {
-      var _props4 = this.props,
-          getContent = _props4.getContent,
-          children = _props4.children; // Generate tooltip content
-
-      var content = void 0;
-
-      if (getContent) {
-        if (Array.isArray(getContent)) {
-          content = getContent[0] && getContent[0](this.state.originTooltip);
-        } else {
-          content = getContent(this.state.originTooltip);
-        }
-      }
-
-      return (0, _getTipContent2.default)(this.state.originTooltip, children, content, this.state.isMultiline);
-    }
-  }, {
-    key: 'isEmptyTip',
-    value: function isEmptyTip(placeholder) {
-      return typeof placeholder === 'string' && placeholder === '' || placeholder === null;
-    }
-    /**
-     * When mouse enter, show the tooltip
-     */
-
-  }, {
-    key: 'showTooltip',
-    value: function showTooltip(e, isGlobalCall) {
-      if (isGlobalCall) {
-        // Don't trigger other elements belongs to other ReactTooltip
-        var targetArray = this.getTargetArray(this.props.id);
-        var isMyElement = targetArray.some(function (ele) {
-          return ele === e.currentTarget;
-        });
-        if (!isMyElement) return;
-      } // Get the tooltip content
-      // calculate in this phrase so that tip width height can be detected
-
-
-      var _props5 = this.props,
-          multiline = _props5.multiline,
-          getContent = _props5.getContent;
-      var originTooltip = e.currentTarget.getAttribute('data-tip');
-      var isMultiline = e.currentTarget.getAttribute('data-multiline') || multiline || false; // If it is focus event or called by ReactTooltip.show, switch to `solid` effect
-
-      var switchToSolid = e instanceof window.FocusEvent || isGlobalCall; // if it needs to skip adding hide listener to scroll
-
-      var scrollHide = true;
-
-      if (e.currentTarget.getAttribute('data-scroll-hide')) {
-        scrollHide = e.currentTarget.getAttribute('data-scroll-hide') === 'true';
-      } else if (this.props.scrollHide != null) {
-        scrollHide = this.props.scrollHide;
-      } // Make sure the correct place is set
-
-
-      var desiredPlace = e.currentTarget.getAttribute('data-place') || this.props.place || 'top';
-      var effect = switchToSolid && 'solid' || this.getEffect(e.currentTarget);
-      var offset = e.currentTarget.getAttribute('data-offset') || this.props.offset || {};
-      var result = (0, _getPosition2.default)(e, e.currentTarget, _reactDom2.default.findDOMNode(this), desiredPlace, desiredPlace, effect, offset);
-      var place = result.isNewState ? result.newState.place : desiredPlace; // To prevent previously created timers from triggering
-
-      this.clearTimer();
-      var target = e.currentTarget;
-      var reshowDelay = this.state.show ? target.getAttribute('data-delay-update') || this.props.delayUpdate : 0;
-      var self = this;
-
-      var updateState = function updateState() {
-        self.setState({
-          originTooltip: originTooltip,
-          isMultiline: isMultiline,
-          desiredPlace: desiredPlace,
-          place: place,
-          type: target.getAttribute('data-type') || self.props.type || 'dark',
-          effect: effect,
-          offset: offset,
-          html: target.getAttribute('data-html') ? target.getAttribute('data-html') === 'true' : self.props.html || false,
-          delayShow: target.getAttribute('data-delay-show') || self.props.delayShow || 0,
-          delayHide: target.getAttribute('data-delay-hide') || self.props.delayHide || 0,
-          delayUpdate: target.getAttribute('data-delay-update') || self.props.delayUpdate || 0,
-          border: target.getAttribute('data-border') ? target.getAttribute('data-border') === 'true' : self.props.border || false,
-          extraClass: target.getAttribute('data-class') || self.props.class || self.props.className || '',
-          disable: target.getAttribute('data-tip-disable') ? target.getAttribute('data-tip-disable') === 'true' : self.props.disable || false,
-          currentTarget: target
-        }, function () {
-          if (scrollHide) self.addScrollListener(self.state.currentTarget);
-          self.updateTooltip(e);
-
-          if (getContent && Array.isArray(getContent)) {
-            self.intervalUpdateContent = setInterval(function () {
-              if (self.mount) {
-                var _getContent = self.props.getContent;
-                var placeholder = (0, _getTipContent2.default)(originTooltip, '', _getContent[0](), isMultiline);
-                var isEmptyTip = self.isEmptyTip(placeholder);
-                self.setState({
-                  isEmptyTip: isEmptyTip
-                });
-                self.updatePosition();
-              }
-            }, getContent[1]);
-          }
-        });
-      }; // If there is no delay call immediately, don't allow events to get in first.
-
-
-      if (reshowDelay) {
-        this.delayReshow = setTimeout(updateState, reshowDelay);
-      } else {
-        updateState();
-      }
-    }
-    /**
-     * When mouse hover, updatetooltip
-     */
-
-  }, {
-    key: 'updateTooltip',
-    value: function updateTooltip(e) {
-      var _this5 = this;
-
-      var _state = this.state,
-          delayShow = _state.delayShow,
-          disable = _state.disable;
-      var afterShow = this.props.afterShow;
-      var placeholder = this.getTooltipContent();
-      var delayTime = parseInt(delayShow, 10);
-      var eventTarget = e.currentTarget || e.target; // Check if the mouse is actually over the tooltip, if so don't hide the tooltip
-
-      if (this.mouseOnToolTip()) {
-        return;
-      }
-
-      if (this.isEmptyTip(placeholder) || disable) return; // if the tooltip is empty, disable the tooltip
-
-      var updateState = function updateState() {
-        if (Array.isArray(placeholder) && placeholder.length > 0 || placeholder) {
-          var isInvisible = !_this5.state.show;
-
-          _this5.setState({
-            currentEvent: e,
-            currentTarget: eventTarget,
-            show: true
-          }, function () {
-            _this5.updatePosition();
-
-            if (isInvisible && afterShow) afterShow(e);
-          });
-        }
-      };
-
-      clearTimeout(this.delayShowLoop);
-
-      if (delayShow) {
-        this.delayShowLoop = setTimeout(updateState, delayTime);
-      } else {
-        updateState();
-      }
-    }
-    /*
-    * If we're mousing over the tooltip remove it when we leave.
-     */
-
-  }, {
-    key: 'listenForTooltipExit',
-    value: function listenForTooltipExit() {
-      var show = this.state.show;
-
-      if (show && this.tooltipRef) {
-        this.tooltipRef.addEventListener('mouseleave', this.hideTooltip);
-      }
-    }
-  }, {
-    key: 'removeListenerForTooltipExit',
-    value: function removeListenerForTooltipExit() {
-      var show = this.state.show;
-
-      if (show && this.tooltipRef) {
-        this.tooltipRef.removeEventListener('mouseleave', this.hideTooltip);
-      }
-    }
-    /**
-     * When mouse leave, hide tooltip
-     */
-
-  }, {
-    key: 'hideTooltip',
-    value: function hideTooltip(e, hasTarget) {
-      var _this6 = this;
-
-      var _state2 = this.state,
-          delayHide = _state2.delayHide,
-          disable = _state2.disable;
-      var afterHide = this.props.afterHide;
-      var placeholder = this.getTooltipContent();
-      if (!this.mount) return;
-      if (this.isEmptyTip(placeholder) || disable) return; // if the tooltip is empty, disable the tooltip
-
-      if (hasTarget) {
-        // Don't trigger other elements belongs to other ReactTooltip
-        var targetArray = this.getTargetArray(this.props.id);
-        var isMyElement = targetArray.some(function (ele) {
-          return ele === e.currentTarget;
-        });
-        if (!isMyElement || !this.state.show) return;
-      }
-
-      var resetState = function resetState() {
-        var isVisible = _this6.state.show; // Check if the mouse is actually over the tooltip, if so don't hide the tooltip
-
-        if (_this6.mouseOnToolTip()) {
-          _this6.listenForTooltipExit();
-
-          return;
-        }
-
-        _this6.removeListenerForTooltipExit();
-
-        _this6.setState({
-          show: false
-        }, function () {
-          _this6.removeScrollListener();
-
-          if (isVisible && afterHide) afterHide(e);
-        });
-      };
-
-      this.clearTimer();
-
-      if (delayHide) {
-        this.delayHideLoop = setTimeout(resetState, parseInt(delayHide, 10));
-      } else {
-        resetState();
-      }
-    }
-    /**
-     * Add scroll eventlistener when tooltip show
-     * automatically hide the tooltip when scrolling
-     */
-
-  }, {
-    key: 'addScrollListener',
-    value: function addScrollListener(currentTarget) {
-      var isCaptureMode = this.isCapture(currentTarget);
-      window.addEventListener('scroll', this.hideTooltip, isCaptureMode);
-    }
-  }, {
-    key: 'removeScrollListener',
-    value: function removeScrollListener() {
-      window.removeEventListener('scroll', this.hideTooltip);
-    } // Calculation the position
-
-  }, {
-    key: 'updatePosition',
-    value: function updatePosition() {
-      var _this7 = this;
-
-      var _state3 = this.state,
-          currentEvent = _state3.currentEvent,
-          currentTarget = _state3.currentTarget,
-          place = _state3.place,
-          desiredPlace = _state3.desiredPlace,
-          effect = _state3.effect,
-          offset = _state3.offset;
-
-      var node = _reactDom2.default.findDOMNode(this);
-
-      var result = (0, _getPosition2.default)(currentEvent, currentTarget, node, place, desiredPlace, effect, offset);
-
-      if (result.isNewState) {
-        // Switch to reverse placement
-        return this.setState(result.newState, function () {
-          _this7.updatePosition();
-        });
-      } // Set tooltip position
-
-
-      node.style.left = result.position.left + 'px';
-      node.style.top = result.position.top + 'px';
-    }
-    /**
-     * Set style tag in header
-     * in this way we can insert default css
-     */
-
-  }, {
-    key: 'setStyleHeader',
-    value: function setStyleHeader() {
-      var head = document.getElementsByTagName('head')[0];
-
-      if (!head.querySelector('style[id="react-tooltip"]')) {
-        var tag = document.createElement('style');
-        tag.id = 'react-tooltip';
-        tag.innerHTML = _style2.default;
-        /* eslint-disable */
-
-        if (typeof __webpack_nonce__ !== 'undefined' && __webpack_nonce__) {
-          tag.setAttribute('nonce', __webpack_nonce__);
-        }
-        /* eslint-enable */
-
-
-        head.insertBefore(tag, head.firstChild);
-      }
-    }
-    /**
-     * CLear all kinds of timeout of interval
-     */
-
-  }, {
-    key: 'clearTimer',
-    value: function clearTimer() {
-      clearTimeout(this.delayShowLoop);
-      clearTimeout(this.delayHideLoop);
-      clearTimeout(this.delayReshow);
-      clearInterval(this.intervalUpdateContent);
-    }
-  }, {
-    key: 'render',
-    value: function render() {
-      var _this8 = this;
-
-      var _state4 = this.state,
-          extraClass = _state4.extraClass,
-          html = _state4.html,
-          ariaProps = _state4.ariaProps,
-          disable = _state4.disable;
-      var placeholder = this.getTooltipContent();
-      var isEmptyTip = this.isEmptyTip(placeholder);
-      var tooltipClass = (0, _classnames2.default)('__react_component_tooltip', {
-        'show': this.state.show && !disable && !isEmptyTip
-      }, {
-        'border': this.state.border
-      }, {
-        'place-top': this.state.place === 'top'
-      }, {
-        'place-bottom': this.state.place === 'bottom'
-      }, {
-        'place-left': this.state.place === 'left'
-      }, {
-        'place-right': this.state.place === 'right'
-      }, {
-        'type-dark': this.state.type === 'dark'
-      }, {
-        'type-success': this.state.type === 'success'
-      }, {
-        'type-warning': this.state.type === 'warning'
-      }, {
-        'type-error': this.state.type === 'error'
-      }, {
-        'type-info': this.state.type === 'info'
-      }, {
-        'type-light': this.state.type === 'light'
-      }, {
-        'allow_hover': this.props.delayUpdate
-      }, {
-        'allow_click': this.props.clickable
-      });
-      var Wrapper = this.props.wrapper;
-
-      if (ReactTooltip.supportedWrappers.indexOf(Wrapper) < 0) {
-        Wrapper = ReactTooltip.defaultProps.wrapper;
-      }
-
-      if (html) {
-        return _react2.default.createElement(Wrapper, _extends({
-          className: tooltipClass + ' ' + extraClass,
-          id: this.props.id,
-          ref: function ref(_ref) {
-            return _this8.tooltipRef = _ref;
-          }
-        }, ariaProps, {
-          'data-id': 'tooltip',
-          dangerouslySetInnerHTML: {
-            __html: placeholder
-          }
-        }));
-      } else {
-        return _react2.default.createElement(Wrapper, _extends({
-          className: tooltipClass + ' ' + extraClass,
-          id: this.props.id
-        }, ariaProps, {
-          ref: function ref(_ref2) {
-            return _this8.tooltipRef = _ref2;
-          },
-          'data-id': 'tooltip'
-        }), placeholder);
-      }
-    }
-  }]);
-
-  return ReactTooltip;
-}(_react2.default.Component), _class2.propTypes = {
-  children: _propTypes2.default.any,
-  place: _propTypes2.default.string,
-  type: _propTypes2.default.string,
-  effect: _propTypes2.default.string,
-  offset: _propTypes2.default.object,
-  multiline: _propTypes2.default.bool,
-  border: _propTypes2.default.bool,
-  insecure: _propTypes2.default.bool,
-  class: _propTypes2.default.string,
-  className: _propTypes2.default.string,
-  id: _propTypes2.default.string,
-  html: _propTypes2.default.bool,
-  delayHide: _propTypes2.default.number,
-  delayUpdate: _propTypes2.default.number,
-  delayShow: _propTypes2.default.number,
-  event: _propTypes2.default.string,
-  eventOff: _propTypes2.default.string,
-  watchWindow: _propTypes2.default.bool,
-  isCapture: _propTypes2.default.bool,
-  globalEventOff: _propTypes2.default.string,
-  getContent: _propTypes2.default.any,
-  afterShow: _propTypes2.default.func,
-  afterHide: _propTypes2.default.func,
-  disable: _propTypes2.default.bool,
-  scrollHide: _propTypes2.default.bool,
-  resizeHide: _propTypes2.default.bool,
-  wrapper: _propTypes2.default.string,
-  clickable: _propTypes2.default.bool
-}, _class2.defaultProps = {
-  insecure: true,
-  resizeHide: true,
-  wrapper: 'div',
-  clickable: false
-}, _class2.supportedWrappers = ['div', 'span'], _class2.displayName = 'ReactTooltip', _temp)) || _class) || _class) || _class) || _class) || _class) || _class;
-/* export default not fit for standalone, it will exports {default:...} */
-
-
-module.exports = ReactTooltip;
-},{"react":"../node_modules/react/index.js","prop-types":"../node_modules/prop-types/index.js","react-dom":"../node_modules/react-dom/index.js","classnames":"../node_modules/classnames/index.js","./decorators/staticMethods":"../node_modules/react-tooltip/dist/decorators/staticMethods.js","./decorators/windowListener":"../node_modules/react-tooltip/dist/decorators/windowListener.js","./decorators/customEvent":"../node_modules/react-tooltip/dist/decorators/customEvent.js","./decorators/isCapture":"../node_modules/react-tooltip/dist/decorators/isCapture.js","./decorators/getEffect":"../node_modules/react-tooltip/dist/decorators/getEffect.js","./decorators/trackRemoval":"../node_modules/react-tooltip/dist/decorators/trackRemoval.js","./utils/getPosition":"../node_modules/react-tooltip/dist/utils/getPosition.js","./utils/getTipContent":"../node_modules/react-tooltip/dist/utils/getTipContent.js","./utils/aria":"../node_modules/react-tooltip/dist/utils/aria.js","./utils/nodeListToArray":"../node_modules/react-tooltip/dist/utils/nodeListToArray.js","./style":"../node_modules/react-tooltip/dist/style.js"}],"../node_modules/@babel/runtime/helpers/esm/extends.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = _extends;
-
-function _extends() {
-  exports.default = _extends = Object.assign || function (target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
-
-      for (var key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
-    }
-
-    return target;
-  };
-
-  return _extends.apply(this, arguments);
-}
-},{}],"../node_modules/@babel/runtime/helpers/esm/objectWithoutPropertiesLoose.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = _objectWithoutPropertiesLoose;
-
-function _objectWithoutPropertiesLoose(source, excluded) {
-  if (source == null) return {};
-  var target = {};
-  var sourceKeys = Object.keys(source);
-  var key, i;
-
-  for (i = 0; i < sourceKeys.length; i++) {
-    key = sourceKeys[i];
-    if (excluded.indexOf(key) >= 0) continue;
-    target[key] = source[key];
-  }
-
-  return target;
-}
-},{}],"../node_modules/@babel/runtime/helpers/esm/inheritsLoose.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = _inheritsLoose;
-
-function _inheritsLoose(subClass, superClass) {
-  subClass.prototype = Object.create(superClass.prototype);
-  subClass.prototype.constructor = subClass;
-  subClass.__proto__ = superClass;
-}
-},{}],"../node_modules/@babel/runtime/helpers/esm/assertThisInitialized.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = _assertThisInitialized;
-
-function _assertThisInitialized(self) {
-  if (self === void 0) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-
-  return self;
-}
-},{}],"../node_modules/react-textarea-autosize/dist/react-textarea-autosize.esm.browser.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _extends2 = _interopRequireDefault(require("@babel/runtime/helpers/esm/extends"));
-
-var _objectWithoutPropertiesLoose2 = _interopRequireDefault(require("@babel/runtime/helpers/esm/objectWithoutPropertiesLoose"));
-
-var _inheritsLoose2 = _interopRequireDefault(require("@babel/runtime/helpers/esm/inheritsLoose"));
-
-var _assertThisInitialized2 = _interopRequireDefault(require("@babel/runtime/helpers/esm/assertThisInitialized"));
-
-var _react = _interopRequireDefault(require("react"));
-
-var _propTypes = _interopRequireDefault(require("prop-types"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var isIE = !!document.documentElement.currentStyle;
-var HIDDEN_TEXTAREA_STYLE = {
-  'min-height': '0',
-  'max-height': 'none',
-  height: '0',
-  visibility: 'hidden',
-  overflow: 'hidden',
-  position: 'absolute',
-  'z-index': '-1000',
-  top: '0',
-  right: '0'
-};
-var SIZING_STYLE = ['letter-spacing', 'line-height', 'font-family', 'font-weight', 'font-size', 'font-style', 'tab-size', 'text-rendering', 'text-transform', 'width', 'text-indent', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left', 'border-top-width', 'border-right-width', 'border-bottom-width', 'border-left-width', 'box-sizing'];
-var computedStyleCache = {};
-var hiddenTextarea = document.createElement('textarea');
-
-var forceHiddenStyles = function forceHiddenStyles(node) {
-  Object.keys(HIDDEN_TEXTAREA_STYLE).forEach(function (key) {
-    node.style.setProperty(key, HIDDEN_TEXTAREA_STYLE[key], 'important');
-  });
-};
-
-{
-  forceHiddenStyles(hiddenTextarea);
-}
-
-function calculateNodeHeight(uiTextNode, uid, useCache, minRows, maxRows) {
-  if (useCache === void 0) {
-    useCache = false;
-  }
-
-  if (minRows === void 0) {
-    minRows = null;
-  }
-
-  if (maxRows === void 0) {
-    maxRows = null;
-  }
-
-  if (hiddenTextarea.parentNode === null) {
-    document.body.appendChild(hiddenTextarea);
-  } // Copy all CSS properties that have an impact on the height of the content in
-  // the textbox
-
-
-  var nodeStyling = calculateNodeStyling(uiTextNode, uid, useCache);
-
-  if (nodeStyling === null) {
-    return null;
-  }
-
-  var paddingSize = nodeStyling.paddingSize,
-      borderSize = nodeStyling.borderSize,
-      boxSizing = nodeStyling.boxSizing,
-      sizingStyle = nodeStyling.sizingStyle; // Need to have the overflow attribute to hide the scrollbar otherwise
-  // text-lines will not calculated properly as the shadow will technically be
-  // narrower for content
-
-  Object.keys(sizingStyle).forEach(function (key) {
-    hiddenTextarea.style[key] = sizingStyle[key];
-  });
-  forceHiddenStyles(hiddenTextarea);
-  hiddenTextarea.value = uiTextNode.value || uiTextNode.placeholder || 'x';
-  var minHeight = -Infinity;
-  var maxHeight = Infinity;
-  var height = hiddenTextarea.scrollHeight;
-
-  if (boxSizing === 'border-box') {
-    // border-box: add border, since height = content + padding + border
-    height = height + borderSize;
-  } else if (boxSizing === 'content-box') {
-    // remove padding, since height = content
-    height = height - paddingSize;
-  } // measure height of a textarea with a single row
-
-
-  hiddenTextarea.value = 'x';
-  var singleRowHeight = hiddenTextarea.scrollHeight - paddingSize; // Stores the value's rows count rendered in `hiddenTextarea`,
-  // regardless if `maxRows` or `minRows` props are passed
-
-  var valueRowCount = Math.floor(height / singleRowHeight);
-
-  if (minRows !== null) {
-    minHeight = singleRowHeight * minRows;
-
-    if (boxSizing === 'border-box') {
-      minHeight = minHeight + paddingSize + borderSize;
-    }
-
-    height = Math.max(minHeight, height);
-  }
-
-  if (maxRows !== null) {
-    maxHeight = singleRowHeight * maxRows;
-
-    if (boxSizing === 'border-box') {
-      maxHeight = maxHeight + paddingSize + borderSize;
-    }
-
-    height = Math.min(maxHeight, height);
-  }
-
-  var rowCount = Math.floor(height / singleRowHeight);
-  return {
-    height: height,
-    minHeight: minHeight,
-    maxHeight: maxHeight,
-    rowCount: rowCount,
-    valueRowCount: valueRowCount
-  };
-}
-
-function calculateNodeStyling(node, uid, useCache) {
-  if (useCache === void 0) {
-    useCache = false;
-  }
-
-  if (useCache && computedStyleCache[uid]) {
-    return computedStyleCache[uid];
-  }
-
-  var style = window.getComputedStyle(node);
-
-  if (style === null) {
-    return null;
-  }
-
-  var sizingStyle = SIZING_STYLE.reduce(function (obj, name) {
-    obj[name] = style.getPropertyValue(name);
-    return obj;
-  }, {});
-  var boxSizing = sizingStyle['box-sizing']; // probably node is detached from DOM, can't read computed dimensions
-
-  if (boxSizing === '') {
-    return null;
-  } // IE (Edge has already correct behaviour) returns content width as computed width
-  // so we need to add manually padding and border widths
-
-
-  if (isIE && boxSizing === 'border-box') {
-    sizingStyle.width = parseFloat(sizingStyle.width) + parseFloat(style['border-right-width']) + parseFloat(style['border-left-width']) + parseFloat(style['padding-right']) + parseFloat(style['padding-left']) + 'px';
-  }
-
-  var paddingSize = parseFloat(sizingStyle['padding-bottom']) + parseFloat(sizingStyle['padding-top']);
-  var borderSize = parseFloat(sizingStyle['border-bottom-width']) + parseFloat(sizingStyle['border-top-width']);
-  var nodeInfo = {
-    sizingStyle: sizingStyle,
-    paddingSize: paddingSize,
-    borderSize: borderSize,
-    boxSizing: boxSizing
-  };
-
-  if (useCache) {
-    computedStyleCache[uid] = nodeInfo;
-  }
-
-  return nodeInfo;
-}
-
-var purgeCache = function purgeCache(uid) {
-  delete computedStyleCache[uid];
-};
-
-var noop = function noop() {};
-
-var uid = 0;
-
-var TextareaAutosize =
-/*#__PURE__*/
-function (_React$Component) {
-  (0, _inheritsLoose2.default)(TextareaAutosize, _React$Component);
-
-  function TextareaAutosize(props) {
-    var _this;
-
-    _this = _React$Component.call(this, props) || this;
-
-    _this._onRef = function (node) {
-      _this._ref = node;
-      var inputRef = _this.props.inputRef;
-
-      if (typeof inputRef === 'function') {
-        inputRef(node);
-        return;
-      }
-
-      inputRef.current = node;
-    };
-
-    _this._onChange = function (event) {
-      if (!_this._controlled) {
-        _this._resizeComponent();
-      }
-
-      _this.props.onChange(event, (0, _assertThisInitialized2.default)((0, _assertThisInitialized2.default)(_this)));
-    };
-
-    _this._resizeComponent = function (callback) {
-      if (callback === void 0) {
-        callback = noop;
-      }
-
-      var nodeHeight = calculateNodeHeight(_this._ref, _this._uid, _this.props.useCacheForDOMMeasurements, _this.props.minRows, _this.props.maxRows);
-
-      if (nodeHeight === null) {
-        callback();
-        return;
-      }
-
-      var height = nodeHeight.height,
-          minHeight = nodeHeight.minHeight,
-          maxHeight = nodeHeight.maxHeight,
-          rowCount = nodeHeight.rowCount,
-          valueRowCount = nodeHeight.valueRowCount;
-      _this.rowCount = rowCount;
-      _this.valueRowCount = valueRowCount;
-
-      if (_this.state.height !== height || _this.state.minHeight !== minHeight || _this.state.maxHeight !== maxHeight) {
-        _this.setState({
-          height: height,
-          minHeight: minHeight,
-          maxHeight: maxHeight
-        }, callback);
-
-        return;
-      }
-
-      callback();
-    };
-
-    _this.state = {
-      height: props.style && props.style.height || 0,
-      minHeight: -Infinity,
-      maxHeight: Infinity
-    };
-    _this._uid = uid++;
-    _this._controlled = props.value !== undefined;
-    _this._resizeLock = false;
-    return _this;
-  }
-
-  var _proto = TextareaAutosize.prototype;
-
-  _proto.render = function render() {
-    var _this$props = this.props,
-        _inputRef = _this$props.inputRef,
-        _maxRows = _this$props.maxRows,
-        _minRows = _this$props.minRows,
-        _onHeightChange = _this$props.onHeightChange,
-        _useCacheForDOMMeasurements = _this$props.useCacheForDOMMeasurements,
-        props = (0, _objectWithoutPropertiesLoose2.default)(_this$props, ["inputRef", "maxRows", "minRows", "onHeightChange", "useCacheForDOMMeasurements"]);
-    props.style = (0, _extends2.default)({}, props.style, {
-      height: this.state.height
-    });
-    var maxHeight = Math.max(props.style.maxHeight || Infinity, this.state.maxHeight);
-
-    if (maxHeight < this.state.height) {
-      props.style.overflow = 'hidden';
-    }
-
-    return _react.default.createElement("textarea", (0, _extends2.default)({}, props, {
-      onChange: this._onChange,
-      ref: this._onRef
-    }));
-  };
-
-  _proto.componentDidMount = function componentDidMount() {
-    var _this2 = this;
-
-    this._resizeComponent(); // Working around Firefox bug which runs resize listeners even when other JS is running at the same moment
-    // causing competing rerenders (due to setState in the listener) in React.
-    // More can be found here - facebook/react#6324
-
-
-    this._resizeListener = function () {
-      if (_this2._resizeLock) {
-        return;
-      }
-
-      _this2._resizeLock = true;
-
-      _this2._resizeComponent(function () {
-        _this2._resizeLock = false;
-      });
-    };
-
-    window.addEventListener('resize', this._resizeListener);
-  };
-
-  _proto.componentDidUpdate = function componentDidUpdate(prevProps, prevState) {
-    if (prevProps !== this.props) {
-      this._resizeComponent();
-    }
-
-    if (this.state.height !== prevState.height) {
-      this.props.onHeightChange(this.state.height, this);
-    }
-  };
-
-  _proto.componentWillUnmount = function componentWillUnmount() {
-    window.removeEventListener('resize', this._resizeListener);
-    purgeCache(this._uid);
-  };
-
-  return TextareaAutosize;
-}(_react.default.Component);
-
-TextareaAutosize.defaultProps = {
-  inputRef: noop,
-  onChange: noop,
-  onHeightChange: noop,
-  useCacheForDOMMeasurements: false
-};
-"development" !== "production" ? TextareaAutosize.propTypes = {
-  inputRef: _propTypes.default.oneOfType([_propTypes.default.func, _propTypes.default.shape({
-    current: _propTypes.default.any
-  })]),
-  maxRows: _propTypes.default.number,
-  minRows: _propTypes.default.number,
-  onChange: _propTypes.default.func,
-  onHeightChange: _propTypes.default.func,
-  style: _propTypes.default.object,
-  useCacheForDOMMeasurements: _propTypes.default.bool,
-  value: _propTypes.default.string
-} : void 0;
-var _default = TextareaAutosize;
-exports.default = _default;
-},{"@babel/runtime/helpers/esm/extends":"../node_modules/@babel/runtime/helpers/esm/extends.js","@babel/runtime/helpers/esm/objectWithoutPropertiesLoose":"../node_modules/@babel/runtime/helpers/esm/objectWithoutPropertiesLoose.js","@babel/runtime/helpers/esm/inheritsLoose":"../node_modules/@babel/runtime/helpers/esm/inheritsLoose.js","@babel/runtime/helpers/esm/assertThisInitialized":"../node_modules/@babel/runtime/helpers/esm/assertThisInitialized.js","react":"../node_modules/react/index.js","prop-types":"../node_modules/prop-types/index.js"}],"../node_modules/react-icons/lib/esm/iconsManifest.js":[function(require,module,exports) {
+},{"./stub":"../node_modules/local-storage/stub.js","./parse":"../node_modules/local-storage/parse.js","./tracking":"../node_modules/local-storage/tracking.js"}],"../node_modules/react-icons/lib/esm/iconsManifest.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -88892,7 +85151,2143 @@ var FaRegWindowRestore = function (props) {
 
 exports.FaRegWindowRestore = FaRegWindowRestore;
 FaRegWindowRestore.displayName = "FaRegWindowRestore";
-},{"../lib":"../node_modules/react-icons/lib/esm/index.js"}],"../src/components/Theme.tsx":[function(require,module,exports) {
+},{"../lib":"../node_modules/react-icons/lib/esm/index.js"}],"../node_modules/axios/lib/helpers/bind.js":[function(require,module,exports) {
+'use strict';
+
+module.exports = function bind(fn, thisArg) {
+  return function wrap() {
+    var args = new Array(arguments.length);
+    for (var i = 0; i < args.length; i++) {
+      args[i] = arguments[i];
+    }
+    return fn.apply(thisArg, args);
+  };
+};
+
+},{}],"../node_modules/axios/node_modules/is-buffer/index.js":[function(require,module,exports) {
+/*!
+ * Determine if an object is a Buffer
+ *
+ * @author   Feross Aboukhadijeh <https://feross.org>
+ * @license  MIT
+ */
+module.exports = function isBuffer(obj) {
+  return obj != null && obj.constructor != null && typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj);
+};
+},{}],"../node_modules/axios/lib/utils.js":[function(require,module,exports) {
+'use strict';
+
+var bind = require('./helpers/bind');
+var isBuffer = require('is-buffer');
+
+/*global toString:true*/
+
+// utils is a library of generic helper functions non-specific to axios
+
+var toString = Object.prototype.toString;
+
+/**
+ * Determine if a value is an Array
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an Array, otherwise false
+ */
+function isArray(val) {
+  return toString.call(val) === '[object Array]';
+}
+
+/**
+ * Determine if a value is an ArrayBuffer
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an ArrayBuffer, otherwise false
+ */
+function isArrayBuffer(val) {
+  return toString.call(val) === '[object ArrayBuffer]';
+}
+
+/**
+ * Determine if a value is a FormData
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an FormData, otherwise false
+ */
+function isFormData(val) {
+  return (typeof FormData !== 'undefined') && (val instanceof FormData);
+}
+
+/**
+ * Determine if a value is a view on an ArrayBuffer
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a view on an ArrayBuffer, otherwise false
+ */
+function isArrayBufferView(val) {
+  var result;
+  if ((typeof ArrayBuffer !== 'undefined') && (ArrayBuffer.isView)) {
+    result = ArrayBuffer.isView(val);
+  } else {
+    result = (val) && (val.buffer) && (val.buffer instanceof ArrayBuffer);
+  }
+  return result;
+}
+
+/**
+ * Determine if a value is a String
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a String, otherwise false
+ */
+function isString(val) {
+  return typeof val === 'string';
+}
+
+/**
+ * Determine if a value is a Number
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Number, otherwise false
+ */
+function isNumber(val) {
+  return typeof val === 'number';
+}
+
+/**
+ * Determine if a value is undefined
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if the value is undefined, otherwise false
+ */
+function isUndefined(val) {
+  return typeof val === 'undefined';
+}
+
+/**
+ * Determine if a value is an Object
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an Object, otherwise false
+ */
+function isObject(val) {
+  return val !== null && typeof val === 'object';
+}
+
+/**
+ * Determine if a value is a Date
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Date, otherwise false
+ */
+function isDate(val) {
+  return toString.call(val) === '[object Date]';
+}
+
+/**
+ * Determine if a value is a File
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a File, otherwise false
+ */
+function isFile(val) {
+  return toString.call(val) === '[object File]';
+}
+
+/**
+ * Determine if a value is a Blob
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Blob, otherwise false
+ */
+function isBlob(val) {
+  return toString.call(val) === '[object Blob]';
+}
+
+/**
+ * Determine if a value is a Function
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Function, otherwise false
+ */
+function isFunction(val) {
+  return toString.call(val) === '[object Function]';
+}
+
+/**
+ * Determine if a value is a Stream
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Stream, otherwise false
+ */
+function isStream(val) {
+  return isObject(val) && isFunction(val.pipe);
+}
+
+/**
+ * Determine if a value is a URLSearchParams object
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a URLSearchParams object, otherwise false
+ */
+function isURLSearchParams(val) {
+  return typeof URLSearchParams !== 'undefined' && val instanceof URLSearchParams;
+}
+
+/**
+ * Trim excess whitespace off the beginning and end of a string
+ *
+ * @param {String} str The String to trim
+ * @returns {String} The String freed of excess whitespace
+ */
+function trim(str) {
+  return str.replace(/^\s*/, '').replace(/\s*$/, '');
+}
+
+/**
+ * Determine if we're running in a standard browser environment
+ *
+ * This allows axios to run in a web worker, and react-native.
+ * Both environments support XMLHttpRequest, but not fully standard globals.
+ *
+ * web workers:
+ *  typeof window -> undefined
+ *  typeof document -> undefined
+ *
+ * react-native:
+ *  navigator.product -> 'ReactNative'
+ * nativescript
+ *  navigator.product -> 'NativeScript' or 'NS'
+ */
+function isStandardBrowserEnv() {
+  if (typeof navigator !== 'undefined' && (navigator.product === 'ReactNative' ||
+                                           navigator.product === 'NativeScript' ||
+                                           navigator.product === 'NS')) {
+    return false;
+  }
+  return (
+    typeof window !== 'undefined' &&
+    typeof document !== 'undefined'
+  );
+}
+
+/**
+ * Iterate over an Array or an Object invoking a function for each item.
+ *
+ * If `obj` is an Array callback will be called passing
+ * the value, index, and complete array for each item.
+ *
+ * If 'obj' is an Object callback will be called passing
+ * the value, key, and complete object for each property.
+ *
+ * @param {Object|Array} obj The object to iterate
+ * @param {Function} fn The callback to invoke for each item
+ */
+function forEach(obj, fn) {
+  // Don't bother if no value provided
+  if (obj === null || typeof obj === 'undefined') {
+    return;
+  }
+
+  // Force an array if not already something iterable
+  if (typeof obj !== 'object') {
+    /*eslint no-param-reassign:0*/
+    obj = [obj];
+  }
+
+  if (isArray(obj)) {
+    // Iterate over array values
+    for (var i = 0, l = obj.length; i < l; i++) {
+      fn.call(null, obj[i], i, obj);
+    }
+  } else {
+    // Iterate over object keys
+    for (var key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        fn.call(null, obj[key], key, obj);
+      }
+    }
+  }
+}
+
+/**
+ * Accepts varargs expecting each argument to be an object, then
+ * immutably merges the properties of each object and returns result.
+ *
+ * When multiple objects contain the same key the later object in
+ * the arguments list will take precedence.
+ *
+ * Example:
+ *
+ * ```js
+ * var result = merge({foo: 123}, {foo: 456});
+ * console.log(result.foo); // outputs 456
+ * ```
+ *
+ * @param {Object} obj1 Object to merge
+ * @returns {Object} Result of all merge properties
+ */
+function merge(/* obj1, obj2, obj3, ... */) {
+  var result = {};
+  function assignValue(val, key) {
+    if (typeof result[key] === 'object' && typeof val === 'object') {
+      result[key] = merge(result[key], val);
+    } else {
+      result[key] = val;
+    }
+  }
+
+  for (var i = 0, l = arguments.length; i < l; i++) {
+    forEach(arguments[i], assignValue);
+  }
+  return result;
+}
+
+/**
+ * Function equal to merge with the difference being that no reference
+ * to original objects is kept.
+ *
+ * @see merge
+ * @param {Object} obj1 Object to merge
+ * @returns {Object} Result of all merge properties
+ */
+function deepMerge(/* obj1, obj2, obj3, ... */) {
+  var result = {};
+  function assignValue(val, key) {
+    if (typeof result[key] === 'object' && typeof val === 'object') {
+      result[key] = deepMerge(result[key], val);
+    } else if (typeof val === 'object') {
+      result[key] = deepMerge({}, val);
+    } else {
+      result[key] = val;
+    }
+  }
+
+  for (var i = 0, l = arguments.length; i < l; i++) {
+    forEach(arguments[i], assignValue);
+  }
+  return result;
+}
+
+/**
+ * Extends object a by mutably adding to it the properties of object b.
+ *
+ * @param {Object} a The object to be extended
+ * @param {Object} b The object to copy properties from
+ * @param {Object} thisArg The object to bind function to
+ * @return {Object} The resulting value of object a
+ */
+function extend(a, b, thisArg) {
+  forEach(b, function assignValue(val, key) {
+    if (thisArg && typeof val === 'function') {
+      a[key] = bind(val, thisArg);
+    } else {
+      a[key] = val;
+    }
+  });
+  return a;
+}
+
+module.exports = {
+  isArray: isArray,
+  isArrayBuffer: isArrayBuffer,
+  isBuffer: isBuffer,
+  isFormData: isFormData,
+  isArrayBufferView: isArrayBufferView,
+  isString: isString,
+  isNumber: isNumber,
+  isObject: isObject,
+  isUndefined: isUndefined,
+  isDate: isDate,
+  isFile: isFile,
+  isBlob: isBlob,
+  isFunction: isFunction,
+  isStream: isStream,
+  isURLSearchParams: isURLSearchParams,
+  isStandardBrowserEnv: isStandardBrowserEnv,
+  forEach: forEach,
+  merge: merge,
+  deepMerge: deepMerge,
+  extend: extend,
+  trim: trim
+};
+
+},{"./helpers/bind":"../node_modules/axios/lib/helpers/bind.js","is-buffer":"../node_modules/axios/node_modules/is-buffer/index.js"}],"../node_modules/axios/lib/helpers/buildURL.js":[function(require,module,exports) {
+'use strict';
+
+var utils = require('./../utils');
+
+function encode(val) {
+  return encodeURIComponent(val).
+    replace(/%40/gi, '@').
+    replace(/%3A/gi, ':').
+    replace(/%24/g, '$').
+    replace(/%2C/gi, ',').
+    replace(/%20/g, '+').
+    replace(/%5B/gi, '[').
+    replace(/%5D/gi, ']');
+}
+
+/**
+ * Build a URL by appending params to the end
+ *
+ * @param {string} url The base of the url (e.g., http://www.google.com)
+ * @param {object} [params] The params to be appended
+ * @returns {string} The formatted url
+ */
+module.exports = function buildURL(url, params, paramsSerializer) {
+  /*eslint no-param-reassign:0*/
+  if (!params) {
+    return url;
+  }
+
+  var serializedParams;
+  if (paramsSerializer) {
+    serializedParams = paramsSerializer(params);
+  } else if (utils.isURLSearchParams(params)) {
+    serializedParams = params.toString();
+  } else {
+    var parts = [];
+
+    utils.forEach(params, function serialize(val, key) {
+      if (val === null || typeof val === 'undefined') {
+        return;
+      }
+
+      if (utils.isArray(val)) {
+        key = key + '[]';
+      } else {
+        val = [val];
+      }
+
+      utils.forEach(val, function parseValue(v) {
+        if (utils.isDate(v)) {
+          v = v.toISOString();
+        } else if (utils.isObject(v)) {
+          v = JSON.stringify(v);
+        }
+        parts.push(encode(key) + '=' + encode(v));
+      });
+    });
+
+    serializedParams = parts.join('&');
+  }
+
+  if (serializedParams) {
+    var hashmarkIndex = url.indexOf('#');
+    if (hashmarkIndex !== -1) {
+      url = url.slice(0, hashmarkIndex);
+    }
+
+    url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams;
+  }
+
+  return url;
+};
+
+},{"./../utils":"../node_modules/axios/lib/utils.js"}],"../node_modules/axios/lib/core/InterceptorManager.js":[function(require,module,exports) {
+'use strict';
+
+var utils = require('./../utils');
+
+function InterceptorManager() {
+  this.handlers = [];
+}
+
+/**
+ * Add a new interceptor to the stack
+ *
+ * @param {Function} fulfilled The function to handle `then` for a `Promise`
+ * @param {Function} rejected The function to handle `reject` for a `Promise`
+ *
+ * @return {Number} An ID used to remove interceptor later
+ */
+InterceptorManager.prototype.use = function use(fulfilled, rejected) {
+  this.handlers.push({
+    fulfilled: fulfilled,
+    rejected: rejected
+  });
+  return this.handlers.length - 1;
+};
+
+/**
+ * Remove an interceptor from the stack
+ *
+ * @param {Number} id The ID that was returned by `use`
+ */
+InterceptorManager.prototype.eject = function eject(id) {
+  if (this.handlers[id]) {
+    this.handlers[id] = null;
+  }
+};
+
+/**
+ * Iterate over all the registered interceptors
+ *
+ * This method is particularly useful for skipping over any
+ * interceptors that may have become `null` calling `eject`.
+ *
+ * @param {Function} fn The function to call for each interceptor
+ */
+InterceptorManager.prototype.forEach = function forEach(fn) {
+  utils.forEach(this.handlers, function forEachHandler(h) {
+    if (h !== null) {
+      fn(h);
+    }
+  });
+};
+
+module.exports = InterceptorManager;
+
+},{"./../utils":"../node_modules/axios/lib/utils.js"}],"../node_modules/axios/lib/core/transformData.js":[function(require,module,exports) {
+'use strict';
+
+var utils = require('./../utils');
+
+/**
+ * Transform the data for a request or a response
+ *
+ * @param {Object|String} data The data to be transformed
+ * @param {Array} headers The headers for the request or response
+ * @param {Array|Function} fns A single function or Array of functions
+ * @returns {*} The resulting transformed data
+ */
+module.exports = function transformData(data, headers, fns) {
+  /*eslint no-param-reassign:0*/
+  utils.forEach(fns, function transform(fn) {
+    data = fn(data, headers);
+  });
+
+  return data;
+};
+
+},{"./../utils":"../node_modules/axios/lib/utils.js"}],"../node_modules/axios/lib/cancel/isCancel.js":[function(require,module,exports) {
+'use strict';
+
+module.exports = function isCancel(value) {
+  return !!(value && value.__CANCEL__);
+};
+
+},{}],"../node_modules/axios/lib/helpers/normalizeHeaderName.js":[function(require,module,exports) {
+'use strict';
+
+var utils = require('../utils');
+
+module.exports = function normalizeHeaderName(headers, normalizedName) {
+  utils.forEach(headers, function processHeader(value, name) {
+    if (name !== normalizedName && name.toUpperCase() === normalizedName.toUpperCase()) {
+      headers[normalizedName] = value;
+      delete headers[name];
+    }
+  });
+};
+
+},{"../utils":"../node_modules/axios/lib/utils.js"}],"../node_modules/axios/lib/core/enhanceError.js":[function(require,module,exports) {
+'use strict';
+
+/**
+ * Update an Error with the specified config, error code, and response.
+ *
+ * @param {Error} error The error to update.
+ * @param {Object} config The config.
+ * @param {string} [code] The error code (for example, 'ECONNABORTED').
+ * @param {Object} [request] The request.
+ * @param {Object} [response] The response.
+ * @returns {Error} The error.
+ */
+module.exports = function enhanceError(error, config, code, request, response) {
+  error.config = config;
+  if (code) {
+    error.code = code;
+  }
+
+  error.request = request;
+  error.response = response;
+  error.isAxiosError = true;
+
+  error.toJSON = function() {
+    return {
+      // Standard
+      message: this.message,
+      name: this.name,
+      // Microsoft
+      description: this.description,
+      number: this.number,
+      // Mozilla
+      fileName: this.fileName,
+      lineNumber: this.lineNumber,
+      columnNumber: this.columnNumber,
+      stack: this.stack,
+      // Axios
+      config: this.config,
+      code: this.code
+    };
+  };
+  return error;
+};
+
+},{}],"../node_modules/axios/lib/core/createError.js":[function(require,module,exports) {
+'use strict';
+
+var enhanceError = require('./enhanceError');
+
+/**
+ * Create an Error with the specified message, config, error code, request and response.
+ *
+ * @param {string} message The error message.
+ * @param {Object} config The config.
+ * @param {string} [code] The error code (for example, 'ECONNABORTED').
+ * @param {Object} [request] The request.
+ * @param {Object} [response] The response.
+ * @returns {Error} The created error.
+ */
+module.exports = function createError(message, config, code, request, response) {
+  var error = new Error(message);
+  return enhanceError(error, config, code, request, response);
+};
+
+},{"./enhanceError":"../node_modules/axios/lib/core/enhanceError.js"}],"../node_modules/axios/lib/core/settle.js":[function(require,module,exports) {
+'use strict';
+
+var createError = require('./createError');
+
+/**
+ * Resolve or reject a Promise based on response status.
+ *
+ * @param {Function} resolve A function that resolves the promise.
+ * @param {Function} reject A function that rejects the promise.
+ * @param {object} response The response.
+ */
+module.exports = function settle(resolve, reject, response) {
+  var validateStatus = response.config.validateStatus;
+  if (!validateStatus || validateStatus(response.status)) {
+    resolve(response);
+  } else {
+    reject(createError(
+      'Request failed with status code ' + response.status,
+      response.config,
+      null,
+      response.request,
+      response
+    ));
+  }
+};
+
+},{"./createError":"../node_modules/axios/lib/core/createError.js"}],"../node_modules/axios/lib/helpers/parseHeaders.js":[function(require,module,exports) {
+'use strict';
+
+var utils = require('./../utils');
+
+// Headers whose duplicates are ignored by node
+// c.f. https://nodejs.org/api/http.html#http_message_headers
+var ignoreDuplicateOf = [
+  'age', 'authorization', 'content-length', 'content-type', 'etag',
+  'expires', 'from', 'host', 'if-modified-since', 'if-unmodified-since',
+  'last-modified', 'location', 'max-forwards', 'proxy-authorization',
+  'referer', 'retry-after', 'user-agent'
+];
+
+/**
+ * Parse headers into an object
+ *
+ * ```
+ * Date: Wed, 27 Aug 2014 08:58:49 GMT
+ * Content-Type: application/json
+ * Connection: keep-alive
+ * Transfer-Encoding: chunked
+ * ```
+ *
+ * @param {String} headers Headers needing to be parsed
+ * @returns {Object} Headers parsed into an object
+ */
+module.exports = function parseHeaders(headers) {
+  var parsed = {};
+  var key;
+  var val;
+  var i;
+
+  if (!headers) { return parsed; }
+
+  utils.forEach(headers.split('\n'), function parser(line) {
+    i = line.indexOf(':');
+    key = utils.trim(line.substr(0, i)).toLowerCase();
+    val = utils.trim(line.substr(i + 1));
+
+    if (key) {
+      if (parsed[key] && ignoreDuplicateOf.indexOf(key) >= 0) {
+        return;
+      }
+      if (key === 'set-cookie') {
+        parsed[key] = (parsed[key] ? parsed[key] : []).concat([val]);
+      } else {
+        parsed[key] = parsed[key] ? parsed[key] + ', ' + val : val;
+      }
+    }
+  });
+
+  return parsed;
+};
+
+},{"./../utils":"../node_modules/axios/lib/utils.js"}],"../node_modules/axios/lib/helpers/isURLSameOrigin.js":[function(require,module,exports) {
+'use strict';
+
+var utils = require('./../utils');
+
+module.exports = (
+  utils.isStandardBrowserEnv() ?
+
+  // Standard browser envs have full support of the APIs needed to test
+  // whether the request URL is of the same origin as current location.
+    (function standardBrowserEnv() {
+      var msie = /(msie|trident)/i.test(navigator.userAgent);
+      var urlParsingNode = document.createElement('a');
+      var originURL;
+
+      /**
+    * Parse a URL to discover it's components
+    *
+    * @param {String} url The URL to be parsed
+    * @returns {Object}
+    */
+      function resolveURL(url) {
+        var href = url;
+
+        if (msie) {
+        // IE needs attribute set twice to normalize properties
+          urlParsingNode.setAttribute('href', href);
+          href = urlParsingNode.href;
+        }
+
+        urlParsingNode.setAttribute('href', href);
+
+        // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
+        return {
+          href: urlParsingNode.href,
+          protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
+          host: urlParsingNode.host,
+          search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
+          hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
+          hostname: urlParsingNode.hostname,
+          port: urlParsingNode.port,
+          pathname: (urlParsingNode.pathname.charAt(0) === '/') ?
+            urlParsingNode.pathname :
+            '/' + urlParsingNode.pathname
+        };
+      }
+
+      originURL = resolveURL(window.location.href);
+
+      /**
+    * Determine if a URL shares the same origin as the current location
+    *
+    * @param {String} requestURL The URL to test
+    * @returns {boolean} True if URL shares the same origin, otherwise false
+    */
+      return function isURLSameOrigin(requestURL) {
+        var parsed = (utils.isString(requestURL)) ? resolveURL(requestURL) : requestURL;
+        return (parsed.protocol === originURL.protocol &&
+            parsed.host === originURL.host);
+      };
+    })() :
+
+  // Non standard browser envs (web workers, react-native) lack needed support.
+    (function nonStandardBrowserEnv() {
+      return function isURLSameOrigin() {
+        return true;
+      };
+    })()
+);
+
+},{"./../utils":"../node_modules/axios/lib/utils.js"}],"../node_modules/axios/lib/helpers/cookies.js":[function(require,module,exports) {
+'use strict';
+
+var utils = require('./../utils');
+
+module.exports = (
+  utils.isStandardBrowserEnv() ?
+
+  // Standard browser envs support document.cookie
+    (function standardBrowserEnv() {
+      return {
+        write: function write(name, value, expires, path, domain, secure) {
+          var cookie = [];
+          cookie.push(name + '=' + encodeURIComponent(value));
+
+          if (utils.isNumber(expires)) {
+            cookie.push('expires=' + new Date(expires).toGMTString());
+          }
+
+          if (utils.isString(path)) {
+            cookie.push('path=' + path);
+          }
+
+          if (utils.isString(domain)) {
+            cookie.push('domain=' + domain);
+          }
+
+          if (secure === true) {
+            cookie.push('secure');
+          }
+
+          document.cookie = cookie.join('; ');
+        },
+
+        read: function read(name) {
+          var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
+          return (match ? decodeURIComponent(match[3]) : null);
+        },
+
+        remove: function remove(name) {
+          this.write(name, '', Date.now() - 86400000);
+        }
+      };
+    })() :
+
+  // Non standard browser env (web workers, react-native) lack needed support.
+    (function nonStandardBrowserEnv() {
+      return {
+        write: function write() {},
+        read: function read() { return null; },
+        remove: function remove() {}
+      };
+    })()
+);
+
+},{"./../utils":"../node_modules/axios/lib/utils.js"}],"../node_modules/axios/lib/adapters/xhr.js":[function(require,module,exports) {
+'use strict';
+
+var utils = require('./../utils');
+var settle = require('./../core/settle');
+var buildURL = require('./../helpers/buildURL');
+var parseHeaders = require('./../helpers/parseHeaders');
+var isURLSameOrigin = require('./../helpers/isURLSameOrigin');
+var createError = require('../core/createError');
+
+module.exports = function xhrAdapter(config) {
+  return new Promise(function dispatchXhrRequest(resolve, reject) {
+    var requestData = config.data;
+    var requestHeaders = config.headers;
+
+    if (utils.isFormData(requestData)) {
+      delete requestHeaders['Content-Type']; // Let the browser set it
+    }
+
+    var request = new XMLHttpRequest();
+
+    // HTTP basic authentication
+    if (config.auth) {
+      var username = config.auth.username || '';
+      var password = config.auth.password || '';
+      requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
+    }
+
+    request.open(config.method.toUpperCase(), buildURL(config.url, config.params, config.paramsSerializer), true);
+
+    // Set the request timeout in MS
+    request.timeout = config.timeout;
+
+    // Listen for ready state
+    request.onreadystatechange = function handleLoad() {
+      if (!request || request.readyState !== 4) {
+        return;
+      }
+
+      // The request errored out and we didn't get a response, this will be
+      // handled by onerror instead
+      // With one exception: request that using file: protocol, most browsers
+      // will return status as 0 even though it's a successful request
+      if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
+        return;
+      }
+
+      // Prepare the response
+      var responseHeaders = 'getAllResponseHeaders' in request ? parseHeaders(request.getAllResponseHeaders()) : null;
+      var responseData = !config.responseType || config.responseType === 'text' ? request.responseText : request.response;
+      var response = {
+        data: responseData,
+        status: request.status,
+        statusText: request.statusText,
+        headers: responseHeaders,
+        config: config,
+        request: request
+      };
+
+      settle(resolve, reject, response);
+
+      // Clean up request
+      request = null;
+    };
+
+    // Handle browser request cancellation (as opposed to a manual cancellation)
+    request.onabort = function handleAbort() {
+      if (!request) {
+        return;
+      }
+
+      reject(createError('Request aborted', config, 'ECONNABORTED', request));
+
+      // Clean up request
+      request = null;
+    };
+
+    // Handle low level network errors
+    request.onerror = function handleError() {
+      // Real errors are hidden from us by the browser
+      // onerror should only fire if it's a network error
+      reject(createError('Network Error', config, null, request));
+
+      // Clean up request
+      request = null;
+    };
+
+    // Handle timeout
+    request.ontimeout = function handleTimeout() {
+      reject(createError('timeout of ' + config.timeout + 'ms exceeded', config, 'ECONNABORTED',
+        request));
+
+      // Clean up request
+      request = null;
+    };
+
+    // Add xsrf header
+    // This is only done if running in a standard browser environment.
+    // Specifically not if we're in a web worker, or react-native.
+    if (utils.isStandardBrowserEnv()) {
+      var cookies = require('./../helpers/cookies');
+
+      // Add xsrf header
+      var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
+        cookies.read(config.xsrfCookieName) :
+        undefined;
+
+      if (xsrfValue) {
+        requestHeaders[config.xsrfHeaderName] = xsrfValue;
+      }
+    }
+
+    // Add headers to the request
+    if ('setRequestHeader' in request) {
+      utils.forEach(requestHeaders, function setRequestHeader(val, key) {
+        if (typeof requestData === 'undefined' && key.toLowerCase() === 'content-type') {
+          // Remove Content-Type if data is undefined
+          delete requestHeaders[key];
+        } else {
+          // Otherwise add header to the request
+          request.setRequestHeader(key, val);
+        }
+      });
+    }
+
+    // Add withCredentials to request if needed
+    if (config.withCredentials) {
+      request.withCredentials = true;
+    }
+
+    // Add responseType to request if needed
+    if (config.responseType) {
+      try {
+        request.responseType = config.responseType;
+      } catch (e) {
+        // Expected DOMException thrown by browsers not compatible XMLHttpRequest Level 2.
+        // But, this can be suppressed for 'json' type as it can be parsed by default 'transformResponse' function.
+        if (config.responseType !== 'json') {
+          throw e;
+        }
+      }
+    }
+
+    // Handle progress if needed
+    if (typeof config.onDownloadProgress === 'function') {
+      request.addEventListener('progress', config.onDownloadProgress);
+    }
+
+    // Not all browsers support upload events
+    if (typeof config.onUploadProgress === 'function' && request.upload) {
+      request.upload.addEventListener('progress', config.onUploadProgress);
+    }
+
+    if (config.cancelToken) {
+      // Handle cancellation
+      config.cancelToken.promise.then(function onCanceled(cancel) {
+        if (!request) {
+          return;
+        }
+
+        request.abort();
+        reject(cancel);
+        // Clean up request
+        request = null;
+      });
+    }
+
+    if (requestData === undefined) {
+      requestData = null;
+    }
+
+    // Send the request
+    request.send(requestData);
+  });
+};
+
+},{"./../utils":"../node_modules/axios/lib/utils.js","./../core/settle":"../node_modules/axios/lib/core/settle.js","./../helpers/buildURL":"../node_modules/axios/lib/helpers/buildURL.js","./../helpers/parseHeaders":"../node_modules/axios/lib/helpers/parseHeaders.js","./../helpers/isURLSameOrigin":"../node_modules/axios/lib/helpers/isURLSameOrigin.js","../core/createError":"../node_modules/axios/lib/core/createError.js","./../helpers/cookies":"../node_modules/axios/lib/helpers/cookies.js"}],"../node_modules/axios/lib/defaults.js":[function(require,module,exports) {
+var process = require("process");
+'use strict';
+
+var utils = require('./utils');
+var normalizeHeaderName = require('./helpers/normalizeHeaderName');
+
+var DEFAULT_CONTENT_TYPE = {
+  'Content-Type': 'application/x-www-form-urlencoded'
+};
+
+function setContentTypeIfUnset(headers, value) {
+  if (!utils.isUndefined(headers) && utils.isUndefined(headers['Content-Type'])) {
+    headers['Content-Type'] = value;
+  }
+}
+
+function getDefaultAdapter() {
+  var adapter;
+  // Only Node.JS has a process variable that is of [[Class]] process
+  if (typeof process !== 'undefined' && Object.prototype.toString.call(process) === '[object process]') {
+    // For node use HTTP adapter
+    adapter = require('./adapters/http');
+  } else if (typeof XMLHttpRequest !== 'undefined') {
+    // For browsers use XHR adapter
+    adapter = require('./adapters/xhr');
+  }
+  return adapter;
+}
+
+var defaults = {
+  adapter: getDefaultAdapter(),
+
+  transformRequest: [function transformRequest(data, headers) {
+    normalizeHeaderName(headers, 'Accept');
+    normalizeHeaderName(headers, 'Content-Type');
+    if (utils.isFormData(data) ||
+      utils.isArrayBuffer(data) ||
+      utils.isBuffer(data) ||
+      utils.isStream(data) ||
+      utils.isFile(data) ||
+      utils.isBlob(data)
+    ) {
+      return data;
+    }
+    if (utils.isArrayBufferView(data)) {
+      return data.buffer;
+    }
+    if (utils.isURLSearchParams(data)) {
+      setContentTypeIfUnset(headers, 'application/x-www-form-urlencoded;charset=utf-8');
+      return data.toString();
+    }
+    if (utils.isObject(data)) {
+      setContentTypeIfUnset(headers, 'application/json;charset=utf-8');
+      return JSON.stringify(data);
+    }
+    return data;
+  }],
+
+  transformResponse: [function transformResponse(data) {
+    /*eslint no-param-reassign:0*/
+    if (typeof data === 'string') {
+      try {
+        data = JSON.parse(data);
+      } catch (e) { /* Ignore */ }
+    }
+    return data;
+  }],
+
+  /**
+   * A timeout in milliseconds to abort a request. If set to 0 (default) a
+   * timeout is not created.
+   */
+  timeout: 0,
+
+  xsrfCookieName: 'XSRF-TOKEN',
+  xsrfHeaderName: 'X-XSRF-TOKEN',
+
+  maxContentLength: -1,
+
+  validateStatus: function validateStatus(status) {
+    return status >= 200 && status < 300;
+  }
+};
+
+defaults.headers = {
+  common: {
+    'Accept': 'application/json, text/plain, */*'
+  }
+};
+
+utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
+  defaults.headers[method] = {};
+});
+
+utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+  defaults.headers[method] = utils.merge(DEFAULT_CONTENT_TYPE);
+});
+
+module.exports = defaults;
+
+},{"./utils":"../node_modules/axios/lib/utils.js","./helpers/normalizeHeaderName":"../node_modules/axios/lib/helpers/normalizeHeaderName.js","./adapters/http":"../node_modules/axios/lib/adapters/xhr.js","./adapters/xhr":"../node_modules/axios/lib/adapters/xhr.js","process":"../node_modules/process/browser.js"}],"../node_modules/axios/lib/helpers/isAbsoluteURL.js":[function(require,module,exports) {
+'use strict';
+
+/**
+ * Determines whether the specified URL is absolute
+ *
+ * @param {string} url The URL to test
+ * @returns {boolean} True if the specified URL is absolute, otherwise false
+ */
+module.exports = function isAbsoluteURL(url) {
+  // A URL is considered absolute if it begins with "<scheme>://" or "//" (protocol-relative URL).
+  // RFC 3986 defines scheme name as a sequence of characters beginning with a letter and followed
+  // by any combination of letters, digits, plus, period, or hyphen.
+  return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
+};
+
+},{}],"../node_modules/axios/lib/helpers/combineURLs.js":[function(require,module,exports) {
+'use strict';
+
+/**
+ * Creates a new URL by combining the specified URLs
+ *
+ * @param {string} baseURL The base URL
+ * @param {string} relativeURL The relative URL
+ * @returns {string} The combined URL
+ */
+module.exports = function combineURLs(baseURL, relativeURL) {
+  return relativeURL
+    ? baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '')
+    : baseURL;
+};
+
+},{}],"../node_modules/axios/lib/core/dispatchRequest.js":[function(require,module,exports) {
+'use strict';
+
+var utils = require('./../utils');
+var transformData = require('./transformData');
+var isCancel = require('../cancel/isCancel');
+var defaults = require('../defaults');
+var isAbsoluteURL = require('./../helpers/isAbsoluteURL');
+var combineURLs = require('./../helpers/combineURLs');
+
+/**
+ * Throws a `Cancel` if cancellation has been requested.
+ */
+function throwIfCancellationRequested(config) {
+  if (config.cancelToken) {
+    config.cancelToken.throwIfRequested();
+  }
+}
+
+/**
+ * Dispatch a request to the server using the configured adapter.
+ *
+ * @param {object} config The config that is to be used for the request
+ * @returns {Promise} The Promise to be fulfilled
+ */
+module.exports = function dispatchRequest(config) {
+  throwIfCancellationRequested(config);
+
+  // Support baseURL config
+  if (config.baseURL && !isAbsoluteURL(config.url)) {
+    config.url = combineURLs(config.baseURL, config.url);
+  }
+
+  // Ensure headers exist
+  config.headers = config.headers || {};
+
+  // Transform request data
+  config.data = transformData(
+    config.data,
+    config.headers,
+    config.transformRequest
+  );
+
+  // Flatten headers
+  config.headers = utils.merge(
+    config.headers.common || {},
+    config.headers[config.method] || {},
+    config.headers || {}
+  );
+
+  utils.forEach(
+    ['delete', 'get', 'head', 'post', 'put', 'patch', 'common'],
+    function cleanHeaderConfig(method) {
+      delete config.headers[method];
+    }
+  );
+
+  var adapter = config.adapter || defaults.adapter;
+
+  return adapter(config).then(function onAdapterResolution(response) {
+    throwIfCancellationRequested(config);
+
+    // Transform response data
+    response.data = transformData(
+      response.data,
+      response.headers,
+      config.transformResponse
+    );
+
+    return response;
+  }, function onAdapterRejection(reason) {
+    if (!isCancel(reason)) {
+      throwIfCancellationRequested(config);
+
+      // Transform response data
+      if (reason && reason.response) {
+        reason.response.data = transformData(
+          reason.response.data,
+          reason.response.headers,
+          config.transformResponse
+        );
+      }
+    }
+
+    return Promise.reject(reason);
+  });
+};
+
+},{"./../utils":"../node_modules/axios/lib/utils.js","./transformData":"../node_modules/axios/lib/core/transformData.js","../cancel/isCancel":"../node_modules/axios/lib/cancel/isCancel.js","../defaults":"../node_modules/axios/lib/defaults.js","./../helpers/isAbsoluteURL":"../node_modules/axios/lib/helpers/isAbsoluteURL.js","./../helpers/combineURLs":"../node_modules/axios/lib/helpers/combineURLs.js"}],"../node_modules/axios/lib/core/mergeConfig.js":[function(require,module,exports) {
+'use strict';
+
+var utils = require('../utils');
+
+/**
+ * Config-specific merge-function which creates a new config-object
+ * by merging two configuration objects together.
+ *
+ * @param {Object} config1
+ * @param {Object} config2
+ * @returns {Object} New object resulting from merging config2 to config1
+ */
+module.exports = function mergeConfig(config1, config2) {
+  // eslint-disable-next-line no-param-reassign
+  config2 = config2 || {};
+  var config = {};
+
+  utils.forEach(['url', 'method', 'params', 'data'], function valueFromConfig2(prop) {
+    if (typeof config2[prop] !== 'undefined') {
+      config[prop] = config2[prop];
+    }
+  });
+
+  utils.forEach(['headers', 'auth', 'proxy'], function mergeDeepProperties(prop) {
+    if (utils.isObject(config2[prop])) {
+      config[prop] = utils.deepMerge(config1[prop], config2[prop]);
+    } else if (typeof config2[prop] !== 'undefined') {
+      config[prop] = config2[prop];
+    } else if (utils.isObject(config1[prop])) {
+      config[prop] = utils.deepMerge(config1[prop]);
+    } else if (typeof config1[prop] !== 'undefined') {
+      config[prop] = config1[prop];
+    }
+  });
+
+  utils.forEach([
+    'baseURL', 'transformRequest', 'transformResponse', 'paramsSerializer',
+    'timeout', 'withCredentials', 'adapter', 'responseType', 'xsrfCookieName',
+    'xsrfHeaderName', 'onUploadProgress', 'onDownloadProgress', 'maxContentLength',
+    'validateStatus', 'maxRedirects', 'httpAgent', 'httpsAgent', 'cancelToken',
+    'socketPath'
+  ], function defaultToConfig2(prop) {
+    if (typeof config2[prop] !== 'undefined') {
+      config[prop] = config2[prop];
+    } else if (typeof config1[prop] !== 'undefined') {
+      config[prop] = config1[prop];
+    }
+  });
+
+  return config;
+};
+
+},{"../utils":"../node_modules/axios/lib/utils.js"}],"../node_modules/axios/lib/core/Axios.js":[function(require,module,exports) {
+'use strict';
+
+var utils = require('./../utils');
+var buildURL = require('../helpers/buildURL');
+var InterceptorManager = require('./InterceptorManager');
+var dispatchRequest = require('./dispatchRequest');
+var mergeConfig = require('./mergeConfig');
+
+/**
+ * Create a new instance of Axios
+ *
+ * @param {Object} instanceConfig The default config for the instance
+ */
+function Axios(instanceConfig) {
+  this.defaults = instanceConfig;
+  this.interceptors = {
+    request: new InterceptorManager(),
+    response: new InterceptorManager()
+  };
+}
+
+/**
+ * Dispatch a request
+ *
+ * @param {Object} config The config specific for this request (merged with this.defaults)
+ */
+Axios.prototype.request = function request(config) {
+  /*eslint no-param-reassign:0*/
+  // Allow for axios('example/url'[, config]) a la fetch API
+  if (typeof config === 'string') {
+    config = arguments[1] || {};
+    config.url = arguments[0];
+  } else {
+    config = config || {};
+  }
+
+  config = mergeConfig(this.defaults, config);
+  config.method = config.method ? config.method.toLowerCase() : 'get';
+
+  // Hook up interceptors middleware
+  var chain = [dispatchRequest, undefined];
+  var promise = Promise.resolve(config);
+
+  this.interceptors.request.forEach(function unshiftRequestInterceptors(interceptor) {
+    chain.unshift(interceptor.fulfilled, interceptor.rejected);
+  });
+
+  this.interceptors.response.forEach(function pushResponseInterceptors(interceptor) {
+    chain.push(interceptor.fulfilled, interceptor.rejected);
+  });
+
+  while (chain.length) {
+    promise = promise.then(chain.shift(), chain.shift());
+  }
+
+  return promise;
+};
+
+Axios.prototype.getUri = function getUri(config) {
+  config = mergeConfig(this.defaults, config);
+  return buildURL(config.url, config.params, config.paramsSerializer).replace(/^\?/, '');
+};
+
+// Provide aliases for supported request methods
+utils.forEach(['delete', 'get', 'head', 'options'], function forEachMethodNoData(method) {
+  /*eslint func-names:0*/
+  Axios.prototype[method] = function(url, config) {
+    return this.request(utils.merge(config || {}, {
+      method: method,
+      url: url
+    }));
+  };
+});
+
+utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+  /*eslint func-names:0*/
+  Axios.prototype[method] = function(url, data, config) {
+    return this.request(utils.merge(config || {}, {
+      method: method,
+      url: url,
+      data: data
+    }));
+  };
+});
+
+module.exports = Axios;
+
+},{"./../utils":"../node_modules/axios/lib/utils.js","../helpers/buildURL":"../node_modules/axios/lib/helpers/buildURL.js","./InterceptorManager":"../node_modules/axios/lib/core/InterceptorManager.js","./dispatchRequest":"../node_modules/axios/lib/core/dispatchRequest.js","./mergeConfig":"../node_modules/axios/lib/core/mergeConfig.js"}],"../node_modules/axios/lib/cancel/Cancel.js":[function(require,module,exports) {
+'use strict';
+
+/**
+ * A `Cancel` is an object that is thrown when an operation is canceled.
+ *
+ * @class
+ * @param {string=} message The message.
+ */
+function Cancel(message) {
+  this.message = message;
+}
+
+Cancel.prototype.toString = function toString() {
+  return 'Cancel' + (this.message ? ': ' + this.message : '');
+};
+
+Cancel.prototype.__CANCEL__ = true;
+
+module.exports = Cancel;
+
+},{}],"../node_modules/axios/lib/cancel/CancelToken.js":[function(require,module,exports) {
+'use strict';
+
+var Cancel = require('./Cancel');
+
+/**
+ * A `CancelToken` is an object that can be used to request cancellation of an operation.
+ *
+ * @class
+ * @param {Function} executor The executor function.
+ */
+function CancelToken(executor) {
+  if (typeof executor !== 'function') {
+    throw new TypeError('executor must be a function.');
+  }
+
+  var resolvePromise;
+  this.promise = new Promise(function promiseExecutor(resolve) {
+    resolvePromise = resolve;
+  });
+
+  var token = this;
+  executor(function cancel(message) {
+    if (token.reason) {
+      // Cancellation has already been requested
+      return;
+    }
+
+    token.reason = new Cancel(message);
+    resolvePromise(token.reason);
+  });
+}
+
+/**
+ * Throws a `Cancel` if cancellation has been requested.
+ */
+CancelToken.prototype.throwIfRequested = function throwIfRequested() {
+  if (this.reason) {
+    throw this.reason;
+  }
+};
+
+/**
+ * Returns an object that contains a new `CancelToken` and a function that, when called,
+ * cancels the `CancelToken`.
+ */
+CancelToken.source = function source() {
+  var cancel;
+  var token = new CancelToken(function executor(c) {
+    cancel = c;
+  });
+  return {
+    token: token,
+    cancel: cancel
+  };
+};
+
+module.exports = CancelToken;
+
+},{"./Cancel":"../node_modules/axios/lib/cancel/Cancel.js"}],"../node_modules/axios/lib/helpers/spread.js":[function(require,module,exports) {
+'use strict';
+
+/**
+ * Syntactic sugar for invoking a function and expanding an array for arguments.
+ *
+ * Common use case would be to use `Function.prototype.apply`.
+ *
+ *  ```js
+ *  function f(x, y, z) {}
+ *  var args = [1, 2, 3];
+ *  f.apply(null, args);
+ *  ```
+ *
+ * With `spread` this example can be re-written.
+ *
+ *  ```js
+ *  spread(function(x, y, z) {})([1, 2, 3]);
+ *  ```
+ *
+ * @param {Function} callback
+ * @returns {Function}
+ */
+module.exports = function spread(callback) {
+  return function wrap(arr) {
+    return callback.apply(null, arr);
+  };
+};
+
+},{}],"../node_modules/axios/lib/axios.js":[function(require,module,exports) {
+'use strict';
+
+var utils = require('./utils');
+var bind = require('./helpers/bind');
+var Axios = require('./core/Axios');
+var mergeConfig = require('./core/mergeConfig');
+var defaults = require('./defaults');
+
+/**
+ * Create an instance of Axios
+ *
+ * @param {Object} defaultConfig The default config for the instance
+ * @return {Axios} A new instance of Axios
+ */
+function createInstance(defaultConfig) {
+  var context = new Axios(defaultConfig);
+  var instance = bind(Axios.prototype.request, context);
+
+  // Copy axios.prototype to instance
+  utils.extend(instance, Axios.prototype, context);
+
+  // Copy context to instance
+  utils.extend(instance, context);
+
+  return instance;
+}
+
+// Create the default instance to be exported
+var axios = createInstance(defaults);
+
+// Expose Axios class to allow class inheritance
+axios.Axios = Axios;
+
+// Factory for creating new instances
+axios.create = function create(instanceConfig) {
+  return createInstance(mergeConfig(axios.defaults, instanceConfig));
+};
+
+// Expose Cancel & CancelToken
+axios.Cancel = require('./cancel/Cancel');
+axios.CancelToken = require('./cancel/CancelToken');
+axios.isCancel = require('./cancel/isCancel');
+
+// Expose all/spread
+axios.all = function all(promises) {
+  return Promise.all(promises);
+};
+axios.spread = require('./helpers/spread');
+
+module.exports = axios;
+
+// Allow use of default import syntax in TypeScript
+module.exports.default = axios;
+
+},{"./utils":"../node_modules/axios/lib/utils.js","./helpers/bind":"../node_modules/axios/lib/helpers/bind.js","./core/Axios":"../node_modules/axios/lib/core/Axios.js","./core/mergeConfig":"../node_modules/axios/lib/core/mergeConfig.js","./defaults":"../node_modules/axios/lib/defaults.js","./cancel/Cancel":"../node_modules/axios/lib/cancel/Cancel.js","./cancel/CancelToken":"../node_modules/axios/lib/cancel/CancelToken.js","./cancel/isCancel":"../node_modules/axios/lib/cancel/isCancel.js","./helpers/spread":"../node_modules/axios/lib/helpers/spread.js"}],"../node_modules/axios/index.js":[function(require,module,exports) {
+module.exports = require('./lib/axios');
+},{"./lib/axios":"../node_modules/axios/lib/axios.js"}],"../src/ApiClient.tsx":[function(require,module,exports) {
+"use strict";
+
+var __awaiter = this && this.__awaiter || function (thisArg, _arguments, P, generator) {
+  return new (P || (P = Promise))(function (resolve, reject) {
+    function fulfilled(value) {
+      try {
+        step(generator.next(value));
+      } catch (e) {
+        reject(e);
+      }
+    }
+
+    function rejected(value) {
+      try {
+        step(generator["throw"](value));
+      } catch (e) {
+        reject(e);
+      }
+    }
+
+    function step(result) {
+      result.done ? resolve(result.value) : new P(function (resolve) {
+        resolve(result.value);
+      }).then(fulfilled, rejected);
+    }
+
+    step((generator = generator.apply(thisArg, _arguments || [])).next());
+  });
+};
+
+var __generator = this && this.__generator || function (thisArg, body) {
+  var _ = {
+    label: 0,
+    sent: function sent() {
+      if (t[0] & 1) throw t[1];
+      return t[1];
+    },
+    trys: [],
+    ops: []
+  },
+      f,
+      y,
+      t,
+      g;
+  return g = {
+    next: verb(0),
+    "throw": verb(1),
+    "return": verb(2)
+  }, typeof Symbol === "function" && (g[Symbol.iterator] = function () {
+    return this;
+  }), g;
+
+  function verb(n) {
+    return function (v) {
+      return step([n, v]);
+    };
+  }
+
+  function step(op) {
+    if (f) throw new TypeError("Generator is already executing.");
+
+    while (_) {
+      try {
+        if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+        if (y = 0, t) op = [op[0] & 2, t.value];
+
+        switch (op[0]) {
+          case 0:
+          case 1:
+            t = op;
+            break;
+
+          case 4:
+            _.label++;
+            return {
+              value: op[1],
+              done: false
+            };
+
+          case 5:
+            _.label++;
+            y = op[1];
+            op = [0];
+            continue;
+
+          case 7:
+            op = _.ops.pop();
+
+            _.trys.pop();
+
+            continue;
+
+          default:
+            if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
+              _ = 0;
+              continue;
+            }
+
+            if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
+              _.label = op[1];
+              break;
+            }
+
+            if (op[0] === 6 && _.label < t[1]) {
+              _.label = t[1];
+              t = op;
+              break;
+            }
+
+            if (t && _.label < t[2]) {
+              _.label = t[2];
+
+              _.ops.push(op);
+
+              break;
+            }
+
+            if (t[2]) _.ops.pop();
+
+            _.trys.pop();
+
+            continue;
+        }
+
+        op = body.call(thisArg, _);
+      } catch (e) {
+        op = [6, e];
+        y = 0;
+      } finally {
+        f = t = 0;
+      }
+    }
+
+    if (op[0] & 5) throw op[1];
+    return {
+      value: op[0] ? op[1] : void 0,
+      done: true
+    };
+  }
+};
+
+var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var axios_1 = __importDefault(require("axios"));
+
+var BaseURI = "http://localhost:8000";
+var client = axios_1.default.create({
+  baseURL: BaseURI,
+  data: JSON
+});
+
+var APIClient =
+/** @class */
+function () {
+  function APIClient() {}
+
+  APIClient.prototype.getOperators = function () {
+    return this.perform("GET", "/v1/operators");
+  };
+
+  APIClient.prototype.getDagSpec = function () {
+    return this.perform("GET", "/v1/dag");
+  };
+
+  APIClient.prototype.getWml = function (wmlname) {
+    return this.perform("GET", "/v1/wml/" + wmlname);
+  };
+
+  APIClient.prototype.getWmlList = function () {
+    return this.perform("GET", "/v1/wml/");
+  };
+
+  APIClient.prototype.saveWml = function (wmlname, wml) {
+    return this.perform("POST", "/v1/wml/" + wmlname, wml);
+  };
+
+  APIClient.prototype.perform = function (method, resource, data) {
+    return __awaiter(this, void 0, void 0, function () {
+      return __generator(this, function (_a) {
+        return [2
+        /*return*/
+        , client({
+          method: method,
+          url: resource,
+          data: data //   headers: {
+          //     Authorization: `Bearer ${this.accessToken}`
+          //   }
+
+        }).then(function (resp) {
+          return resp.data ? resp.data : [];
+        })];
+      });
+    });
+  };
+
+  return APIClient;
+}();
+
+exports.APIClient = APIClient;
+},{"axios":"../node_modules/axios/index.js"}],"../node_modules/@babel/runtime/helpers/esm/extends.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = _extends;
+
+function _extends() {
+  exports.default = _extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  return _extends.apply(this, arguments);
+}
+},{}],"../node_modules/@babel/runtime/helpers/esm/objectWithoutPropertiesLoose.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = _objectWithoutPropertiesLoose;
+
+function _objectWithoutPropertiesLoose(source, excluded) {
+  if (source == null) return {};
+  var target = {};
+  var sourceKeys = Object.keys(source);
+  var key, i;
+
+  for (i = 0; i < sourceKeys.length; i++) {
+    key = sourceKeys[i];
+    if (excluded.indexOf(key) >= 0) continue;
+    target[key] = source[key];
+  }
+
+  return target;
+}
+},{}],"../node_modules/@babel/runtime/helpers/esm/inheritsLoose.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = _inheritsLoose;
+
+function _inheritsLoose(subClass, superClass) {
+  subClass.prototype = Object.create(superClass.prototype);
+  subClass.prototype.constructor = subClass;
+  subClass.__proto__ = superClass;
+}
+},{}],"../node_modules/@babel/runtime/helpers/esm/assertThisInitialized.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = _assertThisInitialized;
+
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return self;
+}
+},{}],"../node_modules/react-textarea-autosize/dist/react-textarea-autosize.esm.browser.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _extends2 = _interopRequireDefault(require("@babel/runtime/helpers/esm/extends"));
+
+var _objectWithoutPropertiesLoose2 = _interopRequireDefault(require("@babel/runtime/helpers/esm/objectWithoutPropertiesLoose"));
+
+var _inheritsLoose2 = _interopRequireDefault(require("@babel/runtime/helpers/esm/inheritsLoose"));
+
+var _assertThisInitialized2 = _interopRequireDefault(require("@babel/runtime/helpers/esm/assertThisInitialized"));
+
+var _react = _interopRequireDefault(require("react"));
+
+var _propTypes = _interopRequireDefault(require("prop-types"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var isIE = !!document.documentElement.currentStyle;
+var HIDDEN_TEXTAREA_STYLE = {
+  'min-height': '0',
+  'max-height': 'none',
+  height: '0',
+  visibility: 'hidden',
+  overflow: 'hidden',
+  position: 'absolute',
+  'z-index': '-1000',
+  top: '0',
+  right: '0'
+};
+var SIZING_STYLE = ['letter-spacing', 'line-height', 'font-family', 'font-weight', 'font-size', 'font-style', 'tab-size', 'text-rendering', 'text-transform', 'width', 'text-indent', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left', 'border-top-width', 'border-right-width', 'border-bottom-width', 'border-left-width', 'box-sizing'];
+var computedStyleCache = {};
+var hiddenTextarea = document.createElement('textarea');
+
+var forceHiddenStyles = function forceHiddenStyles(node) {
+  Object.keys(HIDDEN_TEXTAREA_STYLE).forEach(function (key) {
+    node.style.setProperty(key, HIDDEN_TEXTAREA_STYLE[key], 'important');
+  });
+};
+
+{
+  forceHiddenStyles(hiddenTextarea);
+}
+
+function calculateNodeHeight(uiTextNode, uid, useCache, minRows, maxRows) {
+  if (useCache === void 0) {
+    useCache = false;
+  }
+
+  if (minRows === void 0) {
+    minRows = null;
+  }
+
+  if (maxRows === void 0) {
+    maxRows = null;
+  }
+
+  if (hiddenTextarea.parentNode === null) {
+    document.body.appendChild(hiddenTextarea);
+  } // Copy all CSS properties that have an impact on the height of the content in
+  // the textbox
+
+
+  var nodeStyling = calculateNodeStyling(uiTextNode, uid, useCache);
+
+  if (nodeStyling === null) {
+    return null;
+  }
+
+  var paddingSize = nodeStyling.paddingSize,
+      borderSize = nodeStyling.borderSize,
+      boxSizing = nodeStyling.boxSizing,
+      sizingStyle = nodeStyling.sizingStyle; // Need to have the overflow attribute to hide the scrollbar otherwise
+  // text-lines will not calculated properly as the shadow will technically be
+  // narrower for content
+
+  Object.keys(sizingStyle).forEach(function (key) {
+    hiddenTextarea.style[key] = sizingStyle[key];
+  });
+  forceHiddenStyles(hiddenTextarea);
+  hiddenTextarea.value = uiTextNode.value || uiTextNode.placeholder || 'x';
+  var minHeight = -Infinity;
+  var maxHeight = Infinity;
+  var height = hiddenTextarea.scrollHeight;
+
+  if (boxSizing === 'border-box') {
+    // border-box: add border, since height = content + padding + border
+    height = height + borderSize;
+  } else if (boxSizing === 'content-box') {
+    // remove padding, since height = content
+    height = height - paddingSize;
+  } // measure height of a textarea with a single row
+
+
+  hiddenTextarea.value = 'x';
+  var singleRowHeight = hiddenTextarea.scrollHeight - paddingSize; // Stores the value's rows count rendered in `hiddenTextarea`,
+  // regardless if `maxRows` or `minRows` props are passed
+
+  var valueRowCount = Math.floor(height / singleRowHeight);
+
+  if (minRows !== null) {
+    minHeight = singleRowHeight * minRows;
+
+    if (boxSizing === 'border-box') {
+      minHeight = minHeight + paddingSize + borderSize;
+    }
+
+    height = Math.max(minHeight, height);
+  }
+
+  if (maxRows !== null) {
+    maxHeight = singleRowHeight * maxRows;
+
+    if (boxSizing === 'border-box') {
+      maxHeight = maxHeight + paddingSize + borderSize;
+    }
+
+    height = Math.min(maxHeight, height);
+  }
+
+  var rowCount = Math.floor(height / singleRowHeight);
+  return {
+    height: height,
+    minHeight: minHeight,
+    maxHeight: maxHeight,
+    rowCount: rowCount,
+    valueRowCount: valueRowCount
+  };
+}
+
+function calculateNodeStyling(node, uid, useCache) {
+  if (useCache === void 0) {
+    useCache = false;
+  }
+
+  if (useCache && computedStyleCache[uid]) {
+    return computedStyleCache[uid];
+  }
+
+  var style = window.getComputedStyle(node);
+
+  if (style === null) {
+    return null;
+  }
+
+  var sizingStyle = SIZING_STYLE.reduce(function (obj, name) {
+    obj[name] = style.getPropertyValue(name);
+    return obj;
+  }, {});
+  var boxSizing = sizingStyle['box-sizing']; // probably node is detached from DOM, can't read computed dimensions
+
+  if (boxSizing === '') {
+    return null;
+  } // IE (Edge has already correct behaviour) returns content width as computed width
+  // so we need to add manually padding and border widths
+
+
+  if (isIE && boxSizing === 'border-box') {
+    sizingStyle.width = parseFloat(sizingStyle.width) + parseFloat(style['border-right-width']) + parseFloat(style['border-left-width']) + parseFloat(style['padding-right']) + parseFloat(style['padding-left']) + 'px';
+  }
+
+  var paddingSize = parseFloat(sizingStyle['padding-bottom']) + parseFloat(sizingStyle['padding-top']);
+  var borderSize = parseFloat(sizingStyle['border-bottom-width']) + parseFloat(sizingStyle['border-top-width']);
+  var nodeInfo = {
+    sizingStyle: sizingStyle,
+    paddingSize: paddingSize,
+    borderSize: borderSize,
+    boxSizing: boxSizing
+  };
+
+  if (useCache) {
+    computedStyleCache[uid] = nodeInfo;
+  }
+
+  return nodeInfo;
+}
+
+var purgeCache = function purgeCache(uid) {
+  delete computedStyleCache[uid];
+};
+
+var noop = function noop() {};
+
+var uid = 0;
+
+var TextareaAutosize =
+/*#__PURE__*/
+function (_React$Component) {
+  (0, _inheritsLoose2.default)(TextareaAutosize, _React$Component);
+
+  function TextareaAutosize(props) {
+    var _this;
+
+    _this = _React$Component.call(this, props) || this;
+
+    _this._onRef = function (node) {
+      _this._ref = node;
+      var inputRef = _this.props.inputRef;
+
+      if (typeof inputRef === 'function') {
+        inputRef(node);
+        return;
+      }
+
+      inputRef.current = node;
+    };
+
+    _this._onChange = function (event) {
+      if (!_this._controlled) {
+        _this._resizeComponent();
+      }
+
+      _this.props.onChange(event, (0, _assertThisInitialized2.default)((0, _assertThisInitialized2.default)(_this)));
+    };
+
+    _this._resizeComponent = function (callback) {
+      if (callback === void 0) {
+        callback = noop;
+      }
+
+      var nodeHeight = calculateNodeHeight(_this._ref, _this._uid, _this.props.useCacheForDOMMeasurements, _this.props.minRows, _this.props.maxRows);
+
+      if (nodeHeight === null) {
+        callback();
+        return;
+      }
+
+      var height = nodeHeight.height,
+          minHeight = nodeHeight.minHeight,
+          maxHeight = nodeHeight.maxHeight,
+          rowCount = nodeHeight.rowCount,
+          valueRowCount = nodeHeight.valueRowCount;
+      _this.rowCount = rowCount;
+      _this.valueRowCount = valueRowCount;
+
+      if (_this.state.height !== height || _this.state.minHeight !== minHeight || _this.state.maxHeight !== maxHeight) {
+        _this.setState({
+          height: height,
+          minHeight: minHeight,
+          maxHeight: maxHeight
+        }, callback);
+
+        return;
+      }
+
+      callback();
+    };
+
+    _this.state = {
+      height: props.style && props.style.height || 0,
+      minHeight: -Infinity,
+      maxHeight: Infinity
+    };
+    _this._uid = uid++;
+    _this._controlled = props.value !== undefined;
+    _this._resizeLock = false;
+    return _this;
+  }
+
+  var _proto = TextareaAutosize.prototype;
+
+  _proto.render = function render() {
+    var _this$props = this.props,
+        _inputRef = _this$props.inputRef,
+        _maxRows = _this$props.maxRows,
+        _minRows = _this$props.minRows,
+        _onHeightChange = _this$props.onHeightChange,
+        _useCacheForDOMMeasurements = _this$props.useCacheForDOMMeasurements,
+        props = (0, _objectWithoutPropertiesLoose2.default)(_this$props, ["inputRef", "maxRows", "minRows", "onHeightChange", "useCacheForDOMMeasurements"]);
+    props.style = (0, _extends2.default)({}, props.style, {
+      height: this.state.height
+    });
+    var maxHeight = Math.max(props.style.maxHeight || Infinity, this.state.maxHeight);
+
+    if (maxHeight < this.state.height) {
+      props.style.overflow = 'hidden';
+    }
+
+    return _react.default.createElement("textarea", (0, _extends2.default)({}, props, {
+      onChange: this._onChange,
+      ref: this._onRef
+    }));
+  };
+
+  _proto.componentDidMount = function componentDidMount() {
+    var _this2 = this;
+
+    this._resizeComponent(); // Working around Firefox bug which runs resize listeners even when other JS is running at the same moment
+    // causing competing rerenders (due to setState in the listener) in React.
+    // More can be found here - facebook/react#6324
+
+
+    this._resizeListener = function () {
+      if (_this2._resizeLock) {
+        return;
+      }
+
+      _this2._resizeLock = true;
+
+      _this2._resizeComponent(function () {
+        _this2._resizeLock = false;
+      });
+    };
+
+    window.addEventListener('resize', this._resizeListener);
+  };
+
+  _proto.componentDidUpdate = function componentDidUpdate(prevProps, prevState) {
+    if (prevProps !== this.props) {
+      this._resizeComponent();
+    }
+
+    if (this.state.height !== prevState.height) {
+      this.props.onHeightChange(this.state.height, this);
+    }
+  };
+
+  _proto.componentWillUnmount = function componentWillUnmount() {
+    window.removeEventListener('resize', this._resizeListener);
+    purgeCache(this._uid);
+  };
+
+  return TextareaAutosize;
+}(_react.default.Component);
+
+TextareaAutosize.defaultProps = {
+  inputRef: noop,
+  onChange: noop,
+  onHeightChange: noop,
+  useCacheForDOMMeasurements: false
+};
+"development" !== "production" ? TextareaAutosize.propTypes = {
+  inputRef: _propTypes.default.oneOfType([_propTypes.default.func, _propTypes.default.shape({
+    current: _propTypes.default.any
+  })]),
+  maxRows: _propTypes.default.number,
+  minRows: _propTypes.default.number,
+  onChange: _propTypes.default.func,
+  onHeightChange: _propTypes.default.func,
+  style: _propTypes.default.object,
+  useCacheForDOMMeasurements: _propTypes.default.bool,
+  value: _propTypes.default.string
+} : void 0;
+var _default = TextareaAutosize;
+exports.default = _default;
+},{"@babel/runtime/helpers/esm/extends":"../node_modules/@babel/runtime/helpers/esm/extends.js","@babel/runtime/helpers/esm/objectWithoutPropertiesLoose":"../node_modules/@babel/runtime/helpers/esm/objectWithoutPropertiesLoose.js","@babel/runtime/helpers/esm/inheritsLoose":"../node_modules/@babel/runtime/helpers/esm/inheritsLoose.js","@babel/runtime/helpers/esm/assertThisInitialized":"../node_modules/@babel/runtime/helpers/esm/assertThisInitialized.js","react":"../node_modules/react/index.js","prop-types":"../node_modules/prop-types/index.js"}],"../src/components/Theme.tsx":[function(require,module,exports) {
 "use strict";
 
 var __makeTemplateObject = this && this.__makeTemplateObject || function (cooked, raw) {
@@ -89009,8 +87404,6 @@ var lodash_1 = require("lodash");
 
 var styled_components_1 = __importStar(require("styled-components"));
 
-var react_tooltip_1 = __importDefault(require("react-tooltip"));
-
 var react_textarea_autosize_1 = __importDefault(require("react-textarea-autosize"));
 
 var fa_1 = require("react-icons/fa");
@@ -89034,7 +87427,6 @@ var StyledLableDiv = styled_components_1.default.div(templateObject_14 || (templ
 var StyledLabel = styled_components_1.default.div(templateObject_15 || (templateObject_15 = __makeTemplateObject(["\n  ", ";\n  font-size: ", ";\n  padding: 4px 10px 0px 6px;\n  color: ", ";\n  float: left;\n  width: auto;\n"], ["\n  ", ";\n  font-size: ", ";\n  padding: 4px 10px 0px 6px;\n  color: ", ";\n  float: left;\n  width: auto;\n"])), SmartTextAreaBase, Theme_1.Theme.fonts.normalSize, Theme_1.Theme.colors.darkAccent);
 var StyledInfo = styled_components_1.default.div(templateObject_16 || (templateObject_16 = __makeTemplateObject(["\n  ", ";\n  font-size: ", ";\n  padding: 3px;\n  /* border-radius: 4px; */\n  color: ", ";\n  float: right;\n  text-align: right;\n  width: 20px;\n"], ["\n  ", ";\n  font-size: ", ";\n  padding: 3px;\n  /* border-radius: 4px; */\n  color: ", ";\n  float: right;\n  text-align: right;\n  width: 20px;\n"])), SmartTextAreaBase, Theme_1.Theme.fonts.normalSize, Theme_1.Theme.colors.darkAccent);
 var StyledErrorMessage = styled_components_1.default.div(templateObject_17 || (templateObject_17 = __makeTemplateObject(["\n  ", ";\n  font-size: ", ";\n  font-style: italic;\n  padding: 4px 10px 0px 6px;\n  color: red;\n  float: right;\n  text-align: right;\n"], ["\n  ", ";\n  font-size: ", ";\n  font-style: italic;\n  padding: 4px 10px 0px 6px;\n  color: red;\n  float: right;\n  text-align: right;\n"])), SmartTextAreaBase, Theme_1.Theme.fonts.normalSize);
-var StyledTooltip = styled_components_1.default(react_tooltip_1.default)(templateObject_18 || (templateObject_18 = __makeTemplateObject(["\n  max-width: 300px;\n"], ["\n  max-width: 300px;\n"])));
 
 var isValid = function isValid(params) {
   var value = params.value,
@@ -89153,10 +87545,7 @@ function (_super) {
       }
     }, React.createElement(StyledLableDiv, null, React.createElement(StyledLabel, null, id), React.createElement(StyledErrorMessage, null, errmsg), React.createElement(StyledInfo, {
       "data-tip": description
-    }, React.createElement(fa_1.FaInfoCircle, null))), this.renderForm(), React.createElement(StyledTooltip, {
-      multiline: true,
-      place: "right"
-    }));
+    }, React.createElement(fa_1.FaInfoCircle, null))), this.renderForm());
   };
 
   return SmartTextarea;
@@ -89190,6 +87579,7 @@ function (_super) {
 
   RenderedAirflowParameter.prototype.render = function () {
     switch (this.params.type) {
+      case "callable":
       case "str":
         {
           return React.createElement(SmartTextarea, {
@@ -89257,7 +87647,6 @@ function (_super) {
           });
         }
 
-      case "mapping":
       case "dict":
         {
           return React.createElement(SmartTextarea, {
@@ -89319,10 +87708,7 @@ function (_super) {
         float: "right",
         marginLeft: "5px"
       }
-    }), this.props.type ? React.createElement(exports.Type, null, this.props.type) : null, React.createElement(StyledTooltip, {
-      multiline: true,
-      place: "right"
-    })), React.createElement(NameInput, {
+    }), this.props.type ? React.createElement(exports.Type, null, this.props.type) : null), React.createElement(NameInput, {
       placeholder: "Input name..",
       type: "text",
       value: this.props.properties.name || "",
@@ -89392,8 +87778,8 @@ function (_super) {
 }(React.Component);
 
 exports.AirflowNodeForm = AirflowNodeForm;
-var templateObject_1, templateObject_2, templateObject_3, templateObject_4, templateObject_5, templateObject_6, templateObject_7, templateObject_8, templateObject_9, templateObject_10, templateObject_11, templateObject_12, templateObject_13, templateObject_14, templateObject_15, templateObject_16, templateObject_17, templateObject_18;
-},{"react":"../node_modules/react/index.js","lodash":"../node_modules/lodash/lodash.js","styled-components":"../node_modules/styled-components/dist/styled-components.browser.esm.js","react-tooltip":"../node_modules/react-tooltip/dist/index.js","react-textarea-autosize":"../node_modules/react-textarea-autosize/dist/react-textarea-autosize.esm.browser.js","react-icons/fa":"../node_modules/react-icons/fa/index.esm.js","../Theme":"../src/components/Theme.tsx"}],"../src/components/Airflow/AirflowDag.tsx":[function(require,module,exports) {
+var templateObject_1, templateObject_2, templateObject_3, templateObject_4, templateObject_5, templateObject_6, templateObject_7, templateObject_8, templateObject_9, templateObject_10, templateObject_11, templateObject_12, templateObject_13, templateObject_14, templateObject_15, templateObject_16, templateObject_17;
+},{"react":"../node_modules/react/index.js","lodash":"../node_modules/lodash/lodash.js","styled-components":"../node_modules/styled-components/dist/styled-components.browser.esm.js","react-textarea-autosize":"../node_modules/react-textarea-autosize/dist/react-textarea-autosize.esm.browser.js","react-icons/fa":"../node_modules/react-icons/fa/index.esm.js","../Theme":"../src/components/Theme.tsx"}],"../src/components/Airflow/AirflowDag.tsx":[function(require,module,exports) {
 "use strict";
 
 var __extends = this && this.__extends || function () {
@@ -89846,7 +88232,1612 @@ __export(require("./AirflowNode"));
 __export(require("./AirflowOperator"));
 
 __export(require("./AirflowSidebar"));
-},{"./AirflowDag":"../src/components/Airflow/AirflowDag.tsx","./AirflowNode":"../src/components/Airflow/AirflowNode.tsx","./AirflowOperator":"../src/components/Airflow/AirflowOperator.tsx","./AirflowSidebar":"../src/components/Airflow/AirflowSidebar.tsx"}],"../src/components/Page/MainPage.tsx":[function(require,module,exports) {
+},{"./AirflowDag":"../src/components/Airflow/AirflowDag.tsx","./AirflowNode":"../src/components/Airflow/AirflowNode.tsx","./AirflowOperator":"../src/components/Airflow/AirflowOperator.tsx","./AirflowSidebar":"../src/components/Airflow/AirflowSidebar.tsx"}],"../node_modules/classnames/index.js":[function(require,module,exports) {
+var define;
+/*!
+  Copyright (c) 2017 Jed Watson.
+  Licensed under the MIT License (MIT), see
+  http://jedwatson.github.io/classnames
+*/
+/* global define */
+
+(function () {
+	'use strict';
+
+	var hasOwn = {}.hasOwnProperty;
+
+	function classNames () {
+		var classes = [];
+
+		for (var i = 0; i < arguments.length; i++) {
+			var arg = arguments[i];
+			if (!arg) continue;
+
+			var argType = typeof arg;
+
+			if (argType === 'string' || argType === 'number') {
+				classes.push(arg);
+			} else if (Array.isArray(arg) && arg.length) {
+				var inner = classNames.apply(null, arg);
+				if (inner) {
+					classes.push(inner);
+				}
+			} else if (argType === 'object') {
+				for (var key in arg) {
+					if (hasOwn.call(arg, key) && arg[key]) {
+						classes.push(key);
+					}
+				}
+			}
+		}
+
+		return classes.join(' ');
+	}
+
+	if (typeof module !== 'undefined' && module.exports) {
+		classNames.default = classNames;
+		module.exports = classNames;
+	} else if (typeof define === 'function' && typeof define.amd === 'object' && define.amd) {
+		// register as 'classnames', consistent with npm package name
+		define('classnames', [], function () {
+			return classNames;
+		});
+	} else {
+		window.classNames = classNames;
+	}
+}());
+
+},{}],"../node_modules/react-tooltip/dist/constant.js":[function(require,module,exports) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = {
+  GLOBAL: {
+    HIDE: '__react_tooltip_hide_event',
+    REBUILD: '__react_tooltip_rebuild_event',
+    SHOW: '__react_tooltip_show_event'
+  }
+};
+},{}],"../node_modules/react-tooltip/dist/decorators/staticMethods.js":[function(require,module,exports) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+exports.default = function (target) {
+  /**
+   * Hide all tooltip
+   * @trigger ReactTooltip.hide()
+   */
+  target.hide = function (target) {
+    dispatchGlobalEvent(_constant2.default.GLOBAL.HIDE, {
+      target: target
+    });
+  };
+  /**
+   * Rebuild all tooltip
+   * @trigger ReactTooltip.rebuild()
+   */
+
+
+  target.rebuild = function () {
+    dispatchGlobalEvent(_constant2.default.GLOBAL.REBUILD);
+  };
+  /**
+   * Show specific tooltip
+   * @trigger ReactTooltip.show()
+   */
+
+
+  target.show = function (target) {
+    dispatchGlobalEvent(_constant2.default.GLOBAL.SHOW, {
+      target: target
+    });
+  };
+
+  target.prototype.globalRebuild = function () {
+    if (this.mount) {
+      this.unbindListener();
+      this.bindListener();
+    }
+  };
+
+  target.prototype.globalShow = function (event) {
+    if (this.mount) {
+      // Create a fake event, specific show will limit the type to `solid`
+      // only `float` type cares e.clientX e.clientY
+      var e = {
+        currentTarget: event.detail.target
+      };
+      this.showTooltip(e, true);
+    }
+  };
+
+  target.prototype.globalHide = function (event) {
+    if (this.mount) {
+      var hasTarget = event && event.detail && event.detail.target && true || false;
+      this.hideTooltip({
+        currentTarget: hasTarget && event.detail.target
+      }, hasTarget);
+    }
+  };
+};
+
+var _constant = require('../constant');
+
+var _constant2 = _interopRequireDefault(_constant);
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : {
+    default: obj
+  };
+}
+
+var dispatchGlobalEvent = function dispatchGlobalEvent(eventName, opts) {
+  // Compatibale with IE
+  // @see http://stackoverflow.com/questions/26596123/internet-explorer-9-10-11-event-constructor-doesnt-work
+  var event = void 0;
+
+  if (typeof window.CustomEvent === 'function') {
+    event = new window.CustomEvent(eventName, {
+      detail: opts
+    });
+  } else {
+    event = document.createEvent('Event');
+    event.initEvent(eventName, false, true);
+    event.detail = opts;
+  }
+
+  window.dispatchEvent(event);
+};
+/**
+ * Static methods for react-tooltip
+ */
+},{"../constant":"../node_modules/react-tooltip/dist/constant.js"}],"../node_modules/react-tooltip/dist/decorators/windowListener.js":[function(require,module,exports) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+exports.default = function (target) {
+  target.prototype.bindWindowEvents = function (resizeHide) {
+    // ReactTooltip.hide
+    window.removeEventListener(_constant2.default.GLOBAL.HIDE, this.globalHide);
+    window.addEventListener(_constant2.default.GLOBAL.HIDE, this.globalHide, false); // ReactTooltip.rebuild
+
+    window.removeEventListener(_constant2.default.GLOBAL.REBUILD, this.globalRebuild);
+    window.addEventListener(_constant2.default.GLOBAL.REBUILD, this.globalRebuild, false); // ReactTooltip.show
+
+    window.removeEventListener(_constant2.default.GLOBAL.SHOW, this.globalShow);
+    window.addEventListener(_constant2.default.GLOBAL.SHOW, this.globalShow, false); // Resize
+
+    if (resizeHide) {
+      window.removeEventListener('resize', this.onWindowResize);
+      window.addEventListener('resize', this.onWindowResize, false);
+    }
+  };
+
+  target.prototype.unbindWindowEvents = function () {
+    window.removeEventListener(_constant2.default.GLOBAL.HIDE, this.globalHide);
+    window.removeEventListener(_constant2.default.GLOBAL.REBUILD, this.globalRebuild);
+    window.removeEventListener(_constant2.default.GLOBAL.SHOW, this.globalShow);
+    window.removeEventListener('resize', this.onWindowResize);
+  };
+  /**
+   * invoked by resize event of window
+   */
+
+
+  target.prototype.onWindowResize = function () {
+    if (!this.mount) return;
+    this.hideTooltip();
+  };
+};
+
+var _constant = require('../constant');
+
+var _constant2 = _interopRequireDefault(_constant);
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : {
+    default: obj
+  };
+}
+},{"../constant":"../node_modules/react-tooltip/dist/constant.js"}],"../node_modules/react-tooltip/dist/decorators/customEvent.js":[function(require,module,exports) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+exports.default = function (target) {
+  target.prototype.isCustomEvent = function (ele) {
+    var event = this.state.event;
+    return event || !!ele.getAttribute('data-event');
+  };
+  /* Bind listener for custom event */
+
+
+  target.prototype.customBindListener = function (ele) {
+    var _this = this;
+
+    var _state = this.state,
+        event = _state.event,
+        eventOff = _state.eventOff;
+    var dataEvent = ele.getAttribute('data-event') || event;
+    var dataEventOff = ele.getAttribute('data-event-off') || eventOff;
+    dataEvent.split(' ').forEach(function (event) {
+      ele.removeEventListener(event, customListeners.get(ele, event));
+      var customListener = checkStatus.bind(_this, dataEventOff);
+      customListeners.set(ele, event, customListener);
+      ele.addEventListener(event, customListener, false);
+    });
+
+    if (dataEventOff) {
+      dataEventOff.split(' ').forEach(function (event) {
+        ele.removeEventListener(event, _this.hideTooltip);
+        ele.addEventListener(event, _this.hideTooltip, false);
+      });
+    }
+  };
+  /* Unbind listener for custom event */
+
+
+  target.prototype.customUnbindListener = function (ele) {
+    var _state2 = this.state,
+        event = _state2.event,
+        eventOff = _state2.eventOff;
+    var dataEvent = event || ele.getAttribute('data-event');
+    var dataEventOff = eventOff || ele.getAttribute('data-event-off');
+    ele.removeEventListener(dataEvent, customListeners.get(ele, event));
+    if (dataEventOff) ele.removeEventListener(dataEventOff, this.hideTooltip);
+  };
+};
+
+function _defineProperty(obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+}
+/**
+ * Custom events to control showing and hiding of tooltip
+ *
+ * @attributes
+ * - `event` {String}
+ * - `eventOff` {String}
+ */
+
+
+var checkStatus = function checkStatus(dataEventOff, e) {
+  var show = this.state.show;
+  var id = this.props.id;
+  var dataIsCapture = e.currentTarget.getAttribute('data-iscapture');
+  var isCapture = dataIsCapture && dataIsCapture === 'true' || this.props.isCapture;
+  var currentItem = e.currentTarget.getAttribute('currentItem');
+  if (!isCapture) e.stopPropagation();
+
+  if (show && currentItem === 'true') {
+    if (!dataEventOff) this.hideTooltip(e);
+  } else {
+    e.currentTarget.setAttribute('currentItem', 'true');
+    setUntargetItems(e.currentTarget, this.getTargetArray(id));
+    this.showTooltip(e);
+  }
+};
+
+var setUntargetItems = function setUntargetItems(currentTarget, targetArray) {
+  for (var i = 0; i < targetArray.length; i++) {
+    if (currentTarget !== targetArray[i]) {
+      targetArray[i].setAttribute('currentItem', 'false');
+    } else {
+      targetArray[i].setAttribute('currentItem', 'true');
+    }
+  }
+};
+
+var customListeners = {
+  id: '9b69f92e-d3fe-498b-b1b4-c5e63a51b0cf',
+  set: function set(target, event, listener) {
+    if (this.id in target) {
+      var map = target[this.id];
+      map[event] = listener;
+    } else {
+      // this is workaround for WeakMap, which is not supported in older browsers, such as IE
+      Object.defineProperty(target, this.id, {
+        configurable: true,
+        value: _defineProperty({}, event, listener)
+      });
+    }
+  },
+  get: function get(target, event) {
+    var map = target[this.id];
+
+    if (map !== undefined) {
+      return map[event];
+    }
+  }
+};
+},{}],"../node_modules/react-tooltip/dist/decorators/isCapture.js":[function(require,module,exports) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+exports.default = function (target) {
+  target.prototype.isCapture = function (currentTarget) {
+    return currentTarget && currentTarget.getAttribute('data-iscapture') === 'true' || this.props.isCapture || false;
+  };
+};
+},{}],"../node_modules/react-tooltip/dist/decorators/getEffect.js":[function(require,module,exports) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+exports.default = function (target) {
+  target.prototype.getEffect = function (currentTarget) {
+    var dataEffect = currentTarget.getAttribute('data-effect');
+    return dataEffect || this.props.effect || 'float';
+  };
+};
+},{}],"../node_modules/react-tooltip/dist/decorators/trackRemoval.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+exports.default = function (target) {
+  target.prototype.bindRemovalTracker = function () {
+    var _this = this;
+
+    var MutationObserver = getMutationObserverClass();
+    if (MutationObserver == null) return;
+    var observer = new MutationObserver(function (mutations) {
+      for (var m1 = 0; m1 < mutations.length; m1++) {
+        var mutation = mutations[m1];
+
+        for (var m2 = 0; m2 < mutation.removedNodes.length; m2++) {
+          var element = mutation.removedNodes[m2];
+
+          if (element === _this.state.currentTarget) {
+            _this.hideTooltip();
+
+            return;
+          }
+        }
+      }
+    });
+    observer.observe(window.document, {
+      childList: true,
+      subtree: true
+    });
+    this.removalTracker = observer;
+  };
+
+  target.prototype.unbindRemovalTracker = function () {
+    if (this.removalTracker) {
+      this.removalTracker.disconnect();
+      this.removalTracker = null;
+    }
+  };
+};
+/**
+ * Tracking target removing from DOM.
+ * It's nessesary to hide tooltip when it's target disappears.
+ * Otherwise, the tooltip would be shown forever until another target
+ * is triggered.
+ *
+ * If MutationObserver is not available, this feature just doesn't work.
+ */
+// https://hacks.mozilla.org/2012/05/dom-mutationobserver-reacting-to-dom-changes-without-killing-browser-performance/
+
+
+var getMutationObserverClass = function getMutationObserverClass() {
+  return window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
+};
+},{}],"../node_modules/react-tooltip/dist/utils/getPosition.js":[function(require,module,exports) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+exports.default = function (e, target, node, place, desiredPlace, effect, offset) {
+  var _getDimensions = getDimensions(node),
+      tipWidth = _getDimensions.width,
+      tipHeight = _getDimensions.height;
+
+  var _getDimensions2 = getDimensions(target),
+      targetWidth = _getDimensions2.width,
+      targetHeight = _getDimensions2.height;
+
+  var _getCurrentOffset = getCurrentOffset(e, target, effect),
+      mouseX = _getCurrentOffset.mouseX,
+      mouseY = _getCurrentOffset.mouseY;
+
+  var defaultOffset = getDefaultPosition(effect, targetWidth, targetHeight, tipWidth, tipHeight);
+
+  var _calculateOffset = calculateOffset(offset),
+      extraOffset_X = _calculateOffset.extraOffset_X,
+      extraOffset_Y = _calculateOffset.extraOffset_Y;
+
+  var windowWidth = window.innerWidth;
+  var windowHeight = window.innerHeight;
+
+  var _getParent = getParent(node),
+      parentTop = _getParent.parentTop,
+      parentLeft = _getParent.parentLeft; // Get the edge offset of the tooltip
+
+
+  var getTipOffsetLeft = function getTipOffsetLeft(place) {
+    var offset_X = defaultOffset[place].l;
+    return mouseX + offset_X + extraOffset_X;
+  };
+
+  var getTipOffsetRight = function getTipOffsetRight(place) {
+    var offset_X = defaultOffset[place].r;
+    return mouseX + offset_X + extraOffset_X;
+  };
+
+  var getTipOffsetTop = function getTipOffsetTop(place) {
+    var offset_Y = defaultOffset[place].t;
+    return mouseY + offset_Y + extraOffset_Y;
+  };
+
+  var getTipOffsetBottom = function getTipOffsetBottom(place) {
+    var offset_Y = defaultOffset[place].b;
+    return mouseY + offset_Y + extraOffset_Y;
+  }; //
+  // Functions to test whether the tooltip's sides are inside
+  // the client window for a given orientation p
+  //
+  //  _____________
+  // |             | <-- Right side
+  // | p = 'left'  |\
+  // |             |/  |\
+  // |_____________|   |_\  <-- Mouse
+  //      / \           |
+  //       |
+  //       |
+  //  Bottom side
+  //
+
+
+  var outsideLeft = function outsideLeft(p) {
+    return getTipOffsetLeft(p) < 0;
+  };
+
+  var outsideRight = function outsideRight(p) {
+    return getTipOffsetRight(p) > windowWidth;
+  };
+
+  var outsideTop = function outsideTop(p) {
+    return getTipOffsetTop(p) < 0;
+  };
+
+  var outsideBottom = function outsideBottom(p) {
+    return getTipOffsetBottom(p) > windowHeight;
+  }; // Check whether the tooltip with orientation p is completely inside the client window
+
+
+  var outside = function outside(p) {
+    return outsideLeft(p) || outsideRight(p) || outsideTop(p) || outsideBottom(p);
+  };
+
+  var inside = function inside(p) {
+    return !outside(p);
+  };
+
+  var placesList = ['top', 'bottom', 'left', 'right'];
+  var insideList = [];
+
+  for (var i = 0; i < 4; i++) {
+    var p = placesList[i];
+
+    if (inside(p)) {
+      insideList.push(p);
+    }
+  }
+
+  var isNewState = false;
+  var newPlace = void 0;
+
+  if (inside(desiredPlace) && desiredPlace !== place) {
+    isNewState = true;
+    newPlace = desiredPlace;
+  } else if (insideList.length > 0 && outside(desiredPlace) && outside(place)) {
+    isNewState = true;
+    newPlace = insideList[0];
+  }
+
+  if (isNewState) {
+    return {
+      isNewState: true,
+      newState: {
+        place: newPlace
+      }
+    };
+  }
+
+  return {
+    isNewState: false,
+    position: {
+      left: parseInt(getTipOffsetLeft(place) - parentLeft, 10),
+      top: parseInt(getTipOffsetTop(place) - parentTop, 10)
+    }
+  };
+};
+
+var getDimensions = function getDimensions(node) {
+  var _node$getBoundingClie = node.getBoundingClientRect(),
+      height = _node$getBoundingClie.height,
+      width = _node$getBoundingClie.width;
+
+  return {
+    height: parseInt(height, 10),
+    width: parseInt(width, 10)
+  };
+}; // Get current mouse offset
+
+/**
+ * Calculate the position of tooltip
+ *
+ * @params
+ * - `e` {Event} the event of current mouse
+ * - `target` {Element} the currentTarget of the event
+ * - `node` {DOM} the react-tooltip object
+ * - `place` {String} top / right / bottom / left
+ * - `effect` {String} float / solid
+ * - `offset` {Object} the offset to default position
+ *
+ * @return {Object}
+ * - `isNewState` {Bool} required
+ * - `newState` {Object}
+ * - `position` {Object} {left: {Number}, top: {Number}}
+ */
+
+
+var getCurrentOffset = function getCurrentOffset(e, currentTarget, effect) {
+  var boundingClientRect = currentTarget.getBoundingClientRect();
+  var targetTop = boundingClientRect.top;
+  var targetLeft = boundingClientRect.left;
+
+  var _getDimensions3 = getDimensions(currentTarget),
+      targetWidth = _getDimensions3.width,
+      targetHeight = _getDimensions3.height;
+
+  if (effect === 'float') {
+    return {
+      mouseX: e.clientX,
+      mouseY: e.clientY
+    };
+  }
+
+  return {
+    mouseX: targetLeft + targetWidth / 2,
+    mouseY: targetTop + targetHeight / 2
+  };
+}; // List all possibility of tooltip final offset
+// This is useful in judging if it is necessary for tooltip to switch position when out of window
+
+
+var getDefaultPosition = function getDefaultPosition(effect, targetWidth, targetHeight, tipWidth, tipHeight) {
+  var top = void 0;
+  var right = void 0;
+  var bottom = void 0;
+  var left = void 0;
+  var disToMouse = 3;
+  var triangleHeight = 2;
+  var cursorHeight = 12; // Optimize for float bottom only, cause the cursor will hide the tooltip
+
+  if (effect === 'float') {
+    top = {
+      l: -(tipWidth / 2),
+      r: tipWidth / 2,
+      t: -(tipHeight + disToMouse + triangleHeight),
+      b: -disToMouse
+    };
+    bottom = {
+      l: -(tipWidth / 2),
+      r: tipWidth / 2,
+      t: disToMouse + cursorHeight,
+      b: tipHeight + disToMouse + triangleHeight + cursorHeight
+    };
+    left = {
+      l: -(tipWidth + disToMouse + triangleHeight),
+      r: -disToMouse,
+      t: -(tipHeight / 2),
+      b: tipHeight / 2
+    };
+    right = {
+      l: disToMouse,
+      r: tipWidth + disToMouse + triangleHeight,
+      t: -(tipHeight / 2),
+      b: tipHeight / 2
+    };
+  } else if (effect === 'solid') {
+    top = {
+      l: -(tipWidth / 2),
+      r: tipWidth / 2,
+      t: -(targetHeight / 2 + tipHeight + triangleHeight),
+      b: -(targetHeight / 2)
+    };
+    bottom = {
+      l: -(tipWidth / 2),
+      r: tipWidth / 2,
+      t: targetHeight / 2,
+      b: targetHeight / 2 + tipHeight + triangleHeight
+    };
+    left = {
+      l: -(tipWidth + targetWidth / 2 + triangleHeight),
+      r: -(targetWidth / 2),
+      t: -(tipHeight / 2),
+      b: tipHeight / 2
+    };
+    right = {
+      l: targetWidth / 2,
+      r: tipWidth + targetWidth / 2 + triangleHeight,
+      t: -(tipHeight / 2),
+      b: tipHeight / 2
+    };
+  }
+
+  return {
+    top: top,
+    bottom: bottom,
+    left: left,
+    right: right
+  };
+}; // Consider additional offset into position calculation
+
+
+var calculateOffset = function calculateOffset(offset) {
+  var extraOffset_X = 0;
+  var extraOffset_Y = 0;
+
+  if (Object.prototype.toString.apply(offset) === '[object String]') {
+    offset = JSON.parse(offset.toString().replace(/\'/g, '\"'));
+  }
+
+  for (var key in offset) {
+    if (key === 'top') {
+      extraOffset_Y -= parseInt(offset[key], 10);
+    } else if (key === 'bottom') {
+      extraOffset_Y += parseInt(offset[key], 10);
+    } else if (key === 'left') {
+      extraOffset_X -= parseInt(offset[key], 10);
+    } else if (key === 'right') {
+      extraOffset_X += parseInt(offset[key], 10);
+    }
+  }
+
+  return {
+    extraOffset_X: extraOffset_X,
+    extraOffset_Y: extraOffset_Y
+  };
+}; // Get the offset of the parent elements
+
+
+var getParent = function getParent(currentTarget) {
+  var currentParent = currentTarget;
+
+  while (currentParent) {
+    if (window.getComputedStyle(currentParent).getPropertyValue('transform') !== 'none') break;
+    currentParent = currentParent.parentElement;
+  }
+
+  var parentTop = currentParent && currentParent.getBoundingClientRect().top || 0;
+  var parentLeft = currentParent && currentParent.getBoundingClientRect().left || 0;
+  return {
+    parentTop: parentTop,
+    parentLeft: parentLeft
+  };
+};
+},{}],"../node_modules/react-tooltip/dist/utils/getTipContent.js":[function(require,module,exports) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+exports.default = function (tip, children, getContent, multiline) {
+  if (children) return children;
+  if (getContent !== undefined && getContent !== null) return getContent; // getContent can be 0, '', etc.
+
+  if (getContent === null) return null; // Tip not exist and childern is null or undefined
+
+  var regexp = /<br\s*\/?>/;
+
+  if (!multiline || multiline === 'false' || !regexp.test(tip)) {
+    // No trim(), so that user can keep their input
+    return tip;
+  } // Multiline tooltip content
+
+
+  return tip.split(regexp).map(function (d, i) {
+    return _react2.default.createElement('span', {
+      key: i,
+      className: 'multi-line'
+    }, d);
+  });
+};
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : {
+    default: obj
+  };
+}
+},{"react":"../node_modules/react/index.js"}],"../node_modules/react-tooltip/dist/utils/aria.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.parseAria = parseAria;
+/**
+ * Support aria- and role in ReactTooltip
+ *
+ * @params props {Object}
+ * @return {Object}
+ */
+
+function parseAria(props) {
+  var ariaObj = {};
+  Object.keys(props).filter(function (prop) {
+    // aria-xxx and role is acceptable
+    return /(^aria-\w+$|^role$)/.test(prop);
+  }).forEach(function (prop) {
+    ariaObj[prop] = props[prop];
+  });
+  return ariaObj;
+}
+},{}],"../node_modules/react-tooltip/dist/utils/nodeListToArray.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+exports.default = function (nodeList) {
+  var length = nodeList.length;
+
+  if (nodeList.hasOwnProperty) {
+    return Array.prototype.slice.call(nodeList);
+  }
+
+  return new Array(length).fill().map(function (index) {
+    return nodeList[index];
+  });
+};
+},{}],"../node_modules/react-tooltip/dist/style.js":[function(require,module,exports) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = '.__react_component_tooltip{border-radius:3px;display:inline-block;font-size:13px;left:-999em;opacity:0;padding:8px 21px;position:fixed;pointer-events:none;transition:opacity 0.3s ease-out;top:-999em;visibility:hidden;z-index:999}.__react_component_tooltip.allow_hover,.__react_component_tooltip.allow_click{pointer-events:auto}.__react_component_tooltip:before,.__react_component_tooltip:after{content:"";width:0;height:0;position:absolute}.__react_component_tooltip.show{opacity:0.9;margin-top:0px;margin-left:0px;visibility:visible}.__react_component_tooltip.type-dark{color:#fff;background-color:#222}.__react_component_tooltip.type-dark.place-top:after{border-top-color:#222;border-top-style:solid;border-top-width:6px}.__react_component_tooltip.type-dark.place-bottom:after{border-bottom-color:#222;border-bottom-style:solid;border-bottom-width:6px}.__react_component_tooltip.type-dark.place-left:after{border-left-color:#222;border-left-style:solid;border-left-width:6px}.__react_component_tooltip.type-dark.place-right:after{border-right-color:#222;border-right-style:solid;border-right-width:6px}.__react_component_tooltip.type-dark.border{border:1px solid #fff}.__react_component_tooltip.type-dark.border.place-top:before{border-top:8px solid #fff}.__react_component_tooltip.type-dark.border.place-bottom:before{border-bottom:8px solid #fff}.__react_component_tooltip.type-dark.border.place-left:before{border-left:8px solid #fff}.__react_component_tooltip.type-dark.border.place-right:before{border-right:8px solid #fff}.__react_component_tooltip.type-success{color:#fff;background-color:#8DC572}.__react_component_tooltip.type-success.place-top:after{border-top-color:#8DC572;border-top-style:solid;border-top-width:6px}.__react_component_tooltip.type-success.place-bottom:after{border-bottom-color:#8DC572;border-bottom-style:solid;border-bottom-width:6px}.__react_component_tooltip.type-success.place-left:after{border-left-color:#8DC572;border-left-style:solid;border-left-width:6px}.__react_component_tooltip.type-success.place-right:after{border-right-color:#8DC572;border-right-style:solid;border-right-width:6px}.__react_component_tooltip.type-success.border{border:1px solid #fff}.__react_component_tooltip.type-success.border.place-top:before{border-top:8px solid #fff}.__react_component_tooltip.type-success.border.place-bottom:before{border-bottom:8px solid #fff}.__react_component_tooltip.type-success.border.place-left:before{border-left:8px solid #fff}.__react_component_tooltip.type-success.border.place-right:before{border-right:8px solid #fff}.__react_component_tooltip.type-warning{color:#fff;background-color:#F0AD4E}.__react_component_tooltip.type-warning.place-top:after{border-top-color:#F0AD4E;border-top-style:solid;border-top-width:6px}.__react_component_tooltip.type-warning.place-bottom:after{border-bottom-color:#F0AD4E;border-bottom-style:solid;border-bottom-width:6px}.__react_component_tooltip.type-warning.place-left:after{border-left-color:#F0AD4E;border-left-style:solid;border-left-width:6px}.__react_component_tooltip.type-warning.place-right:after{border-right-color:#F0AD4E;border-right-style:solid;border-right-width:6px}.__react_component_tooltip.type-warning.border{border:1px solid #fff}.__react_component_tooltip.type-warning.border.place-top:before{border-top:8px solid #fff}.__react_component_tooltip.type-warning.border.place-bottom:before{border-bottom:8px solid #fff}.__react_component_tooltip.type-warning.border.place-left:before{border-left:8px solid #fff}.__react_component_tooltip.type-warning.border.place-right:before{border-right:8px solid #fff}.__react_component_tooltip.type-error{color:#fff;background-color:#BE6464}.__react_component_tooltip.type-error.place-top:after{border-top-color:#BE6464;border-top-style:solid;border-top-width:6px}.__react_component_tooltip.type-error.place-bottom:after{border-bottom-color:#BE6464;border-bottom-style:solid;border-bottom-width:6px}.__react_component_tooltip.type-error.place-left:after{border-left-color:#BE6464;border-left-style:solid;border-left-width:6px}.__react_component_tooltip.type-error.place-right:after{border-right-color:#BE6464;border-right-style:solid;border-right-width:6px}.__react_component_tooltip.type-error.border{border:1px solid #fff}.__react_component_tooltip.type-error.border.place-top:before{border-top:8px solid #fff}.__react_component_tooltip.type-error.border.place-bottom:before{border-bottom:8px solid #fff}.__react_component_tooltip.type-error.border.place-left:before{border-left:8px solid #fff}.__react_component_tooltip.type-error.border.place-right:before{border-right:8px solid #fff}.__react_component_tooltip.type-info{color:#fff;background-color:#337AB7}.__react_component_tooltip.type-info.place-top:after{border-top-color:#337AB7;border-top-style:solid;border-top-width:6px}.__react_component_tooltip.type-info.place-bottom:after{border-bottom-color:#337AB7;border-bottom-style:solid;border-bottom-width:6px}.__react_component_tooltip.type-info.place-left:after{border-left-color:#337AB7;border-left-style:solid;border-left-width:6px}.__react_component_tooltip.type-info.place-right:after{border-right-color:#337AB7;border-right-style:solid;border-right-width:6px}.__react_component_tooltip.type-info.border{border:1px solid #fff}.__react_component_tooltip.type-info.border.place-top:before{border-top:8px solid #fff}.__react_component_tooltip.type-info.border.place-bottom:before{border-bottom:8px solid #fff}.__react_component_tooltip.type-info.border.place-left:before{border-left:8px solid #fff}.__react_component_tooltip.type-info.border.place-right:before{border-right:8px solid #fff}.__react_component_tooltip.type-light{color:#222;background-color:#fff}.__react_component_tooltip.type-light.place-top:after{border-top-color:#fff;border-top-style:solid;border-top-width:6px}.__react_component_tooltip.type-light.place-bottom:after{border-bottom-color:#fff;border-bottom-style:solid;border-bottom-width:6px}.__react_component_tooltip.type-light.place-left:after{border-left-color:#fff;border-left-style:solid;border-left-width:6px}.__react_component_tooltip.type-light.place-right:after{border-right-color:#fff;border-right-style:solid;border-right-width:6px}.__react_component_tooltip.type-light.border{border:1px solid #222}.__react_component_tooltip.type-light.border.place-top:before{border-top:8px solid #222}.__react_component_tooltip.type-light.border.place-bottom:before{border-bottom:8px solid #222}.__react_component_tooltip.type-light.border.place-left:before{border-left:8px solid #222}.__react_component_tooltip.type-light.border.place-right:before{border-right:8px solid #222}.__react_component_tooltip.place-top{margin-top:-10px}.__react_component_tooltip.place-top:before{border-left:10px solid transparent;border-right:10px solid transparent;bottom:-8px;left:50%;margin-left:-10px}.__react_component_tooltip.place-top:after{border-left:8px solid transparent;border-right:8px solid transparent;bottom:-6px;left:50%;margin-left:-8px}.__react_component_tooltip.place-bottom{margin-top:10px}.__react_component_tooltip.place-bottom:before{border-left:10px solid transparent;border-right:10px solid transparent;top:-8px;left:50%;margin-left:-10px}.__react_component_tooltip.place-bottom:after{border-left:8px solid transparent;border-right:8px solid transparent;top:-6px;left:50%;margin-left:-8px}.__react_component_tooltip.place-left{margin-left:-10px}.__react_component_tooltip.place-left:before{border-top:6px solid transparent;border-bottom:6px solid transparent;right:-8px;top:50%;margin-top:-5px}.__react_component_tooltip.place-left:after{border-top:5px solid transparent;border-bottom:5px solid transparent;right:-6px;top:50%;margin-top:-4px}.__react_component_tooltip.place-right{margin-left:10px}.__react_component_tooltip.place-right:before{border-top:6px solid transparent;border-bottom:6px solid transparent;left:-8px;top:50%;margin-top:-5px}.__react_component_tooltip.place-right:after{border-top:5px solid transparent;border-bottom:5px solid transparent;left:-6px;top:50%;margin-top:-4px}.__react_component_tooltip .multi-line{display:block;padding:2px 0px;text-align:center}';
+},{}],"../node_modules/react-tooltip/dist/index.js":[function(require,module,exports) {
+'use strict';
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function (obj) { return typeof obj; }; } else { _typeof = function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+var _extends = Object.assign || function (target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i];
+
+    for (var key in source) {
+      if (Object.prototype.hasOwnProperty.call(source, key)) {
+        target[key] = source[key];
+      }
+    }
+  }
+
+  return target;
+};
+
+var _createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) defineProperties(Constructor, staticProps);
+    return Constructor;
+  };
+}();
+
+var _class, _class2, _temp;
+/* Decoraters */
+
+/* Utils */
+
+/* CSS */
+
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _propTypes = require('prop-types');
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
+var _reactDom = require('react-dom');
+
+var _reactDom2 = _interopRequireDefault(_reactDom);
+
+var _classnames = require('classnames');
+
+var _classnames2 = _interopRequireDefault(_classnames);
+
+var _staticMethods = require('./decorators/staticMethods');
+
+var _staticMethods2 = _interopRequireDefault(_staticMethods);
+
+var _windowListener = require('./decorators/windowListener');
+
+var _windowListener2 = _interopRequireDefault(_windowListener);
+
+var _customEvent = require('./decorators/customEvent');
+
+var _customEvent2 = _interopRequireDefault(_customEvent);
+
+var _isCapture = require('./decorators/isCapture');
+
+var _isCapture2 = _interopRequireDefault(_isCapture);
+
+var _getEffect = require('./decorators/getEffect');
+
+var _getEffect2 = _interopRequireDefault(_getEffect);
+
+var _trackRemoval = require('./decorators/trackRemoval');
+
+var _trackRemoval2 = _interopRequireDefault(_trackRemoval);
+
+var _getPosition = require('./utils/getPosition');
+
+var _getPosition2 = _interopRequireDefault(_getPosition);
+
+var _getTipContent = require('./utils/getTipContent');
+
+var _getTipContent2 = _interopRequireDefault(_getTipContent);
+
+var _aria = require('./utils/aria');
+
+var _nodeListToArray = require('./utils/nodeListToArray');
+
+var _nodeListToArray2 = _interopRequireDefault(_nodeListToArray);
+
+var _style = require('./style');
+
+var _style2 = _interopRequireDefault(_style);
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : {
+    default: obj
+  };
+}
+
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+
+function _possibleConstructorReturn(self, call) {
+  if (!self) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return call && (_typeof(call) === "object" || typeof call === "function") ? call : self;
+}
+
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function, not " + _typeof(superClass));
+  }
+
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      enumerable: false,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+}
+
+var ReactTooltip = (0, _staticMethods2.default)(_class = (0, _windowListener2.default)(_class = (0, _customEvent2.default)(_class = (0, _isCapture2.default)(_class = (0, _getEffect2.default)(_class = (0, _trackRemoval2.default)(_class = (_temp = _class2 = function (_React$Component) {
+  _inherits(ReactTooltip, _React$Component);
+
+  function ReactTooltip(props) {
+    _classCallCheck(this, ReactTooltip);
+
+    var _this = _possibleConstructorReturn(this, (ReactTooltip.__proto__ || Object.getPrototypeOf(ReactTooltip)).call(this, props));
+
+    _this.state = {
+      place: props.place || 'top',
+      // Direction of tooltip
+      desiredPlace: props.place || 'top',
+      type: 'dark',
+      // Color theme of tooltip
+      effect: 'float',
+      // float or fixed
+      show: false,
+      border: false,
+      offset: {},
+      extraClass: '',
+      html: false,
+      delayHide: 0,
+      delayShow: 0,
+      event: props.event || null,
+      eventOff: props.eventOff || null,
+      currentEvent: null,
+      // Current mouse event
+      currentTarget: null,
+      // Current target of mouse event
+      ariaProps: (0, _aria.parseAria)(props),
+      // aria- and role attributes
+      isEmptyTip: false,
+      disable: false,
+      originTooltip: null,
+      isMultiline: false
+    };
+
+    _this.bind(['showTooltip', 'updateTooltip', 'hideTooltip', 'getTooltipContent', 'globalRebuild', 'globalShow', 'globalHide', 'onWindowResize', 'mouseOnToolTip']);
+
+    _this.mount = true;
+    _this.delayShowLoop = null;
+    _this.delayHideLoop = null;
+    _this.delayReshow = null;
+    _this.intervalUpdateContent = null;
+    return _this;
+  }
+  /**
+   * For unify the bind and unbind listener
+   */
+
+
+  _createClass(ReactTooltip, [{
+    key: 'bind',
+    value: function bind(methodArray) {
+      var _this2 = this;
+
+      methodArray.forEach(function (method) {
+        _this2[method] = _this2[method].bind(_this2);
+      });
+    }
+  }, {
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      var _props = this.props,
+          insecure = _props.insecure,
+          resizeHide = _props.resizeHide;
+
+      if (insecure) {
+        this.setStyleHeader(); // Set the style to the <link>
+      }
+
+      this.bindListener(); // Bind listener for tooltip
+
+      this.bindWindowEvents(resizeHide); // Bind global event for static method
+    }
+  }, {
+    key: 'componentWillReceiveProps',
+    value: function componentWillReceiveProps(props) {
+      var ariaProps = this.state.ariaProps;
+      var newAriaProps = (0, _aria.parseAria)(props);
+      var isChanged = Object.keys(newAriaProps).some(function (props) {
+        return newAriaProps[props] !== ariaProps[props];
+      });
+
+      if (isChanged) {
+        this.setState({
+          ariaProps: newAriaProps
+        });
+      }
+    }
+  }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+      this.mount = false;
+      this.clearTimer();
+      this.unbindListener();
+      this.removeScrollListener();
+      this.unbindWindowEvents();
+    }
+    /**
+     * Return if the mouse is on the tooltip.
+     * @returns {boolean} true - mouse is on the tooltip
+     */
+
+  }, {
+    key: 'mouseOnToolTip',
+    value: function mouseOnToolTip() {
+      var show = this.state.show;
+
+      if (show && this.tooltipRef) {
+        /* old IE or Firefox work around */
+        if (!this.tooltipRef.matches) {
+          /* old IE work around */
+          if (this.tooltipRef.msMatchesSelector) {
+            this.tooltipRef.matches = this.tooltipRef.msMatchesSelector;
+          } else {
+            /* old Firefox work around */
+            this.tooltipRef.matches = this.tooltipRef.mozMatchesSelector;
+          }
+        }
+
+        return this.tooltipRef.matches(':hover');
+      }
+
+      return false;
+    }
+    /**
+     * Pick out corresponded target elements
+     */
+
+  }, {
+    key: 'getTargetArray',
+    value: function getTargetArray(id) {
+      var targetArray = void 0;
+
+      if (!id) {
+        targetArray = document.querySelectorAll('[data-tip]:not([data-for])');
+      } else {
+        var escaped = id.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+        targetArray = document.querySelectorAll('[data-tip][data-for="' + escaped + '"]');
+      } // targetArray is a NodeList, convert it to a real array
+
+
+      return (0, _nodeListToArray2.default)(targetArray);
+    }
+    /**
+     * Bind listener to the target elements
+     * These listeners used to trigger showing or hiding the tooltip
+     */
+
+  }, {
+    key: 'bindListener',
+    value: function bindListener() {
+      var _this3 = this;
+
+      var _props2 = this.props,
+          id = _props2.id,
+          globalEventOff = _props2.globalEventOff,
+          isCapture = _props2.isCapture;
+      var targetArray = this.getTargetArray(id);
+      targetArray.forEach(function (target) {
+        var isCaptureMode = _this3.isCapture(target);
+
+        var effect = _this3.getEffect(target);
+
+        if (target.getAttribute('currentItem') === null) {
+          target.setAttribute('currentItem', 'false');
+        }
+
+        _this3.unbindBasicListener(target);
+
+        if (_this3.isCustomEvent(target)) {
+          _this3.customBindListener(target);
+
+          return;
+        }
+
+        target.addEventListener('mouseenter', _this3.showTooltip, isCaptureMode);
+
+        if (effect === 'float') {
+          target.addEventListener('mousemove', _this3.updateTooltip, isCaptureMode);
+        }
+
+        target.addEventListener('mouseleave', _this3.hideTooltip, isCaptureMode);
+      }); // Global event to hide tooltip
+
+      if (globalEventOff) {
+        window.removeEventListener(globalEventOff, this.hideTooltip);
+        window.addEventListener(globalEventOff, this.hideTooltip, isCapture);
+      } // Track removal of targetArray elements from DOM
+
+
+      this.bindRemovalTracker();
+    }
+    /**
+     * Unbind listeners on target elements
+     */
+
+  }, {
+    key: 'unbindListener',
+    value: function unbindListener() {
+      var _this4 = this;
+
+      var _props3 = this.props,
+          id = _props3.id,
+          globalEventOff = _props3.globalEventOff;
+      var targetArray = this.getTargetArray(id);
+      targetArray.forEach(function (target) {
+        _this4.unbindBasicListener(target);
+
+        if (_this4.isCustomEvent(target)) _this4.customUnbindListener(target);
+      });
+      if (globalEventOff) window.removeEventListener(globalEventOff, this.hideTooltip);
+      this.unbindRemovalTracker();
+    }
+    /**
+     * Invoke this before bind listener and ummount the compont
+     * it is necessary to invloke this even when binding custom event
+     * so that the tooltip can switch between custom and default listener
+     */
+
+  }, {
+    key: 'unbindBasicListener',
+    value: function unbindBasicListener(target) {
+      var isCaptureMode = this.isCapture(target);
+      target.removeEventListener('mouseenter', this.showTooltip, isCaptureMode);
+      target.removeEventListener('mousemove', this.updateTooltip, isCaptureMode);
+      target.removeEventListener('mouseleave', this.hideTooltip, isCaptureMode);
+    }
+  }, {
+    key: 'getTooltipContent',
+    value: function getTooltipContent() {
+      var _props4 = this.props,
+          getContent = _props4.getContent,
+          children = _props4.children; // Generate tooltip content
+
+      var content = void 0;
+
+      if (getContent) {
+        if (Array.isArray(getContent)) {
+          content = getContent[0] && getContent[0](this.state.originTooltip);
+        } else {
+          content = getContent(this.state.originTooltip);
+        }
+      }
+
+      return (0, _getTipContent2.default)(this.state.originTooltip, children, content, this.state.isMultiline);
+    }
+  }, {
+    key: 'isEmptyTip',
+    value: function isEmptyTip(placeholder) {
+      return typeof placeholder === 'string' && placeholder === '' || placeholder === null;
+    }
+    /**
+     * When mouse enter, show the tooltip
+     */
+
+  }, {
+    key: 'showTooltip',
+    value: function showTooltip(e, isGlobalCall) {
+      if (isGlobalCall) {
+        // Don't trigger other elements belongs to other ReactTooltip
+        var targetArray = this.getTargetArray(this.props.id);
+        var isMyElement = targetArray.some(function (ele) {
+          return ele === e.currentTarget;
+        });
+        if (!isMyElement) return;
+      } // Get the tooltip content
+      // calculate in this phrase so that tip width height can be detected
+
+
+      var _props5 = this.props,
+          multiline = _props5.multiline,
+          getContent = _props5.getContent;
+      var originTooltip = e.currentTarget.getAttribute('data-tip');
+      var isMultiline = e.currentTarget.getAttribute('data-multiline') || multiline || false; // If it is focus event or called by ReactTooltip.show, switch to `solid` effect
+
+      var switchToSolid = e instanceof window.FocusEvent || isGlobalCall; // if it needs to skip adding hide listener to scroll
+
+      var scrollHide = true;
+
+      if (e.currentTarget.getAttribute('data-scroll-hide')) {
+        scrollHide = e.currentTarget.getAttribute('data-scroll-hide') === 'true';
+      } else if (this.props.scrollHide != null) {
+        scrollHide = this.props.scrollHide;
+      } // Make sure the correct place is set
+
+
+      var desiredPlace = e.currentTarget.getAttribute('data-place') || this.props.place || 'top';
+      var effect = switchToSolid && 'solid' || this.getEffect(e.currentTarget);
+      var offset = e.currentTarget.getAttribute('data-offset') || this.props.offset || {};
+      var result = (0, _getPosition2.default)(e, e.currentTarget, _reactDom2.default.findDOMNode(this), desiredPlace, desiredPlace, effect, offset);
+      var place = result.isNewState ? result.newState.place : desiredPlace; // To prevent previously created timers from triggering
+
+      this.clearTimer();
+      var target = e.currentTarget;
+      var reshowDelay = this.state.show ? target.getAttribute('data-delay-update') || this.props.delayUpdate : 0;
+      var self = this;
+
+      var updateState = function updateState() {
+        self.setState({
+          originTooltip: originTooltip,
+          isMultiline: isMultiline,
+          desiredPlace: desiredPlace,
+          place: place,
+          type: target.getAttribute('data-type') || self.props.type || 'dark',
+          effect: effect,
+          offset: offset,
+          html: target.getAttribute('data-html') ? target.getAttribute('data-html') === 'true' : self.props.html || false,
+          delayShow: target.getAttribute('data-delay-show') || self.props.delayShow || 0,
+          delayHide: target.getAttribute('data-delay-hide') || self.props.delayHide || 0,
+          delayUpdate: target.getAttribute('data-delay-update') || self.props.delayUpdate || 0,
+          border: target.getAttribute('data-border') ? target.getAttribute('data-border') === 'true' : self.props.border || false,
+          extraClass: target.getAttribute('data-class') || self.props.class || self.props.className || '',
+          disable: target.getAttribute('data-tip-disable') ? target.getAttribute('data-tip-disable') === 'true' : self.props.disable || false,
+          currentTarget: target
+        }, function () {
+          if (scrollHide) self.addScrollListener(self.state.currentTarget);
+          self.updateTooltip(e);
+
+          if (getContent && Array.isArray(getContent)) {
+            self.intervalUpdateContent = setInterval(function () {
+              if (self.mount) {
+                var _getContent = self.props.getContent;
+                var placeholder = (0, _getTipContent2.default)(originTooltip, '', _getContent[0](), isMultiline);
+                var isEmptyTip = self.isEmptyTip(placeholder);
+                self.setState({
+                  isEmptyTip: isEmptyTip
+                });
+                self.updatePosition();
+              }
+            }, getContent[1]);
+          }
+        });
+      }; // If there is no delay call immediately, don't allow events to get in first.
+
+
+      if (reshowDelay) {
+        this.delayReshow = setTimeout(updateState, reshowDelay);
+      } else {
+        updateState();
+      }
+    }
+    /**
+     * When mouse hover, updatetooltip
+     */
+
+  }, {
+    key: 'updateTooltip',
+    value: function updateTooltip(e) {
+      var _this5 = this;
+
+      var _state = this.state,
+          delayShow = _state.delayShow,
+          disable = _state.disable;
+      var afterShow = this.props.afterShow;
+      var placeholder = this.getTooltipContent();
+      var delayTime = parseInt(delayShow, 10);
+      var eventTarget = e.currentTarget || e.target; // Check if the mouse is actually over the tooltip, if so don't hide the tooltip
+
+      if (this.mouseOnToolTip()) {
+        return;
+      }
+
+      if (this.isEmptyTip(placeholder) || disable) return; // if the tooltip is empty, disable the tooltip
+
+      var updateState = function updateState() {
+        if (Array.isArray(placeholder) && placeholder.length > 0 || placeholder) {
+          var isInvisible = !_this5.state.show;
+
+          _this5.setState({
+            currentEvent: e,
+            currentTarget: eventTarget,
+            show: true
+          }, function () {
+            _this5.updatePosition();
+
+            if (isInvisible && afterShow) afterShow(e);
+          });
+        }
+      };
+
+      clearTimeout(this.delayShowLoop);
+
+      if (delayShow) {
+        this.delayShowLoop = setTimeout(updateState, delayTime);
+      } else {
+        updateState();
+      }
+    }
+    /*
+    * If we're mousing over the tooltip remove it when we leave.
+     */
+
+  }, {
+    key: 'listenForTooltipExit',
+    value: function listenForTooltipExit() {
+      var show = this.state.show;
+
+      if (show && this.tooltipRef) {
+        this.tooltipRef.addEventListener('mouseleave', this.hideTooltip);
+      }
+    }
+  }, {
+    key: 'removeListenerForTooltipExit',
+    value: function removeListenerForTooltipExit() {
+      var show = this.state.show;
+
+      if (show && this.tooltipRef) {
+        this.tooltipRef.removeEventListener('mouseleave', this.hideTooltip);
+      }
+    }
+    /**
+     * When mouse leave, hide tooltip
+     */
+
+  }, {
+    key: 'hideTooltip',
+    value: function hideTooltip(e, hasTarget) {
+      var _this6 = this;
+
+      var _state2 = this.state,
+          delayHide = _state2.delayHide,
+          disable = _state2.disable;
+      var afterHide = this.props.afterHide;
+      var placeholder = this.getTooltipContent();
+      if (!this.mount) return;
+      if (this.isEmptyTip(placeholder) || disable) return; // if the tooltip is empty, disable the tooltip
+
+      if (hasTarget) {
+        // Don't trigger other elements belongs to other ReactTooltip
+        var targetArray = this.getTargetArray(this.props.id);
+        var isMyElement = targetArray.some(function (ele) {
+          return ele === e.currentTarget;
+        });
+        if (!isMyElement || !this.state.show) return;
+      }
+
+      var resetState = function resetState() {
+        var isVisible = _this6.state.show; // Check if the mouse is actually over the tooltip, if so don't hide the tooltip
+
+        if (_this6.mouseOnToolTip()) {
+          _this6.listenForTooltipExit();
+
+          return;
+        }
+
+        _this6.removeListenerForTooltipExit();
+
+        _this6.setState({
+          show: false
+        }, function () {
+          _this6.removeScrollListener();
+
+          if (isVisible && afterHide) afterHide(e);
+        });
+      };
+
+      this.clearTimer();
+
+      if (delayHide) {
+        this.delayHideLoop = setTimeout(resetState, parseInt(delayHide, 10));
+      } else {
+        resetState();
+      }
+    }
+    /**
+     * Add scroll eventlistener when tooltip show
+     * automatically hide the tooltip when scrolling
+     */
+
+  }, {
+    key: 'addScrollListener',
+    value: function addScrollListener(currentTarget) {
+      var isCaptureMode = this.isCapture(currentTarget);
+      window.addEventListener('scroll', this.hideTooltip, isCaptureMode);
+    }
+  }, {
+    key: 'removeScrollListener',
+    value: function removeScrollListener() {
+      window.removeEventListener('scroll', this.hideTooltip);
+    } // Calculation the position
+
+  }, {
+    key: 'updatePosition',
+    value: function updatePosition() {
+      var _this7 = this;
+
+      var _state3 = this.state,
+          currentEvent = _state3.currentEvent,
+          currentTarget = _state3.currentTarget,
+          place = _state3.place,
+          desiredPlace = _state3.desiredPlace,
+          effect = _state3.effect,
+          offset = _state3.offset;
+
+      var node = _reactDom2.default.findDOMNode(this);
+
+      var result = (0, _getPosition2.default)(currentEvent, currentTarget, node, place, desiredPlace, effect, offset);
+
+      if (result.isNewState) {
+        // Switch to reverse placement
+        return this.setState(result.newState, function () {
+          _this7.updatePosition();
+        });
+      } // Set tooltip position
+
+
+      node.style.left = result.position.left + 'px';
+      node.style.top = result.position.top + 'px';
+    }
+    /**
+     * Set style tag in header
+     * in this way we can insert default css
+     */
+
+  }, {
+    key: 'setStyleHeader',
+    value: function setStyleHeader() {
+      var head = document.getElementsByTagName('head')[0];
+
+      if (!head.querySelector('style[id="react-tooltip"]')) {
+        var tag = document.createElement('style');
+        tag.id = 'react-tooltip';
+        tag.innerHTML = _style2.default;
+        /* eslint-disable */
+
+        if (typeof __webpack_nonce__ !== 'undefined' && __webpack_nonce__) {
+          tag.setAttribute('nonce', __webpack_nonce__);
+        }
+        /* eslint-enable */
+
+
+        head.insertBefore(tag, head.firstChild);
+      }
+    }
+    /**
+     * CLear all kinds of timeout of interval
+     */
+
+  }, {
+    key: 'clearTimer',
+    value: function clearTimer() {
+      clearTimeout(this.delayShowLoop);
+      clearTimeout(this.delayHideLoop);
+      clearTimeout(this.delayReshow);
+      clearInterval(this.intervalUpdateContent);
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this8 = this;
+
+      var _state4 = this.state,
+          extraClass = _state4.extraClass,
+          html = _state4.html,
+          ariaProps = _state4.ariaProps,
+          disable = _state4.disable;
+      var placeholder = this.getTooltipContent();
+      var isEmptyTip = this.isEmptyTip(placeholder);
+      var tooltipClass = (0, _classnames2.default)('__react_component_tooltip', {
+        'show': this.state.show && !disable && !isEmptyTip
+      }, {
+        'border': this.state.border
+      }, {
+        'place-top': this.state.place === 'top'
+      }, {
+        'place-bottom': this.state.place === 'bottom'
+      }, {
+        'place-left': this.state.place === 'left'
+      }, {
+        'place-right': this.state.place === 'right'
+      }, {
+        'type-dark': this.state.type === 'dark'
+      }, {
+        'type-success': this.state.type === 'success'
+      }, {
+        'type-warning': this.state.type === 'warning'
+      }, {
+        'type-error': this.state.type === 'error'
+      }, {
+        'type-info': this.state.type === 'info'
+      }, {
+        'type-light': this.state.type === 'light'
+      }, {
+        'allow_hover': this.props.delayUpdate
+      }, {
+        'allow_click': this.props.clickable
+      });
+      var Wrapper = this.props.wrapper;
+
+      if (ReactTooltip.supportedWrappers.indexOf(Wrapper) < 0) {
+        Wrapper = ReactTooltip.defaultProps.wrapper;
+      }
+
+      if (html) {
+        return _react2.default.createElement(Wrapper, _extends({
+          className: tooltipClass + ' ' + extraClass,
+          id: this.props.id,
+          ref: function ref(_ref) {
+            return _this8.tooltipRef = _ref;
+          }
+        }, ariaProps, {
+          'data-id': 'tooltip',
+          dangerouslySetInnerHTML: {
+            __html: placeholder
+          }
+        }));
+      } else {
+        return _react2.default.createElement(Wrapper, _extends({
+          className: tooltipClass + ' ' + extraClass,
+          id: this.props.id
+        }, ariaProps, {
+          ref: function ref(_ref2) {
+            return _this8.tooltipRef = _ref2;
+          },
+          'data-id': 'tooltip'
+        }), placeholder);
+      }
+    }
+  }]);
+
+  return ReactTooltip;
+}(_react2.default.Component), _class2.propTypes = {
+  children: _propTypes2.default.any,
+  place: _propTypes2.default.string,
+  type: _propTypes2.default.string,
+  effect: _propTypes2.default.string,
+  offset: _propTypes2.default.object,
+  multiline: _propTypes2.default.bool,
+  border: _propTypes2.default.bool,
+  insecure: _propTypes2.default.bool,
+  class: _propTypes2.default.string,
+  className: _propTypes2.default.string,
+  id: _propTypes2.default.string,
+  html: _propTypes2.default.bool,
+  delayHide: _propTypes2.default.number,
+  delayUpdate: _propTypes2.default.number,
+  delayShow: _propTypes2.default.number,
+  event: _propTypes2.default.string,
+  eventOff: _propTypes2.default.string,
+  watchWindow: _propTypes2.default.bool,
+  isCapture: _propTypes2.default.bool,
+  globalEventOff: _propTypes2.default.string,
+  getContent: _propTypes2.default.any,
+  afterShow: _propTypes2.default.func,
+  afterHide: _propTypes2.default.func,
+  disable: _propTypes2.default.bool,
+  scrollHide: _propTypes2.default.bool,
+  resizeHide: _propTypes2.default.bool,
+  wrapper: _propTypes2.default.string,
+  clickable: _propTypes2.default.bool
+}, _class2.defaultProps = {
+  insecure: true,
+  resizeHide: true,
+  wrapper: 'div',
+  clickable: false
+}, _class2.supportedWrappers = ['div', 'span'], _class2.displayName = 'ReactTooltip', _temp)) || _class) || _class) || _class) || _class) || _class) || _class;
+/* export default not fit for standalone, it will exports {default:...} */
+
+
+module.exports = ReactTooltip;
+},{"react":"../node_modules/react/index.js","prop-types":"../node_modules/prop-types/index.js","react-dom":"../node_modules/react-dom/index.js","classnames":"../node_modules/classnames/index.js","./decorators/staticMethods":"../node_modules/react-tooltip/dist/decorators/staticMethods.js","./decorators/windowListener":"../node_modules/react-tooltip/dist/decorators/windowListener.js","./decorators/customEvent":"../node_modules/react-tooltip/dist/decorators/customEvent.js","./decorators/isCapture":"../node_modules/react-tooltip/dist/decorators/isCapture.js","./decorators/getEffect":"../node_modules/react-tooltip/dist/decorators/getEffect.js","./decorators/trackRemoval":"../node_modules/react-tooltip/dist/decorators/trackRemoval.js","./utils/getPosition":"../node_modules/react-tooltip/dist/utils/getPosition.js","./utils/getTipContent":"../node_modules/react-tooltip/dist/utils/getTipContent.js","./utils/aria":"../node_modules/react-tooltip/dist/utils/aria.js","./utils/nodeListToArray":"../node_modules/react-tooltip/dist/utils/nodeListToArray.js","./style":"../node_modules/react-tooltip/dist/style.js"}],"../src/components/Page/MainPage.tsx":[function(require,module,exports) {
 "use strict";
 
 var __makeTemplateObject = this && this.__makeTemplateObject || function (cooked, raw) {
@@ -89923,8 +89914,11 @@ var react_flow_chart_1 = require("@mrblenny/react-flow-chart");
 
 var styled_components_1 = __importDefault(require("styled-components"));
 
+var react_tooltip_1 = __importDefault(require("react-tooltip"));
+
 var AppLayout = styled_components_1.default.div(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n  display: flex;\n  flex-direction: column;\n  flex: 1;\n  max-width: 100vw;\n  max-height: 100vh;\n"], ["\n  display: flex;\n  flex-direction: column;\n  flex: 1;\n  max-width: 100vw;\n  max-height: 100vh;\n"])));
 var Content = styled_components_1.default.div(templateObject_2 || (templateObject_2 = __makeTemplateObject(["\n  display: flex;\n  flex-direction: column;\n  flex: 1 1 auto;\n  overflow: hidden;\n"], ["\n  display: flex;\n  flex-direction: column;\n  flex: 1 1 auto;\n  overflow: hidden;\n"])));
+var StyledTooltip = styled_components_1.default(react_tooltip_1.default)(templateObject_3 || (templateObject_3 = __makeTemplateObject(["\n  max-width: 300px;\n"], ["\n  max-width: 300px;\n"])));
 
 var MainPage =
 /** @class */
@@ -89961,15 +89955,18 @@ function (_super) {
     })), react_1.default.createElement(__1.OperatorSidebar, {
       operators: app.state.operators,
       refreshOperators: refreshOperators
-    }))));
+    }))), react_1.default.createElement(StyledTooltip, {
+      effect: "solid",
+      place: "right"
+    }));
   };
 
   return MainPage;
 }(react_1.default.Component);
 
 exports.MainPage = MainPage;
-var templateObject_1, templateObject_2;
-},{"react":"../node_modules/react/index.js","..":"../src/components/index.ts","../Theme":"../src/components/Theme.tsx","@mrblenny/react-flow-chart":"../node_modules/@mrblenny/react-flow-chart/src/index.js","styled-components":"../node_modules/styled-components/dist/styled-components.browser.esm.js"}],"../src/components/Page/Page.tsx":[function(require,module,exports) {
+var templateObject_1, templateObject_2, templateObject_3;
+},{"react":"../node_modules/react/index.js","..":"../src/components/index.ts","../Theme":"../src/components/Theme.tsx","@mrblenny/react-flow-chart":"../node_modules/@mrblenny/react-flow-chart/src/index.js","styled-components":"../node_modules/styled-components/dist/styled-components.browser.esm.js","react-tooltip":"../node_modules/react-tooltip/dist/index.js"}],"../src/components/Page/Page.tsx":[function(require,module,exports) {
 "use strict";
 
 var __makeTemplateObject = this && this.__makeTemplateObject || function (cooked, raw) {
@@ -91145,6 +91142,7 @@ exports.DropdownNavbar = function (props) {
   var filename = props.filename,
       icon = props.icon,
       brand = props.brand,
+      buttons = props.buttons,
       dropdownHandlers = props.dropdownHandlers,
       renameHandler = props.renameHandler;
 
@@ -91157,18 +91155,29 @@ exports.DropdownNavbar = function (props) {
   return React.createElement(Navbar, null, React.createElement(Brand, {
     href: brand.to
   }, icon), React.createElement(DropDownSplit, null, React.createElement(Ul, null, React.createElement(Filename, {
+    "data-tip": "Rename",
     onClick: function onClick() {
       return renameHandler();
     }
-  }, filename)), React.createElement(Ul, null, React.createElement(DropdownButtons, null))));
+  }, filename)), React.createElement(Ul, null, React.createElement(DropdownButtons, null)), React.createElement(Ul, null, [].concat.apply([], buttons.map(function (b, i) {
+    return React.createElement(MenuItem, {
+      "data-tip": b.tooltip,
+      "data-place": "bottom",
+      key: "navbar-button-" + i,
+      onClick: function onClick() {
+        return b.callback();
+      }
+    }, b.icon);
+  })))));
 };
 
 var Navbar = styled_components_1.default.nav(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n  background: ", ";\n  font-family: ", ";\n  color: ", ";\n  display: flex;\n  flex: 1;\n  align-items: center;\n  a {\n    color: ", ";\n    text-decoration: none;\n  }\n"], ["\n  background: ", ";\n  font-family: ", ";\n  color: ", ";\n  display: flex;\n  flex: 1;\n  align-items: center;\n  a {\n    color: ", ";\n    text-decoration: none;\n  }\n"])), Theme_1.Theme.colors.dark, Theme_1.Theme.fonts.heading, Theme_1.Theme.colors.light, Theme_1.Theme.colors.light);
 var Brand = styled_components_1.default.a(templateObject_2 || (templateObject_2 = __makeTemplateObject(["\n  width: 7vh;\n  height: 7vh;\n  position: relative;\n  font-weight: bold;\n  font-style: italic;\n  margin: 0.2rem 0.5rem 0.2rem 0.5rem;\n"], ["\n  width: 7vh;\n  height: 7vh;\n  position: relative;\n  font-weight: bold;\n  font-style: italic;\n  margin: 0.2rem 0.5rem 0.2rem 0.5rem;\n"])));
 var DropDownSplit = styled_components_1.default.div(templateObject_3 || (templateObject_3 = __makeTemplateObject(["\n  display: flex;\n  flex-direction: column;\n  flex: 1;\n"], ["\n  display: flex;\n  flex-direction: column;\n  flex: 1;\n"])));
 var Filename = styled_components_1.default.div(templateObject_4 || (templateObject_4 = __makeTemplateObject(["\n  padding: 3px 12px;\n  color: white;\n  text-align: left;\n  font-size: ", ";\n  transition: 0.3s ease all;\n  border-radius: 3px;\n  cursor: pointer;\n  &:hover {\n    background: ", ";\n  }\n"], ["\n  padding: 3px 12px;\n  color: white;\n  text-align: left;\n  font-size: ", ";\n  transition: 0.3s ease all;\n  border-radius: 3px;\n  cursor: pointer;\n  &:hover {\n    background: ", ";\n  }\n"])), Theme_1.Theme.fonts.headingSize, Theme_1.Theme.colors.darkAccent);
-var Ul = styled_components_1.default.div(templateObject_5 || (templateObject_5 = __makeTemplateObject(["\n  margin: 0px 0px;\n  display: flex;\n  flex-wrap: nowrap;\n  -webkit-overflow-scrolling: touch;\n"], ["\n  margin: 0px 0px;\n  display: flex;\n  flex-wrap: nowrap;\n  -webkit-overflow-scrolling: touch;\n"])));
-var templateObject_1, templateObject_2, templateObject_3, templateObject_4, templateObject_5;
+var MenuItem = styled_components_1.default.div(templateObject_5 || (templateObject_5 = __makeTemplateObject(["\n  font-size: ", ";\n  padding: 3px 12px;\n  &:hover {\n    box-shadow: 30px 30px 30px rgba(0, 0, 0, 0.5) inset;\n  }\n  &:active {\n    background: #5682d2;\n  }\n"], ["\n  font-size: ", ";\n  padding: 3px 12px;\n  &:hover {\n    box-shadow: 30px 30px 30px rgba(0, 0, 0, 0.5) inset;\n  }\n  &:active {\n    background: #5682d2;\n  }\n"])), Theme_1.Theme.fonts.subHeadingSize);
+var Ul = styled_components_1.default.div(templateObject_6 || (templateObject_6 = __makeTemplateObject(["\n  margin: 0px 0px;\n  display: flex;\n  flex-wrap: nowrap;\n  -webkit-overflow-scrolling: touch;\n"], ["\n  margin: 0px 0px;\n  display: flex;\n  flex-wrap: nowrap;\n  -webkit-overflow-scrolling: touch;\n"])));
+var templateObject_1, templateObject_2, templateObject_3, templateObject_4, templateObject_5, templateObject_6;
 },{"react":"../node_modules/react/index.js","styled-components":"../node_modules/styled-components/dist/styled-components.browser.esm.js","../Theme":"../src/components/Theme.tsx"}],"../src/components/Navbar/NavbarDropdowns.tsx":[function(require,module,exports) {
 "use strict";
 
@@ -91618,11 +91627,11 @@ var React = __importStar(require("react"));
 
 var react_dom_1 = require("react-dom");
 
+var fa_1 = require("react-icons/fa");
+
 var ApiClient_1 = require("./ApiClient");
 
 var components_1 = require("./components");
-
-var MenuItems = __importStar(require("./components/Navbar/NavbarDropdowns"));
 
 var defaultChartState_1 = require("./misc/defaultChartState");
 
@@ -91663,34 +91672,44 @@ function (_super) {
       renameHandler: function renameHandler() {
         return _this.toggleRenameBox();
       },
-      dropdownHandlers: [{
-        name: "File",
+      buttons: [{
+        tooltip: "New WML",
+        icon: React.createElement(fa_1.FaFile, null),
         callback: function callback() {
-          return React.createElement(MenuItems.FileDropdown, {
-            getApp: function getApp() {
-              return _this;
-            }
-          });
+          return _this.newWml();
         }
       }, {
-        name: "View",
+        tooltip: "Open WML",
+        icon: React.createElement(fa_1.FaFolderOpen, null),
         callback: function callback() {
-          return React.createElement(MenuItems.ViewDropdown, {
-            getApp: function getApp() {
-              return _this;
-            }
-          });
+          return _this.toggleFileBrowser();
         }
       }, {
-        name: "Help",
+        tooltip: "Save WML",
+        icon: React.createElement(fa_1.FaSave, null),
         callback: function callback() {
-          return React.createElement(MenuItems.HelpDropdown, {
-            getApp: function getApp() {
-              return _this;
-            }
-          });
+          return _this.saveWml();
         }
-      }]
+      }, {
+        tooltip: "Covnert to Python DAG",
+        icon: React.createElement(fa_1.FaProjectDiagram, null),
+        callback: function callback() {
+          return console.log("Convert to Python");
+        }
+      }],
+      dropdownHandlers: [// {
+        //   name: "File",
+        //   callback: () => <MenuItems.FileDropdown getApp={() => this} />
+        // },
+        // {
+        //   name: "View",
+        //   callback: () => <MenuItems.ViewDropdown getApp={() => this} />
+        // },
+        // {
+        //   name: "Help",
+        //   callback: () => <MenuItems.HelpDropdown getApp={() => this} />
+        // }
+      ]
     };
     _this.state = localStorage.get("windmillChart") || lodash_1.cloneDeep(defaultChartState_1.defaultChart);
     _this.newWml = _this.newWml.bind(_this);
@@ -91913,7 +91932,7 @@ function (_super) {
 
 exports.App = App;
 react_dom_1.render(React.createElement(App, null), document.getElementById("root"));
-},{"@mrblenny/react-flow-chart":"../node_modules/@mrblenny/react-flow-chart/src/index.js","local-storage":"../node_modules/local-storage/local-storage.js","lodash":"../node_modules/lodash/lodash.js","react":"../node_modules/react/index.js","react-dom":"../node_modules/react-dom/index.js","./ApiClient":"../src/ApiClient.tsx","./components":"../src/components/index.ts","./components/Navbar/NavbarDropdowns":"../src/components/Navbar/NavbarDropdowns.tsx","./misc/defaultChartState":"../src/misc/defaultChartState.ts","./misc/icon":"../src/misc/icon.tsx"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"@mrblenny/react-flow-chart":"../node_modules/@mrblenny/react-flow-chart/src/index.js","local-storage":"../node_modules/local-storage/local-storage.js","lodash":"../node_modules/lodash/lodash.js","react":"../node_modules/react/index.js","react-dom":"../node_modules/react-dom/index.js","react-icons/fa":"../node_modules/react-icons/fa/index.esm.js","./ApiClient":"../src/ApiClient.tsx","./components":"../src/components/index.ts","./misc/defaultChartState":"../src/misc/defaultChartState.ts","./misc/icon":"../src/misc/icon.tsx"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -91941,7 +91960,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49180" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49893" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

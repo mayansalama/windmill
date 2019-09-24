@@ -7,13 +7,21 @@ VALID_PARAMETER_TYPES = (
     "str",
     "dict",
     "list",
-    "mapping",
     "bool",
     "int",
     "float",
     "datetime.timedelta",
     "datetime.datetime",
+    "callable",
 )
+
+PARAMETER_MAPPINGS = {
+    "mapping": "dict",
+    "python_callable": "callable",
+    "python callable": "callable",
+    "lambda": "callable",
+    "function": "callable",
+}
 
 
 def validate_parameter_type(typ):

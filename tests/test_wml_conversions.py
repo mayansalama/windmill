@@ -38,7 +38,7 @@ class TestWmlMarshalling(Fixture):
         assert res.strip() == self.valid_py.strip()
 
     def test_link_bitshift_conversions(self):
-        # This example is defined in the graph_to_efficient_representation method
+        # This example is defined in the graph_to_efficient_representation docs
         G = nx.DiGraph()
         G.add_edge(1, 2)
         G.add_edge(1, 3)
@@ -104,8 +104,8 @@ class TestDagHandlerMarhsalling(Fixture):
     def test_invalid_dag_fails(self):
         # Add in an additional link that closes the loop - this should break the test
         existing_link = deepcopy(self.valid_wml_dict)["links"].popitem()[1]
-        self.valid_wml_dict["links"]["a broken link"] = {
-            "id": "a broken link",
+        self.valid_wml_dict["links"]["a cyclical link"] = {
+            "id": "a cyclical link",
             "from_node": {"nodeId": existing_link["to_node"]["nodeId"]},
             "to_node": {"nodeId": existing_link["from_node"]["nodeId"]},
         }

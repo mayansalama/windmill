@@ -40,15 +40,11 @@ export interface IAirflowOperatorParameter {
     | "bool"
     | "dict"
     | "list"
-    | "str"
-    | "dict"
-    | "list"
-    | "mapping"
-    | "bool"
     | "int"
     | "float"
     | "datetime.timedelta"
-    | "datetime.datetime";
+    | "datetime.datetime"
+    | "callable";
   value?: string;
   default?: string;
   description?: string;

@@ -4,13 +4,13 @@ from {{ task.module }} import {{ task.operator_type}}
 {% endfor %}
 
 {% for func in dag.callables %}
-def {{ func.name }}(**kwargs):
+def {{ func.name }}((*args, **kwargs):
     {{ func.method }}
 {%- endfor %}
 
 {% for task in dag.tasks %}
 {% for func in task.callables %}
-def {{ func.name }}(**kwargs):
+def {{ func.name }}(*args, **kwargs):
     {{ func.method }}
 {% endfor %}
 {% endfor %}
@@ -23,4 +23,4 @@ def {{ func.name }}(**kwargs):
 
 {% for path in dag.links.paths %}
 {{ path | safe }}
-{% endfor %}
+{%- endfor %}

@@ -6,7 +6,11 @@ from copy import deepcopy
 from docstring_parser import parse
 
 from ..exceptions import DocstringParseError
-from ..models.schemas.app_schemas import validate_parameter_type, VALID_PARAMETER_TYPES
+from ..models.schemas.app_schemas import (
+    validate_parameter_type,
+    VALID_PARAMETER_TYPES,
+    PARAMETER_MAPPINGS,
+)
 
 
 class ClassParser:
@@ -14,6 +18,14 @@ class ClassParser:
     def fix_types(cls, typ: str):
         if typ.lower().startswith("a "):
             typ = typ[2:]
+
+        for root, mapping in PARAMETER_MAPPINGS.items():
+            if typ.startswith(root):
+                typ = mapping
+
+        if typ in PARAMETER_MAPPINGS:
+            typ = PARAMETER_MAPPINGS[typ]
+
         for root in VALID_PARAMETER_TYPES:
             if typ.startswith(root):
                 typ = root

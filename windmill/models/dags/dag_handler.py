@@ -199,7 +199,7 @@ class Links:
 
     def get_bitshift_paths(self):
         paths = self.graph_to_efficient_representation(self.graph)
-        return [" >> ".join(path) for path in paths]
+        return [" >> ".join(path) for path in paths if len(path) > 1]
 
 
 class DagHandler(_ParamHandler):
@@ -269,6 +269,11 @@ class DagHandler(_ParamHandler):
         return [task for task in self.tasks if task.python_callable]
 
     def compile_to_python(self):
+        """Compiles the Dag Instance into Python code 
+        
+        Returns:
+            [str]: The formatted DAG 
+        """
         template = self.env.get_template("dag.j2")
         res = template.render(dag=self)
         return black.format_str(res, line_length=80)
