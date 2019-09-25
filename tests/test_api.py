@@ -78,8 +78,8 @@ class TestV1Dag(Fixture):
 
         assert res.status_code == 201
 
-        with open(os.path.join(self.base_path, "Valid.py"), "r") as f:
-            assert f.read().strip() == test_datafiles["Valid.py"].strip()
+        with open(os.path.join(self.base_path, "valid_dag.py"), "r") as f:
+            assert f.read().strip() == test_datafiles["valid.py"].strip()
 
     def test_post_invalid_wml(self):
         data = {"no": "data"}

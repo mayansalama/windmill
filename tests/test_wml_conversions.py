@@ -14,7 +14,7 @@ from . import test_datafiles
 
 class Fixture(TestCase):
     def setUp(self):
-        self.valid_py = test_datafiles["Valid.py"]
+        self.valid_py = test_datafiles["valid.py"]
 
         self.valid_wml = json.loads(test_datafiles["Valid.wml"])
         self.valid_wml_dict = MinimalWmlSchema().load(
