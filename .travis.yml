@@ -19,6 +19,7 @@ before_deploy:
 - poetry build
 deploy:
   provider: script
+  skip_cleanup: true
   script: poetry publish
   on:
     tags: true
