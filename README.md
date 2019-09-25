@@ -97,9 +97,9 @@ To run as a dev:
 
 Deployment to PyPi is managed using Travis and should be done in the following steps:
 
-1. Commit and merge code into the master branch
-2. Ensure that the travis build is green
-3. Run `poetry version {patch|minor|major}`
-4. Increment the version number in `windmill/__init__.py`
+1. Run `poetry version {patch|minor|major}`
+2. Increment the version number in `windmill/__init__.py`
+3. Commit and merge code into the master branch
+4. Ensure that the travis build is green
 5. Create a git tag for the new build
 6. Push the tag to origin
