@@ -73,8 +73,8 @@ const Navbar = styled.nav`
 `;
 
 const Brand = styled.a`
-  width: 7vh;
-  height: 7vh;
+  width: 5.5vh;
+  height: 5.5vh;
   position: relative;
   font-weight: bold;
   font-style: italic;

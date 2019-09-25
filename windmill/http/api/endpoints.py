@@ -54,7 +54,7 @@ def get_operators():
 @app.route("/v1/wml/<name>", methods=["GET"])
 def get_wmls(name=None):
     logging.info(f"GET /v1/wml/{name}")
-    
+
     if name:
         f_path = os.path.join(app.config["project_conf"].wml_dir, name)
         if os.path.exists(f_path):
@@ -116,7 +116,9 @@ def post_dag(name):
             logging.exception(f"Unknwon error while converting WML {name}")
             return f"Internal error converting WML", 500
 
-        f_path = os.path.join(app.config["project_conf"].dags_dir, f'{wml_dict_parsed["filename"]}.py')
+        f_path = os.path.join(
+            app.config["project_conf"].dags_dir, f"{dag_handler.snake_name}.py"
+        )
         with open(f_path, "w") as f:
             f.write(py_content)
 

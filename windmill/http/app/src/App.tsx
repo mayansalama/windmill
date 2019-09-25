@@ -34,15 +34,16 @@ export class App extends React.Component<{}, IAppState> {
     super(props);
     this.state = localStorage.get("windmillChart") || cloneDeep(defaultChart);
 
+    this.convertToDag = this.convertToDag.bind(this);
     this.newWml = this.newWml.bind(this);
-    this.updateFilename = this.updateFilename.bind(this);
-    this.updateNodeProperties = this.updateNodeProperties.bind(this);
-    this.updateDag = this.updateDag.bind(this);
     this.refreshOperators = this.refreshOperators.bind(this);
     this.refreshDag = this.refreshDag.bind(this);
     this.toggleFileBrowser = this.toggleFileBrowser.bind(this);
     this.toggleRenameBox = this.toggleRenameBox.bind(this);
     this.saveWml = this.saveWml.bind(this);
+    this.updateFilename = this.updateFilename.bind(this);
+    this.updateNodeProperties = this.updateNodeProperties.bind(this);
+    this.updateDag = this.updateDag.bind(this);
   }
 
   public componentDidMount() {
@@ -181,19 +182,19 @@ export class App extends React.Component<{}, IAppState> {
         callback: () => this.newWml()
       },
       {
-        tooltip: "Open WML",
-        icon: <FaFolderOpen />,
-        callback: () => this.toggleFileBrowser()
-      },
-      {
         tooltip: "Save WML",
         icon: <FaSave />,
         callback: () => this.saveWml()
       },
       {
+        tooltip: "Open WML",
+        icon: <FaFolderOpen />,
+        callback: () => this.toggleFileBrowser()
+      },
+      {
         tooltip: "Covnert to Python DAG",
         icon: <FaProjectDiagram />,
-        callback: () => console.log("Convert to Python")
+        callback: () => this.convertToDag()
       }
     ],
     dropdownHandlers: [
@@ -239,6 +240,13 @@ export class App extends React.Component<{}, IAppState> {
     const persistentState = { offset, filename, dag, nodes, links };
 
     this.apiClient.saveWml(`${this.state.filename}.wml`, persistentState);
+  }
+
+  public convertToDag() {
+    const { offset, filename, dag, nodes, links } = this.cleanState(this.state);
+    const persistentState = { offset, filename, dag, nodes, links };
+
+    this.apiClient.convertToDag(`${this.state.filename}.wml`, persistentState);
   }
 
   //////////////////////////////////////////////////

@@ -36,7 +36,7 @@ export const BaseSidebar = styled.div`
   overflow: hidden;
 `;
 
-export const LeftPanelDefaultWidth = 400;
+export const LeftPanelDefaultWidth = 350;
 
 export const CanvasStyle = styled.div<ICanvasOuterDefaultProps>`
   position: relative;

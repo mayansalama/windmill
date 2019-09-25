@@ -86840,6 +86840,10 @@ function () {
     return this.perform("POST", "/v1/wml/" + wmlname, wml);
   };
 
+  APIClient.prototype.convertToDag = function (wmlname, wml) {
+    return this.perform("POST", "/v1/dag/" + wmlname, wml);
+  };
+
   APIClient.prototype.perform = function (method, resource, data) {
     return __awaiter(this, void 0, void 0, function () {
       return __generator(this, function (_a) {
@@ -87334,7 +87338,7 @@ exports.Theme = {
 };
 exports.SidebarTitle = styled_components_1.default.div(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n  font-size: ", ";\n  font-weight: bolder;\n  border: 1px solid ", ";\n  padding: 15px;\n  display: flex;\n  flex: 0 1 auto;\n"], ["\n  font-size: ", ";\n  font-weight: bolder;\n  border: 1px solid ", ";\n  padding: 15px;\n  display: flex;\n  flex: 0 1 auto;\n"])), exports.Theme.fonts.subHeadingSize, exports.Theme.colors.lightAccent);
 exports.BaseSidebar = styled_components_1.default.div(templateObject_2 || (templateObject_2 = __makeTemplateObject(["\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n  overflow: hidden;\n"], ["\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n  overflow: hidden;\n"])));
-exports.LeftPanelDefaultWidth = 400;
+exports.LeftPanelDefaultWidth = 350;
 exports.CanvasStyle = styled_components_1.default.div(templateObject_3 || (templateObject_3 = __makeTemplateObject(["\n  position: relative;\n  background-size: 10px 10px;\n  background-color: white;\n  background-image: linear-gradient(\n      90deg,\n      hsla(0, 10%, 0%, 0.05) 1px,\n      transparent 0\n    ),\n    linear-gradient(180deg, hsla(0, 10%, 0%, 0.05) 1px, transparent 0);\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n  cursor: not-allowed;\n"], ["\n  position: relative;\n  background-size: 10px 10px;\n  background-color: white;\n  background-image: linear-gradient(\n      90deg,\n      hsla(0, 10%, 0%, 0.05) 1px,\n      transparent 0\n    ),\n    linear-gradient(180deg, hsla(0, 10%, 0%, 0.05) 1px, transparent 0);\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n  cursor: not-allowed;\n"])));
 var templateObject_1, templateObject_2, templateObject_3;
 },{"styled-components":"../node_modules/styled-components/dist/styled-components.browser.esm.js"}],"../src/components/Airflow/AirflowNode.tsx":[function(require,module,exports) {
@@ -90002,8 +90006,8 @@ var styled_components_1 = __importStar(require("styled-components"));
 var Theme_1 = require("../Theme");
 
 var GlobalStyle = styled_components_1.createGlobalStyle(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n  body {\n    margin: 0px;\n    max-width: 100vw;\n    max-height: 100vh;\n    overflow: hidden;\n    box-sizing: border-box;\n    font-family: sans-serif;\n  }\n\n  *, :after, :before {\n    box-sizing: inherit;\n  }\n"], ["\n  body {\n    margin: 0px;\n    max-width: 100vw;\n    max-height: 100vh;\n    overflow: hidden;\n    box-sizing: border-box;\n    font-family: sans-serif;\n  }\n\n  *, :after, :before {\n    box-sizing: inherit;\n  }\n"])));
-var NavBarContent = styled_components_1.default.div(templateObject_2 || (templateObject_2 = __makeTemplateObject(["\n  display: flex;\n  flex-direction: row;\n  flex: 1;\n  background: ", ";\n  max-width: 100vw;\n  height: 10vh;\n"], ["\n  display: flex;\n  flex-direction: row;\n  flex: 1;\n  background: ", ";\n  max-width: 100vw;\n  height: 10vh;\n"])), Theme_1.Theme.colors.light);
-var PageContent = styled_components_1.default.div(templateObject_3 || (templateObject_3 = __makeTemplateObject(["\n  display: flex;\n  flex-direction: row;\n  flex: 1;\n  background: ", ";\n  max-width: 100vw;\n  height: 90vh;\n"], ["\n  display: flex;\n  flex-direction: row;\n  flex: 1;\n  background: ", ";\n  max-width: 100vw;\n  height: 90vh;\n"])), Theme_1.Theme.colors.light);
+var NavBarContent = styled_components_1.default.div(templateObject_2 || (templateObject_2 = __makeTemplateObject(["\n  display: flex;\n  flex-direction: row;\n  flex: 1;\n  background: ", ";\n  max-width: 100vw;\n  height: 8vh;\n"], ["\n  display: flex;\n  flex-direction: row;\n  flex: 1;\n  background: ", ";\n  max-width: 100vw;\n  height: 8vh;\n"])), Theme_1.Theme.colors.light);
+var PageContent = styled_components_1.default.div(templateObject_3 || (templateObject_3 = __makeTemplateObject(["\n  display: flex;\n  flex-direction: row;\n  flex: 1;\n  background: ", ";\n  max-width: 100vw;\n  height: 92vh;\n"], ["\n  display: flex;\n  flex-direction: row;\n  flex: 1;\n  background: ", ";\n  max-width: 100vw;\n  height: 92vh;\n"])), Theme_1.Theme.colors.light);
 
 exports.Page = function (_a) {
   var children = _a.children;
@@ -91172,7 +91176,7 @@ exports.DropdownNavbar = function (props) {
 };
 
 var Navbar = styled_components_1.default.nav(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n  background: ", ";\n  font-family: ", ";\n  color: ", ";\n  display: flex;\n  flex: 1;\n  align-items: center;\n  a {\n    color: ", ";\n    text-decoration: none;\n  }\n"], ["\n  background: ", ";\n  font-family: ", ";\n  color: ", ";\n  display: flex;\n  flex: 1;\n  align-items: center;\n  a {\n    color: ", ";\n    text-decoration: none;\n  }\n"])), Theme_1.Theme.colors.dark, Theme_1.Theme.fonts.heading, Theme_1.Theme.colors.light, Theme_1.Theme.colors.light);
-var Brand = styled_components_1.default.a(templateObject_2 || (templateObject_2 = __makeTemplateObject(["\n  width: 7vh;\n  height: 7vh;\n  position: relative;\n  font-weight: bold;\n  font-style: italic;\n  margin: 0.2rem 0.5rem 0.2rem 0.5rem;\n"], ["\n  width: 7vh;\n  height: 7vh;\n  position: relative;\n  font-weight: bold;\n  font-style: italic;\n  margin: 0.2rem 0.5rem 0.2rem 0.5rem;\n"])));
+var Brand = styled_components_1.default.a(templateObject_2 || (templateObject_2 = __makeTemplateObject(["\n  width: 5.5vh;\n  height: 5.5vh;\n  position: relative;\n  font-weight: bold;\n  font-style: italic;\n  margin: 0.2rem 0.5rem 0.2rem 0.5rem;\n"], ["\n  width: 5.5vh;\n  height: 5.5vh;\n  position: relative;\n  font-weight: bold;\n  font-style: italic;\n  margin: 0.2rem 0.5rem 0.2rem 0.5rem;\n"])));
 var DropDownSplit = styled_components_1.default.div(templateObject_3 || (templateObject_3 = __makeTemplateObject(["\n  display: flex;\n  flex-direction: column;\n  flex: 1;\n"], ["\n  display: flex;\n  flex-direction: column;\n  flex: 1;\n"])));
 var Filename = styled_components_1.default.div(templateObject_4 || (templateObject_4 = __makeTemplateObject(["\n  padding: 3px 12px;\n  color: white;\n  text-align: left;\n  font-size: ", ";\n  transition: 0.3s ease all;\n  border-radius: 3px;\n  cursor: pointer;\n  &:hover {\n    background: ", ";\n  }\n"], ["\n  padding: 3px 12px;\n  color: white;\n  text-align: left;\n  font-size: ", ";\n  transition: 0.3s ease all;\n  border-radius: 3px;\n  cursor: pointer;\n  &:hover {\n    background: ", ";\n  }\n"])), Theme_1.Theme.fonts.headingSize, Theme_1.Theme.colors.darkAccent);
 var MenuItem = styled_components_1.default.div(templateObject_5 || (templateObject_5 = __makeTemplateObject(["\n  font-size: ", ";\n  padding: 3px 12px;\n  &:hover {\n    box-shadow: 30px 30px 30px rgba(0, 0, 0, 0.5) inset;\n  }\n  &:active {\n    background: #5682d2;\n  }\n"], ["\n  font-size: ", ";\n  padding: 3px 12px;\n  &:hover {\n    box-shadow: 30px 30px 30px rgba(0, 0, 0, 0.5) inset;\n  }\n  &:active {\n    background: #5682d2;\n  }\n"])), Theme_1.Theme.fonts.subHeadingSize);
@@ -91679,22 +91683,22 @@ function (_super) {
           return _this.newWml();
         }
       }, {
-        tooltip: "Open WML",
-        icon: React.createElement(fa_1.FaFolderOpen, null),
-        callback: function callback() {
-          return _this.toggleFileBrowser();
-        }
-      }, {
         tooltip: "Save WML",
         icon: React.createElement(fa_1.FaSave, null),
         callback: function callback() {
           return _this.saveWml();
         }
       }, {
+        tooltip: "Open WML",
+        icon: React.createElement(fa_1.FaFolderOpen, null),
+        callback: function callback() {
+          return _this.toggleFileBrowser();
+        }
+      }, {
         tooltip: "Covnert to Python DAG",
         icon: React.createElement(fa_1.FaProjectDiagram, null),
         callback: function callback() {
-          return console.log("Convert to Python");
+          return _this.convertToDag();
         }
       }],
       dropdownHandlers: [// {
@@ -91712,15 +91716,16 @@ function (_super) {
       ]
     };
     _this.state = localStorage.get("windmillChart") || lodash_1.cloneDeep(defaultChartState_1.defaultChart);
+    _this.convertToDag = _this.convertToDag.bind(_this);
     _this.newWml = _this.newWml.bind(_this);
-    _this.updateFilename = _this.updateFilename.bind(_this);
-    _this.updateNodeProperties = _this.updateNodeProperties.bind(_this);
-    _this.updateDag = _this.updateDag.bind(_this);
     _this.refreshOperators = _this.refreshOperators.bind(_this);
     _this.refreshDag = _this.refreshDag.bind(_this);
     _this.toggleFileBrowser = _this.toggleFileBrowser.bind(_this);
     _this.toggleRenameBox = _this.toggleRenameBox.bind(_this);
     _this.saveWml = _this.saveWml.bind(_this);
+    _this.updateFilename = _this.updateFilename.bind(_this);
+    _this.updateNodeProperties = _this.updateNodeProperties.bind(_this);
+    _this.updateDag = _this.updateDag.bind(_this);
     return _this;
   }
 
@@ -91872,6 +91877,24 @@ function (_super) {
       links: links
     };
     this.apiClient.saveWml(this.state.filename + ".wml", persistentState);
+  };
+
+  App.prototype.convertToDag = function () {
+    var _a = this.cleanState(this.state),
+        offset = _a.offset,
+        filename = _a.filename,
+        dag = _a.dag,
+        nodes = _a.nodes,
+        links = _a.links;
+
+    var persistentState = {
+      offset: offset,
+      filename: filename,
+      dag: dag,
+      nodes: nodes,
+      links: links
+    };
+    this.apiClient.convertToDag(this.state.filename + ".wml", persistentState);
   }; //////////////////////////////////////////////////
   // Render Methods
   //////////////////////////////////////////////////
@@ -91960,7 +91983,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49893" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59639" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

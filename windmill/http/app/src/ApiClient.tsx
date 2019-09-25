@@ -13,19 +13,23 @@ export class APIClient {
   }
 
   public getDagSpec() {
-    return this.perform("GET", "/v1/dag")
+    return this.perform("GET", "/v1/dag");
   }
 
   public getWml(wmlname: string) {
-    return this.perform("GET", `/v1/wml/${wmlname}`)
+    return this.perform("GET", `/v1/wml/${wmlname}`);
   }
 
   public getWmlList() {
-    return this.perform("GET", "/v1/wml/")
+    return this.perform("GET", "/v1/wml/");
   }
 
   public saveWml(wmlname: string, wml: any) {
-    return this.perform("POST", `/v1/wml/${wmlname}`, wml)
+    return this.perform("POST", `/v1/wml/${wmlname}`, wml);
+  }
+
+  public convertToDag(wmlname: string, wml: any) {
+    return this.perform("POST", `/v1/dag/${wmlname}`, wml);
   }
 
   async perform(method: Method, resource: string, data?: any) {

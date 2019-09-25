@@ -38,7 +38,7 @@ synced to a remote repo
 - [x] Open dag from menu
 - [x] Make save/load more efficient by removing non-essential values
 - [x] Switch nav menu to icons 
-- [ ] Add convert DAG call
+- [x] Add convert DAG call
 - [ ] Add hotkeys to menu functions
 - [ ] Make input/output nodes more clear
 - [ ] Check if file already exists on rename

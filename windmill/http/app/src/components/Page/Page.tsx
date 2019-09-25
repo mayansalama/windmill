@@ -23,7 +23,7 @@ const NavBarContent = styled.div`
   flex: 1;
   background: ${Theme.colors.light};
   max-width: 100vw;
-  height: 10vh;
+  height: 8vh;
 `;
 
 const PageContent = styled.div`
@@ -32,7 +32,7 @@ const PageContent = styled.div`
   flex: 1;
   background: ${Theme.colors.light};
   max-width: 100vw;
-  height: 90vh;
+  height: 92vh;
 `;
 
 export const Page = ({ children }: { children: any }) => (
