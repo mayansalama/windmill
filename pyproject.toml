@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "airflow-windmill"
-version = "0.0.2"
+version = "0.0.3"
 description = "Drag'N'Drop Web Frontend for Building and Managing Airflow DAGs"
 authors = ["mayansalama <micsalama@gmail.com>"]
 readme = "README.md"
@@ -23,6 +23,8 @@ jinja2 = "^2.10.1"
 inflection = "^0.3.1"
 black = {version = "^18.3-alpha.0"}
 apache-airflow = {version = "1.10.4", optional = true}
+doc-cli = "^0.0.4"
+gitpython = "^3.0.2"
 
 [tool.poetry.extras]
 airflow = ["apache-airflow"]

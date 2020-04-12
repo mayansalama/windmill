@@ -36,7 +36,6 @@ class CreateProject:
         os.mkdir(join(proj.name, proj.operators_dir))
 
         logging.info(f"Creating project config file '{proj.conf_file}'")
-        with open(join(proj.name, proj.conf_file), "w+") as f:
-            yaml.dump(proj.dump(), f)
+        proj.to_config_file(join(proj.name, proj.conf_file))
 
         logging.info(f"Succesfully created project '{proj.name}'")

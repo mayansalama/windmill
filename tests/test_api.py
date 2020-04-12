@@ -20,7 +20,7 @@ class Fixture(TestCase):
         self.tmpdir = tempfile.TemporaryDirectory()
         os.chdir(self.tmpdir.name)
 
-        self.conf = ProjectConfig.load()
+        self.conf = ProjectConfig.from_conf_file()
         CreateProject(self.conf)
 
         os.chdir(os.path.join(self.tmpdir.name, self.conf.name))

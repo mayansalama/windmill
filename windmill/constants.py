@@ -1,6 +1,6 @@
 class ProjectDefaults:
     PROJECT_NAME = "windmill-project"
-    PROJECT_CONF = "windmill.conf"
+    PROJECT_CONF = "windmill.yml"
     WML_FOLDER = "wmls"
     DAGS_FOLDER = "dags"
     OPERATORS_FOLDER = "custom_operators"

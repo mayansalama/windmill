@@ -2,11 +2,11 @@ import os
 import tempfile
 from unittest import TestCase
 
-from windmill.cli.cli import get_parser, Cli
+from windmill.cli.cli import Cli
 from windmill.exceptions import InitError
 
 
-cli_parser = get_parser(Cli.get_cli_spec())
+cli_parser = Cli.get_parser()
 
 
 class TestCli(TestCase):

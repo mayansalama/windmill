@@ -2,10 +2,9 @@
 
 [![Build Status](https://travis-ci.org/mayansalama/windmill.svg?branch=master)](https://travis-ci.org/mayansalama/windmill)
 
-Drag'n'drop web app to manage and create Airflow DAGs. The goal is to
-have a Web UI that can generate YML Dag Definitions, integrating with
-custom operators and potentially existing DAGs. YML DAGs can then be
-synced to a remote repo
+Drag'n'drop web app to manage and create Airflow DAGs. DAGs are described
+usinga JSON "wml" file, which can be transpiled into a Python DAG file and 
+pushed to a configured git repository.
 
 - Front end is built using React on Typescript
 - Back end is built using Flask on Python 3.6+
@@ -65,10 +64,10 @@ synced to a remote repo
 - [x] Move airflow dependency as extra
 - [x] Convert WML into Python DAG
 - [x] API Endpoint to trigger WML -> DAG
+- [ ] Make sure that nodes are being put in right order using ports
 - [ ] Edge cases for WML -> DAG
 - [ ] Get WML owner and last-modified details during wml list
 - [ ] Allow custom operators
-- [ ] Add defaults to CLI --help commands
 - [ ] Strategy for Python Opjects (e.g. callables) - allow either a import ref or an inline statement
 - [ ] Backport existing Python DAGs to WMLs
 - [ ] Allow DAG updates to propogate to WMLs

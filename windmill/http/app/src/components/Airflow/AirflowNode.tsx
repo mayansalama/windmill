@@ -1,6 +1,7 @@
 import * as React from "react";
 import { cloneDeep } from "lodash";
 import styled, { css } from "styled-components";
+import ReactTooltip from "react-tooltip";
 import Textarea from "react-textarea-autosize";
 import { FaInfoCircle } from "react-icons/fa";
 import { INodeInnerDefaultProps, INode } from "@mrblenny/react-flow-chart";
@@ -20,6 +21,10 @@ const Tooltip = styled.div`
   padding: 4px;
   font-size: ${Theme.fonts.normalSize};
   color: ${Theme.colors.darkAccent};
+`;
+
+const StyledTooltip = styled(ReactTooltip)`
+  max-width: 300px;
 `;
 
 export const SectionTitle = styled.div`
@@ -405,6 +410,7 @@ export class RenderedAirflowParametersAsForm extends React.Component<
             />
             {this.props.type ? <Type>{this.props.type}</Type> : null}
           </div>
+          <StyledTooltip multiline={true} place="right" />
           <NameInput
             placeholder="Input name.."
             type={"text"}

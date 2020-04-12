@@ -1,42 +1,35 @@
-from marshmallow import Schema, fields
+from doccli import ConfigUtil
 
-from .base_config import BaseConfig
-from .project_config import ProjectConfig
 from ..constants import ServerDefaults
 
 
-class RunConfig(BaseConfig):
-    schema = Schema.from_dict(
-        {
-            "port": fields.Int(missing=ServerDefaults.HOST_PORT, help="Bind port"),
-            "hostname": fields.Str(
-                missing=ServerDefaults.HOST_ADDRESS, help="Bind Address"
-            ),
-            "conf_file": fields.Str(
-                missing=ServerDefaults.PROJECT_CONF,
-                help="Name of config file in this directory",
-            ),
-        }
-    )
+class RunConfig(ConfigUtil):
+    command_name = "run"
+    config_key = "webserver.config"
+
+    @property
+    def project_conf(self):
+        from .project_config import ProjectConfig
+        return ProjectConfig.from_conf_file(self.conf_file)            
 
     def __init__(
         self,
-        port: int,
-        hostname: str,
-        conf_file: str,
-        run_dev_server=False,
-        *args,
-        **kwargs
+        port: int = ServerDefaults.HOST_PORT,
+        hostname: str = ServerDefaults.HOST_ADDRESS,
+        conf_file: str = ServerDefaults.PROJECT_CONF,
+        _run_dev_server=False,
     ):
-        """Wrapper around run-server
+        """Serve Windmill from a windmill project
         
         Args:
-            ...RunConfig.Schema
-            run_dev_server (bool) : If True will run back-end with CORS on Flask (No Gunicorn)
+            port (int): Bind Port
+            hostname (str): Bind address 
+            conf_file (str): Name of config file in this directory
+            _run_dev_server (bool, optional): If True will run back-end with 
+                                              CORS on Flask (No Gunicorn). 
+                                              Defaults to False.
         """
         self.port = port
         self.hostname = hostname
         self.conf_file = conf_file
-        self.run_dev_server = run_dev_server
-
-        self.project_conf = ProjectConfig.from_conf_file(self.conf_file)
+        self.run_dev_server = _run_dev_server
