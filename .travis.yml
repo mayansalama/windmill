@@ -1,22 +1,24 @@
 language: python
 python:
-- '3.6'
-matrix:
-  include:
-  - python: 3.7
-    dist: xenial
+  - "3.6"
+  - "3.7"
+
 before_install:
-- pip install poetry
+  - pip install poetry
+
 install:
-- poetry install -v
-- pip install tox-travis
+  - poetry install -v
+  - pip install tox-travis
+
 script:
-- tox
+  - tox
+
 before_deploy:
-- poetry config http-basic.pypi $PYPI_USER $PYPI_PASSWORD
-- npm install --prefix windmill/http/app/
-- npm run-script build --prefix windmill/http/app/
-- poetry build
+  - poetry config http-basic.pypi $PYPI_USER $PYPI_PASSWORD
+  - npm install --prefix windmill/http/app/
+  - npm run-script build --prefix windmill/http/app/
+  - poetry build
+
 deploy:
   provider: script
   skip_cleanup: true
@@ -24,7 +26,8 @@ deploy:
   on:
     tags: true
     condition: "$TRAVIS_PYTHON_VERSION == 3.7"
+
 env:
   global:
-  - secure: ka3SReJLoC8Xc8KW8tYNNd7MS0kD3shWNvdlOHRuEqRbQT9eWxcNX3vTr1cPsuUivi2Tb7NuD1U4JtBJFmNXRFlDsx0RgkjsOh+A5mSNnht4MnXxzBthI5iUAf6YBDE0Lu/HVTZwC7xx3zLf8YUUlKH3lUYXMgpXYKhEAZ3JOj2LDXWYgdixDTdFlG3Ss4NOL3D7vpeEgVRF7j5YJwD6c5TArWDIHjz3ycpELZTUSSrupSH2ZBabJp7/vXBK1J1Ug/qNcJSdGX3djgPJg4S2K9wIPCnFLRgcgR309xbKcuVPmUQlPzm2KzAxuwPTRT8oDNR/AoWfy7+1L3vFqzyZ5vJivQCgBi8ccwI5hzhf11tqsngj6y3fTPkooIC8DfJPsj5xE/e/KKqqQLZ6ocIzK08mjPKXWp087YEpXWJWg4QkxJY633TTfncT9HZDsSToT9dv6ngd6kIRvHAd/pyYJ+s4fzgrnQazpo9UbHuFmj262rRG2RzvkdIOVfdBCE3l69t5dOUCM+xnZ8SCIU3o1S3btqKbJh0vKZa/5kU+1/hYtxZg/JjqZ7uvTqPt1978HFGr57N91Vh8GCzGzK0McQCwXkA7m9wmLef/JT8N4ziNaZ0i+3R7DaEH91/237w5clEButqdwYRlj4Yx1ol0oKGgNMvAo6F9xTAPijGUp7U=
-  - secure: FBWu79pVq8yW+Z8RcmWGMc5mlPvLtUQGL4BnJdch2wwvPrPdtCIwqW7bqIVsCZhaoz2dR66KUv6WTbzBNYD8DTHv7VdtKlmN2CapplG2JcrHKaBdKntucSQzfORLxRSYIF6ywVV33JAbpjMWK9PFX4oO8xq+cIlCOl/pI6mit0V64GVb7ud5/5rjbwZWX3EhdLLPC21i6oVjC34UxGQxqd47wsU5TwOo1mUx2EvxyFoZUNCTgku3EX1gt0RAzHmZtpvpUl8Ib548y9cUOuzJHue5t1ikf1eH1uG/cs4Afa8BktpsC8VP2mqqe2UXROYzUP1xdJmmOIdm2Tg/vBxoN5iQn/UHbVYBDRzZpZLAIkn2ADCBw6WrPtF4rxnUKtj59xOA6jm808m2xt7hSFV9cjZRQC2L4EdJpUj5AZzX6GqnYohlP+Z5S6zCB3HX6EtlHvzcKdD1AYqAb3nuLgjR5A5MamTG3cKan4cQ8TXM99d4cDxfLDvKApF/idiFEbVeAT0DAgyeuYE47F5rpODIpnyvTxoyM05b01U25zbokofJKp1RQklKJPfKeHxMDhf2Yc0gCGtuWRkhB7bsjqD0zJBU37H/CfAL0FxBERd2F34yJpS4tN/ly7EfiGNPjW1Nm+xATWHxLedV8W4ZNPABN2PaiX7HSUgfYAJ80yh/TkU=
+    - secure: ka3SReJLoC8Xc8KW8tYNNd7MS0kD3shWNvdlOHRuEqRbQT9eWxcNX3vTr1cPsuUivi2Tb7NuD1U4JtBJFmNXRFlDsx0RgkjsOh+A5mSNnht4MnXxzBthI5iUAf6YBDE0Lu/HVTZwC7xx3zLf8YUUlKH3lUYXMgpXYKhEAZ3JOj2LDXWYgdixDTdFlG3Ss4NOL3D7vpeEgVRF7j5YJwD6c5TArWDIHjz3ycpELZTUSSrupSH2ZBabJp7/vXBK1J1Ug/qNcJSdGX3djgPJg4S2K9wIPCnFLRgcgR309xbKcuVPmUQlPzm2KzAxuwPTRT8oDNR/AoWfy7+1L3vFqzyZ5vJivQCgBi8ccwI5hzhf11tqsngj6y3fTPkooIC8DfJPsj5xE/e/KKqqQLZ6ocIzK08mjPKXWp087YEpXWJWg4QkxJY633TTfncT9HZDsSToT9dv6ngd6kIRvHAd/pyYJ+s4fzgrnQazpo9UbHuFmj262rRG2RzvkdIOVfdBCE3l69t5dOUCM+xnZ8SCIU3o1S3btqKbJh0vKZa/5kU+1/hYtxZg/JjqZ7uvTqPt1978HFGr57N91Vh8GCzGzK0McQCwXkA7m9wmLef/JT8N4ziNaZ0i+3R7DaEH91/237w5clEButqdwYRlj4Yx1ol0oKGgNMvAo6F9xTAPijGUp7U=
+    - secure: FBWu79pVq8yW+Z8RcmWGMc5mlPvLtUQGL4BnJdch2wwvPrPdtCIwqW7bqIVsCZhaoz2dR66KUv6WTbzBNYD8DTHv7VdtKlmN2CapplG2JcrHKaBdKntucSQzfORLxRSYIF6ywVV33JAbpjMWK9PFX4oO8xq+cIlCOl/pI6mit0V64GVb7ud5/5rjbwZWX3EhdLLPC21i6oVjC34UxGQxqd47wsU5TwOo1mUx2EvxyFoZUNCTgku3EX1gt0RAzHmZtpvpUl8Ib548y9cUOuzJHue5t1ikf1eH1uG/cs4Afa8BktpsC8VP2mqqe2UXROYzUP1xdJmmOIdm2Tg/vBxoN5iQn/UHbVYBDRzZpZLAIkn2ADCBw6WrPtF4rxnUKtj59xOA6jm808m2xt7hSFV9cjZRQC2L4EdJpUj5AZzX6GqnYohlP+Z5S6zCB3HX6EtlHvzcKdD1AYqAb3nuLgjR5A5MamTG3cKan4cQ8TXM99d4cDxfLDvKApF/idiFEbVeAT0DAgyeuYE47F5rpODIpnyvTxoyM05b01U25zbokofJKp1RQklKJPfKeHxMDhf2Yc0gCGtuWRkhB7bsjqD0zJBU37H/CfAL0FxBERd2F34yJpS4tN/ly7EfiGNPjW1Nm+xATWHxLedV8W4ZNPABN2PaiX7HSUgfYAJ80yh/TkU=

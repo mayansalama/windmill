@@ -13,7 +13,6 @@ import { App } from "../../";
 import { CanvasStyle } from "../Theme";
 import { FlowChart } from "@mrblenny/react-flow-chart";
 import styled from "styled-components";
-import ReactTooltip from "react-tooltip";
 
 const AppLayout = styled.div`
   display: flex;
@@ -28,10 +27,6 @@ const Content = styled.div`
   flex-direction: column;
   flex: 1 1 auto;
   overflow: hidden;
-`;
-
-const StyledTooltip = styled(ReactTooltip)`
-  max-width: 300px;
 `;
 
 export class MainPage extends React.Component<{
@@ -78,7 +73,7 @@ export class MainPage extends React.Component<{
             />
           </ResizablePanel>
         </Page>
-        <StyledTooltip effect="solid" place="right" />
+        
       </AppLayout>
     );
   }

@@ -13,7 +13,7 @@ class TestCli(TestCase):
     def test_init_empty_folder(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             os.chdir(tmpdir)
-            assert os.getcwd() == tmpdir
+            assert os.getcwd().endswith(tmpdir)  # Mac does some weird private stuff
             assert not os.path.exists("test")
 
             args = cli_parser.parse_args(["init", "--name", "test"])
@@ -23,7 +23,7 @@ class TestCli(TestCase):
     def test_init_non_empty_folder(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             os.chdir(tmpdir)
-            assert os.getcwd() == tmpdir
+            assert os.getcwd().endswith(tmpdir) # Mac does some weird private stuff
             assert not os.path.exists("test")
 
             # We can create a project in an existing dir

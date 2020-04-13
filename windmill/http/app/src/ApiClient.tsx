@@ -1,6 +1,7 @@
 import axios, { Method } from "axios";
 
-const BaseURI = "http://localhost:8000";
+
+const BaseURI = "http://127.0.0.1:8000";
 
 const client = axios.create({
   baseURL: BaseURI,
@@ -42,6 +43,8 @@ export class APIClient {
       //   }
     }).then(resp => {
       return resp.data ? resp.data : [];
+    }).catch((error) => {
+      console.log(error);
     });
   }
 }

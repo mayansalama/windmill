@@ -32,6 +32,7 @@ export class App extends React.Component<{}, IAppState> {
 
   constructor(props) {
     super(props);
+    // FIXME: If localstorage is corrupted then this won't stop spinning
     this.state = localStorage.get("windmillChart") || cloneDeep(defaultChart);
 
     this.convertToDag = this.convertToDag.bind(this);
@@ -56,7 +57,7 @@ export class App extends React.Component<{}, IAppState> {
   }
 
   cleanState = (state: IAppState) => {
-    return {
+    const x = {
       ...state,
       nodes: mapValues(state.nodes, node => {
         return {
@@ -68,6 +69,11 @@ export class App extends React.Component<{}, IAppState> {
         };
       })
     };
+    // x.offset = {
+    //   x: x.offset.x,
+    //   y: x.offset.y,
+    // }
+    return x;
   };
 
   public saveStateToLocal() {
@@ -192,11 +198,13 @@ export class App extends React.Component<{}, IAppState> {
         callback: () => this.toggleFileBrowser()
       },
       {
-        tooltip: "Covnert to Python DAG",
+        tooltip: "Convert to Python DAG",
         icon: <FaProjectDiagram />,
         callback: () => this.convertToDag()
       }
     ],
+    // Uncomment to include
+    // FIXME: include in a debug mode? 
     dropdownHandlers: [
       // {
       //   name: "File",
@@ -236,15 +244,17 @@ export class App extends React.Component<{}, IAppState> {
   }
 
   public saveWml() {
-    const { offset, filename, dag, nodes, links } = this.cleanState(this.state);
-    const persistentState = { offset, filename, dag, nodes, links };
+    // FIXME: Can't include position as react-flow-chart nested state here
+    const { filename, dag, nodes, links } = this.cleanState(this.state);
+    const persistentState = { filename, dag, nodes, links };
 
     this.apiClient.saveWml(`${this.state.filename}.wml`, persistentState);
   }
 
   public convertToDag() {
-    const { offset, filename, dag, nodes, links } = this.cleanState(this.state);
-    const persistentState = { offset, filename, dag, nodes, links };
+    // FIXME: Can't include position as react-flow-chart nested state here
+    const { filename, dag, nodes, links } = this.cleanState(this.state);
+    const persistentState = { filename, dag, nodes, links };
 
     this.apiClient.convertToDag(`${this.state.filename}.wml`, persistentState);
   }
@@ -273,13 +283,13 @@ export class App extends React.Component<{}, IAppState> {
         {this.state.isFileBrowserOpen ? (
           <FileBrowser getApp={() => this} />
         ) : (
-          <div />
-        )}
+            <div />
+          )}
         {this.state.isRenameBoxOpen ? (
           <RenameBox getApp={() => this} />
         ) : (
-          <div />
-        )}
+            <div />
+          )}
         <div
           style={{
             filter:

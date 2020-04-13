@@ -6,6 +6,7 @@
 .VSCodeCounter/
 windmill-project/
 .windmill-temp-project/
+.python-version
 
 # Ignore top level dist created by Poetry 
 dist/*

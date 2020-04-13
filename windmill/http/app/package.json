@@ -30,6 +30,7 @@
     "@types/react-tooltip": "^3.11.0",
     "@types/styled-components": "^4.4.3",
     "axios": "^0.19.2",
+    "circular-json": "^0.5.9",
     "gh-pages": "^2.2.0",
     "local-storage": "^2.0.0",
     "react": "^16.13.1",

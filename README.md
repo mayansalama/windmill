@@ -72,6 +72,7 @@ pushed to a configured git repository.
 - [ ] Backport existing Python DAGs to WMLs
 - [ ] Allow DAG updates to propogate to WMLs
 - [ ] Add tests for different airflow version
+- [ ] Version lock travis tox and poetry version? 
 
 ### Other features
 
@@ -87,6 +88,16 @@ To run as a dev:
 2. Run `poetry install -E airflow`
 3. Run `windmill-dev start-backend`
 4. Run `windmill-dev start-frontend`
+
+## Run Python Tests
+
+Expects Tox and Poetry to be available on path
+
+```
+pyenv install 3.6.5 3.7.7
+pyenv local 3.6.5 3.7.7
+tox
+```
 
 ## Future Usage Patterns
 

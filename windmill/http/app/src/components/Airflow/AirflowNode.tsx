@@ -1,12 +1,12 @@
 import * as React from "react";
 import { cloneDeep } from "lodash";
 import styled, { css } from "styled-components";
-import ReactTooltip from "react-tooltip";
 import Textarea from "react-textarea-autosize";
 import { FaInfoCircle } from "react-icons/fa";
 import { INodeInnerDefaultProps, INode } from "@mrblenny/react-flow-chart";
 import { Theme } from "../Theme";
 import { IAirflowOperatorParameter, IAirflowOperatorProperties } from ".";
+import ReactTooltip from "react-tooltip";
 
 export const Outer = styled.div`
   border: 1px solid ${Theme.colors.lightAccent};
@@ -21,10 +21,6 @@ const Tooltip = styled.div`
   padding: 4px;
   font-size: ${Theme.fonts.normalSize};
   color: ${Theme.colors.darkAccent};
-`;
-
-const StyledTooltip = styled(ReactTooltip)`
-  max-width: 300px;
 `;
 
 export const SectionTitle = styled.div`
@@ -140,6 +136,11 @@ const StyledErrorMessage = styled.div`
 `;
 
 
+const StyledTooltip = styled(ReactTooltip)`
+  max-width: 300px;
+`;
+
+
 const isValid = (params: IAirflowOperatorParameter): string => {
   const { value, required, type } = params;
   let err_msg = "";
@@ -242,8 +243,8 @@ class SmartTextarea extends React.Component<ISmartTextAreaProps> {
           borderColor: errmsg
             ? "red"
             : required
-            ? Theme.colors.brand
-            : Theme.colors.lightAccent2
+              ? Theme.colors.brand
+              : Theme.colors.lightAccent2
         }}
       >
         <StyledLableDiv>
@@ -374,7 +375,7 @@ export interface IRenderedAirflowParametersAsFormProps {
 
 export class RenderedAirflowParametersAsForm extends React.Component<
   IRenderedAirflowParametersAsFormProps
-> {
+  > {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
@@ -405,12 +406,11 @@ export class RenderedAirflowParametersAsForm extends React.Component<
           <div>
             <Tooltip>{this.props.nameField}</Tooltip>
             <FaInfoCircle
-              data-tip={this.props.properties.description}
+              data-tip={this.props.properties.description || ""}
               style={{ float: "right", marginLeft: "5px" }}
             />
             {this.props.type ? <Type>{this.props.type}</Type> : null}
           </div>
-          <StyledTooltip multiline={true} place="right" />
           <NameInput
             placeholder="Input name.."
             type={"text"}
@@ -440,12 +440,14 @@ export class RenderedAirflowParametersAsForm extends React.Component<
                     <br key={`${p.id}-${i}-br`} />
                   </div>
                 ) : (
-                  <div key={`${p.id}-${i}-div-name-placeholder`} />
-                )
+                    <div key={`${p.id}-${i}-div-name-placeholder`} />
+                  )
               ];
             })
           )}
         </Outer>
+        {/* FIXME: For some reason this is the only place I can put a styled tooltip and still have it working */}
+        <StyledTooltip effect="solid" place="right" />
       </div>
     );
   }

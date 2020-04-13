@@ -84700,7 +84700,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var axios_1 = __importDefault(require("axios"));
 
-var BaseURI = "http://localhost:8000";
+var BaseURI = "http://127.0.0.1:8000";
 var client = axios_1.default.create({
   baseURL: BaseURI,
   data: JSON
@@ -84749,6 +84749,8 @@ function () {
 
         }).then(function (resp) {
           return resp.data ? resp.data : [];
+        }).catch(function (error) {
+          console.log(error);
         })];
       });
     });
@@ -84758,7 +84760,481 @@ function () {
 }();
 
 exports.APIClient = APIClient;
-},{"axios":"../node_modules/axios/index.js"}],"../node_modules/react-tooltip/dist/index.es.js":[function(require,module,exports) {
+},{"axios":"../node_modules/axios/index.js"}],"../node_modules/@babel/runtime/helpers/esm/extends.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = _extends;
+
+function _extends() {
+  exports.default = _extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  return _extends.apply(this, arguments);
+}
+},{}],"../node_modules/@babel/runtime/helpers/esm/objectWithoutPropertiesLoose.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = _objectWithoutPropertiesLoose;
+
+function _objectWithoutPropertiesLoose(source, excluded) {
+  if (source == null) return {};
+  var target = {};
+  var sourceKeys = Object.keys(source);
+  var key, i;
+
+  for (i = 0; i < sourceKeys.length; i++) {
+    key = sourceKeys[i];
+    if (excluded.indexOf(key) >= 0) continue;
+    target[key] = source[key];
+  }
+
+  return target;
+}
+},{}],"../node_modules/@babel/runtime/helpers/esm/assertThisInitialized.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = _assertThisInitialized;
+
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return self;
+}
+},{}],"../node_modules/@babel/runtime/helpers/esm/inheritsLoose.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = _inheritsLoose;
+
+function _inheritsLoose(subClass, superClass) {
+  subClass.prototype = Object.create(superClass.prototype);
+  subClass.prototype.constructor = subClass;
+  subClass.__proto__ = superClass;
+}
+},{}],"../node_modules/react-textarea-autosize/dist/react-textarea-autosize.esm.browser.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _extends2 = _interopRequireDefault(require("@babel/runtime/helpers/esm/extends"));
+
+var _objectWithoutPropertiesLoose2 = _interopRequireDefault(require("@babel/runtime/helpers/esm/objectWithoutPropertiesLoose"));
+
+var _assertThisInitialized2 = _interopRequireDefault(require("@babel/runtime/helpers/esm/assertThisInitialized"));
+
+var _inheritsLoose2 = _interopRequireDefault(require("@babel/runtime/helpers/esm/inheritsLoose"));
+
+var _react = require("react");
+
+var _propTypes = require("prop-types");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var isIE = !!document.documentElement.currentStyle;
+var HIDDEN_TEXTAREA_STYLE = {
+  'min-height': '0',
+  'max-height': 'none',
+  height: '0',
+  visibility: 'hidden',
+  overflow: 'hidden',
+  position: 'absolute',
+  'z-index': '-1000',
+  top: '0',
+  right: '0'
+};
+var SIZING_STYLE = ['letter-spacing', 'line-height', 'font-family', 'font-weight', 'font-size', 'font-style', 'tab-size', 'text-rendering', 'text-transform', 'width', 'text-indent', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left', 'border-top-width', 'border-right-width', 'border-bottom-width', 'border-left-width', 'box-sizing'];
+var computedStyleCache = {};
+var hiddenTextarea = document.createElement('textarea');
+
+var forceHiddenStyles = function forceHiddenStyles(node) {
+  Object.keys(HIDDEN_TEXTAREA_STYLE).forEach(function (key) {
+    node.style.setProperty(key, HIDDEN_TEXTAREA_STYLE[key], 'important');
+  });
+};
+
+{
+  hiddenTextarea.setAttribute('tab-index', '-1');
+  hiddenTextarea.setAttribute('aria-hidden', 'true');
+  forceHiddenStyles(hiddenTextarea);
+}
+
+function calculateNodeHeight(uiTextNode, uid, useCache, minRows, maxRows) {
+  if (useCache === void 0) {
+    useCache = false;
+  }
+
+  if (minRows === void 0) {
+    minRows = null;
+  }
+
+  if (maxRows === void 0) {
+    maxRows = null;
+  }
+
+  if (hiddenTextarea.parentNode === null) {
+    document.body.appendChild(hiddenTextarea);
+  } // Copy all CSS properties that have an impact on the height of the content in
+  // the textbox
+
+
+  var nodeStyling = calculateNodeStyling(uiTextNode, uid, useCache);
+
+  if (nodeStyling === null) {
+    return null;
+  }
+
+  var paddingSize = nodeStyling.paddingSize,
+      borderSize = nodeStyling.borderSize,
+      boxSizing = nodeStyling.boxSizing,
+      sizingStyle = nodeStyling.sizingStyle; // Need to have the overflow attribute to hide the scrollbar otherwise
+  // text-lines will not calculated properly as the shadow will technically be
+  // narrower for content
+
+  Object.keys(sizingStyle).forEach(function (key) {
+    hiddenTextarea.style[key] = sizingStyle[key];
+  });
+  forceHiddenStyles(hiddenTextarea);
+  hiddenTextarea.value = uiTextNode.value || uiTextNode.placeholder || 'x';
+  var minHeight = -Infinity;
+  var maxHeight = Infinity;
+  var height = hiddenTextarea.scrollHeight;
+
+  if (boxSizing === 'border-box') {
+    // border-box: add border, since height = content + padding + border
+    height = height + borderSize;
+  } else if (boxSizing === 'content-box') {
+    // remove padding, since height = content
+    height = height - paddingSize;
+  } // measure height of a textarea with a single row
+
+
+  hiddenTextarea.value = 'x';
+  var singleRowHeight = hiddenTextarea.scrollHeight - paddingSize; // Stores the value's rows count rendered in `hiddenTextarea`,
+  // regardless if `maxRows` or `minRows` props are passed
+
+  var valueRowCount = Math.floor(height / singleRowHeight);
+
+  if (minRows !== null) {
+    minHeight = singleRowHeight * minRows;
+
+    if (boxSizing === 'border-box') {
+      minHeight = minHeight + paddingSize + borderSize;
+    }
+
+    height = Math.max(minHeight, height);
+  }
+
+  if (maxRows !== null) {
+    maxHeight = singleRowHeight * maxRows;
+
+    if (boxSizing === 'border-box') {
+      maxHeight = maxHeight + paddingSize + borderSize;
+    }
+
+    height = Math.min(maxHeight, height);
+  }
+
+  var rowCount = Math.floor(height / singleRowHeight);
+  return {
+    height: height,
+    minHeight: minHeight,
+    maxHeight: maxHeight,
+    rowCount: rowCount,
+    valueRowCount: valueRowCount
+  };
+}
+
+function calculateNodeStyling(node, uid, useCache) {
+  if (useCache === void 0) {
+    useCache = false;
+  }
+
+  if (useCache && computedStyleCache[uid]) {
+    return computedStyleCache[uid];
+  }
+
+  var style = window.getComputedStyle(node);
+
+  if (style === null) {
+    return null;
+  }
+
+  var sizingStyle = SIZING_STYLE.reduce(function (obj, name) {
+    obj[name] = style.getPropertyValue(name);
+    return obj;
+  }, {});
+  var boxSizing = sizingStyle['box-sizing']; // probably node is detached from DOM, can't read computed dimensions
+
+  if (boxSizing === '') {
+    return null;
+  } // IE (Edge has already correct behaviour) returns content width as computed width
+  // so we need to add manually padding and border widths
+
+
+  if (isIE && boxSizing === 'border-box') {
+    sizingStyle.width = parseFloat(sizingStyle.width) + parseFloat(style['border-right-width']) + parseFloat(style['border-left-width']) + parseFloat(style['padding-right']) + parseFloat(style['padding-left']) + 'px';
+  }
+
+  var paddingSize = parseFloat(sizingStyle['padding-bottom']) + parseFloat(sizingStyle['padding-top']);
+  var borderSize = parseFloat(sizingStyle['border-bottom-width']) + parseFloat(sizingStyle['border-top-width']);
+  var nodeInfo = {
+    sizingStyle: sizingStyle,
+    paddingSize: paddingSize,
+    borderSize: borderSize,
+    boxSizing: boxSizing
+  };
+
+  if (useCache) {
+    computedStyleCache[uid] = nodeInfo;
+  }
+
+  return nodeInfo;
+}
+
+var purgeCache = function purgeCache(uid) {
+  delete computedStyleCache[uid];
+};
+
+var noop = function noop() {};
+
+var uid = 0;
+
+var TextareaAutosize = /*#__PURE__*/function (_React$Component) {
+  (0, _inheritsLoose2.default)(TextareaAutosize, _React$Component);
+
+  function TextareaAutosize(props) {
+    var _this;
+
+    _this = _React$Component.call(this, props) || this;
+
+    _this._onRef = function (node) {
+      _this._ref = node;
+      var inputRef = _this.props.inputRef;
+
+      if (typeof inputRef === 'function') {
+        inputRef(node);
+        return;
+      }
+
+      inputRef.current = node;
+    };
+
+    _this._onChange = function (event) {
+      if (!_this._controlled) {
+        _this._resizeComponent();
+      }
+
+      _this.props.onChange(event, (0, _assertThisInitialized2.default)(_this));
+    };
+
+    _this._resizeComponent = function (callback) {
+      if (callback === void 0) {
+        callback = noop;
+      }
+
+      var nodeHeight = calculateNodeHeight(_this._ref, _this._uid, _this.props.useCacheForDOMMeasurements, _this.props.minRows, _this.props.maxRows);
+
+      if (nodeHeight === null) {
+        callback();
+        return;
+      }
+
+      var height = nodeHeight.height,
+          minHeight = nodeHeight.minHeight,
+          maxHeight = nodeHeight.maxHeight,
+          rowCount = nodeHeight.rowCount,
+          valueRowCount = nodeHeight.valueRowCount;
+      _this.rowCount = rowCount;
+      _this.valueRowCount = valueRowCount;
+
+      if (_this.state.height !== height || _this.state.minHeight !== minHeight || _this.state.maxHeight !== maxHeight) {
+        _this.setState({
+          height: height,
+          minHeight: minHeight,
+          maxHeight: maxHeight
+        }, callback);
+
+        return;
+      }
+
+      callback();
+    };
+
+    _this.state = {
+      height: props.style && props.style.height || 0,
+      minHeight: -Infinity,
+      maxHeight: Infinity
+    };
+    _this._uid = uid++;
+    _this._controlled = props.value !== undefined;
+    _this._resizeLock = false;
+    return _this;
+  }
+
+  var _proto = TextareaAutosize.prototype;
+
+  _proto.render = function render() {
+    var _this$props = this.props,
+        _inputRef = _this$props.inputRef,
+        _maxRows = _this$props.maxRows,
+        _minRows = _this$props.minRows,
+        _onHeightChange = _this$props.onHeightChange,
+        _useCacheForDOMMeasurements = _this$props.useCacheForDOMMeasurements,
+        props = (0, _objectWithoutPropertiesLoose2.default)(_this$props, ["inputRef", "maxRows", "minRows", "onHeightChange", "useCacheForDOMMeasurements"]);
+    props.style = (0, _extends2.default)({}, props.style, {
+      height: this.state.height
+    });
+    var maxHeight = Math.max(props.style.maxHeight || Infinity, this.state.maxHeight);
+
+    if (maxHeight < this.state.height) {
+      props.style.overflow = 'hidden';
+    }
+
+    return (0, _react.createElement)("textarea", (0, _extends2.default)({}, props, {
+      onChange: this._onChange,
+      ref: this._onRef
+    }));
+  };
+
+  _proto.componentDidMount = function componentDidMount() {
+    var _this2 = this;
+
+    this._resizeComponent(); // Working around Firefox bug which runs resize listeners even when other JS is running at the same moment
+    // causing competing rerenders (due to setState in the listener) in React.
+    // More can be found here - facebook/react#6324
+
+
+    this._resizeListener = function () {
+      if (_this2._resizeLock) {
+        return;
+      }
+
+      _this2._resizeLock = true;
+
+      _this2._resizeComponent(function () {
+        _this2._resizeLock = false;
+      });
+    };
+
+    window.addEventListener('resize', this._resizeListener);
+  };
+
+  _proto.componentDidUpdate = function componentDidUpdate(prevProps, prevState) {
+    if (prevProps !== this.props) {
+      this._resizeComponent();
+    }
+
+    if (this.state.height !== prevState.height) {
+      this.props.onHeightChange(this.state.height, this);
+    }
+  };
+
+  _proto.componentWillUnmount = function componentWillUnmount() {
+    window.removeEventListener('resize', this._resizeListener);
+    purgeCache(this._uid);
+  };
+
+  return TextareaAutosize;
+}(_react.Component);
+
+TextareaAutosize.defaultProps = {
+  inputRef: noop,
+  onChange: noop,
+  onHeightChange: noop,
+  useCacheForDOMMeasurements: false
+};
+"development" !== "production" ? TextareaAutosize.propTypes = {
+  inputRef: (0, _propTypes.oneOfType)([_propTypes.func, (0, _propTypes.shape)({
+    current: _propTypes.any
+  })]),
+  maxRows: _propTypes.number,
+  minRows: _propTypes.number,
+  onChange: _propTypes.func,
+  onHeightChange: _propTypes.func,
+  style: _propTypes.object,
+  useCacheForDOMMeasurements: _propTypes.bool,
+  value: _propTypes.string
+} : void 0;
+var _default = TextareaAutosize;
+exports.default = _default;
+},{"@babel/runtime/helpers/esm/extends":"../node_modules/@babel/runtime/helpers/esm/extends.js","@babel/runtime/helpers/esm/objectWithoutPropertiesLoose":"../node_modules/@babel/runtime/helpers/esm/objectWithoutPropertiesLoose.js","@babel/runtime/helpers/esm/assertThisInitialized":"../node_modules/@babel/runtime/helpers/esm/assertThisInitialized.js","@babel/runtime/helpers/esm/inheritsLoose":"../node_modules/@babel/runtime/helpers/esm/inheritsLoose.js","react":"../node_modules/react/index.js","prop-types":"../node_modules/prop-types/index.js"}],"../src/components/Theme.tsx":[function(require,module,exports) {
+"use strict";
+
+var __makeTemplateObject = this && this.__makeTemplateObject || function (cooked, raw) {
+  if (Object.defineProperty) {
+    Object.defineProperty(cooked, "raw", {
+      value: raw
+    });
+  } else {
+    cooked.raw = raw;
+  }
+
+  return cooked;
+};
+
+var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var styled_components_1 = __importDefault(require("styled-components"));
+
+exports.Theme = {
+  colors: {
+    light: "#F5F7F9",
+    lightAccent: "#dce2e8",
+    lightAccent2: "#c5ccd4",
+    dark: "#45689D",
+    darkAccent: "#809BC6",
+    brand: "cornflowerBlue",
+    red: "#ff5851"
+  },
+  fonts: {
+    body: "IBM Plex Sans, sans-serif",
+    heading: "IBM Plex Sans, sans-serif",
+    headingSize: "22px",
+    subHeadingSize: "16px",
+    normalSize: "14px"
+  }
+};
+exports.SidebarTitle = styled_components_1.default.div(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n  font-size: ", ";\n  font-weight: bolder;\n  border: 1px solid ", ";\n  padding: 15px;\n  display: flex;\n  flex: 0 1 auto;\n"], ["\n  font-size: ", ";\n  font-weight: bolder;\n  border: 1px solid ", ";\n  padding: 15px;\n  display: flex;\n  flex: 0 1 auto;\n"])), exports.Theme.fonts.subHeadingSize, exports.Theme.colors.lightAccent);
+exports.BaseSidebar = styled_components_1.default.div(templateObject_2 || (templateObject_2 = __makeTemplateObject(["\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n  overflow: hidden;\n"], ["\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n  overflow: hidden;\n"])));
+exports.LeftPanelDefaultWidth = 350;
+exports.CanvasStyle = styled_components_1.default.div(templateObject_3 || (templateObject_3 = __makeTemplateObject(["\n  position: relative;\n  background-size: 10px 10px;\n  background-color: white;\n  background-image: linear-gradient(\n      90deg,\n      hsla(0, 10%, 0%, 0.05) 1px,\n      transparent 0\n    ),\n    linear-gradient(180deg, hsla(0, 10%, 0%, 0.05) 1px, transparent 0);\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n  cursor: not-allowed;\n"], ["\n  position: relative;\n  background-size: 10px 10px;\n  background-color: white;\n  background-image: linear-gradient(\n      90deg,\n      hsla(0, 10%, 0%, 0.05) 1px,\n      transparent 0\n    ),\n    linear-gradient(180deg, hsla(0, 10%, 0%, 0.05) 1px, transparent 0);\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n  cursor: not-allowed;\n"])));
+var templateObject_1, templateObject_2, templateObject_3;
+},{"styled-components":"../node_modules/styled-components/dist/styled-components.browser.esm.js"}],"../node_modules/react-tooltip/dist/index.es.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -87326,481 +87802,7 @@ var ReactTooltip = staticMethods(_class = windowListener(_class = customEvent(_c
 
 var _default = ReactTooltip;
 exports.default = _default;
-},{"react":"../node_modules/react/index.js"}],"../node_modules/@babel/runtime/helpers/esm/extends.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = _extends;
-
-function _extends() {
-  exports.default = _extends = Object.assign || function (target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
-
-      for (var key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
-    }
-
-    return target;
-  };
-
-  return _extends.apply(this, arguments);
-}
-},{}],"../node_modules/@babel/runtime/helpers/esm/objectWithoutPropertiesLoose.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = _objectWithoutPropertiesLoose;
-
-function _objectWithoutPropertiesLoose(source, excluded) {
-  if (source == null) return {};
-  var target = {};
-  var sourceKeys = Object.keys(source);
-  var key, i;
-
-  for (i = 0; i < sourceKeys.length; i++) {
-    key = sourceKeys[i];
-    if (excluded.indexOf(key) >= 0) continue;
-    target[key] = source[key];
-  }
-
-  return target;
-}
-},{}],"../node_modules/@babel/runtime/helpers/esm/assertThisInitialized.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = _assertThisInitialized;
-
-function _assertThisInitialized(self) {
-  if (self === void 0) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-
-  return self;
-}
-},{}],"../node_modules/@babel/runtime/helpers/esm/inheritsLoose.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = _inheritsLoose;
-
-function _inheritsLoose(subClass, superClass) {
-  subClass.prototype = Object.create(superClass.prototype);
-  subClass.prototype.constructor = subClass;
-  subClass.__proto__ = superClass;
-}
-},{}],"../node_modules/react-textarea-autosize/dist/react-textarea-autosize.esm.browser.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _extends2 = _interopRequireDefault(require("@babel/runtime/helpers/esm/extends"));
-
-var _objectWithoutPropertiesLoose2 = _interopRequireDefault(require("@babel/runtime/helpers/esm/objectWithoutPropertiesLoose"));
-
-var _assertThisInitialized2 = _interopRequireDefault(require("@babel/runtime/helpers/esm/assertThisInitialized"));
-
-var _inheritsLoose2 = _interopRequireDefault(require("@babel/runtime/helpers/esm/inheritsLoose"));
-
-var _react = require("react");
-
-var _propTypes = require("prop-types");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var isIE = !!document.documentElement.currentStyle;
-var HIDDEN_TEXTAREA_STYLE = {
-  'min-height': '0',
-  'max-height': 'none',
-  height: '0',
-  visibility: 'hidden',
-  overflow: 'hidden',
-  position: 'absolute',
-  'z-index': '-1000',
-  top: '0',
-  right: '0'
-};
-var SIZING_STYLE = ['letter-spacing', 'line-height', 'font-family', 'font-weight', 'font-size', 'font-style', 'tab-size', 'text-rendering', 'text-transform', 'width', 'text-indent', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left', 'border-top-width', 'border-right-width', 'border-bottom-width', 'border-left-width', 'box-sizing'];
-var computedStyleCache = {};
-var hiddenTextarea = document.createElement('textarea');
-
-var forceHiddenStyles = function forceHiddenStyles(node) {
-  Object.keys(HIDDEN_TEXTAREA_STYLE).forEach(function (key) {
-    node.style.setProperty(key, HIDDEN_TEXTAREA_STYLE[key], 'important');
-  });
-};
-
-{
-  hiddenTextarea.setAttribute('tab-index', '-1');
-  hiddenTextarea.setAttribute('aria-hidden', 'true');
-  forceHiddenStyles(hiddenTextarea);
-}
-
-function calculateNodeHeight(uiTextNode, uid, useCache, minRows, maxRows) {
-  if (useCache === void 0) {
-    useCache = false;
-  }
-
-  if (minRows === void 0) {
-    minRows = null;
-  }
-
-  if (maxRows === void 0) {
-    maxRows = null;
-  }
-
-  if (hiddenTextarea.parentNode === null) {
-    document.body.appendChild(hiddenTextarea);
-  } // Copy all CSS properties that have an impact on the height of the content in
-  // the textbox
-
-
-  var nodeStyling = calculateNodeStyling(uiTextNode, uid, useCache);
-
-  if (nodeStyling === null) {
-    return null;
-  }
-
-  var paddingSize = nodeStyling.paddingSize,
-      borderSize = nodeStyling.borderSize,
-      boxSizing = nodeStyling.boxSizing,
-      sizingStyle = nodeStyling.sizingStyle; // Need to have the overflow attribute to hide the scrollbar otherwise
-  // text-lines will not calculated properly as the shadow will technically be
-  // narrower for content
-
-  Object.keys(sizingStyle).forEach(function (key) {
-    hiddenTextarea.style[key] = sizingStyle[key];
-  });
-  forceHiddenStyles(hiddenTextarea);
-  hiddenTextarea.value = uiTextNode.value || uiTextNode.placeholder || 'x';
-  var minHeight = -Infinity;
-  var maxHeight = Infinity;
-  var height = hiddenTextarea.scrollHeight;
-
-  if (boxSizing === 'border-box') {
-    // border-box: add border, since height = content + padding + border
-    height = height + borderSize;
-  } else if (boxSizing === 'content-box') {
-    // remove padding, since height = content
-    height = height - paddingSize;
-  } // measure height of a textarea with a single row
-
-
-  hiddenTextarea.value = 'x';
-  var singleRowHeight = hiddenTextarea.scrollHeight - paddingSize; // Stores the value's rows count rendered in `hiddenTextarea`,
-  // regardless if `maxRows` or `minRows` props are passed
-
-  var valueRowCount = Math.floor(height / singleRowHeight);
-
-  if (minRows !== null) {
-    minHeight = singleRowHeight * minRows;
-
-    if (boxSizing === 'border-box') {
-      minHeight = minHeight + paddingSize + borderSize;
-    }
-
-    height = Math.max(minHeight, height);
-  }
-
-  if (maxRows !== null) {
-    maxHeight = singleRowHeight * maxRows;
-
-    if (boxSizing === 'border-box') {
-      maxHeight = maxHeight + paddingSize + borderSize;
-    }
-
-    height = Math.min(maxHeight, height);
-  }
-
-  var rowCount = Math.floor(height / singleRowHeight);
-  return {
-    height: height,
-    minHeight: minHeight,
-    maxHeight: maxHeight,
-    rowCount: rowCount,
-    valueRowCount: valueRowCount
-  };
-}
-
-function calculateNodeStyling(node, uid, useCache) {
-  if (useCache === void 0) {
-    useCache = false;
-  }
-
-  if (useCache && computedStyleCache[uid]) {
-    return computedStyleCache[uid];
-  }
-
-  var style = window.getComputedStyle(node);
-
-  if (style === null) {
-    return null;
-  }
-
-  var sizingStyle = SIZING_STYLE.reduce(function (obj, name) {
-    obj[name] = style.getPropertyValue(name);
-    return obj;
-  }, {});
-  var boxSizing = sizingStyle['box-sizing']; // probably node is detached from DOM, can't read computed dimensions
-
-  if (boxSizing === '') {
-    return null;
-  } // IE (Edge has already correct behaviour) returns content width as computed width
-  // so we need to add manually padding and border widths
-
-
-  if (isIE && boxSizing === 'border-box') {
-    sizingStyle.width = parseFloat(sizingStyle.width) + parseFloat(style['border-right-width']) + parseFloat(style['border-left-width']) + parseFloat(style['padding-right']) + parseFloat(style['padding-left']) + 'px';
-  }
-
-  var paddingSize = parseFloat(sizingStyle['padding-bottom']) + parseFloat(sizingStyle['padding-top']);
-  var borderSize = parseFloat(sizingStyle['border-bottom-width']) + parseFloat(sizingStyle['border-top-width']);
-  var nodeInfo = {
-    sizingStyle: sizingStyle,
-    paddingSize: paddingSize,
-    borderSize: borderSize,
-    boxSizing: boxSizing
-  };
-
-  if (useCache) {
-    computedStyleCache[uid] = nodeInfo;
-  }
-
-  return nodeInfo;
-}
-
-var purgeCache = function purgeCache(uid) {
-  delete computedStyleCache[uid];
-};
-
-var noop = function noop() {};
-
-var uid = 0;
-
-var TextareaAutosize = /*#__PURE__*/function (_React$Component) {
-  (0, _inheritsLoose2.default)(TextareaAutosize, _React$Component);
-
-  function TextareaAutosize(props) {
-    var _this;
-
-    _this = _React$Component.call(this, props) || this;
-
-    _this._onRef = function (node) {
-      _this._ref = node;
-      var inputRef = _this.props.inputRef;
-
-      if (typeof inputRef === 'function') {
-        inputRef(node);
-        return;
-      }
-
-      inputRef.current = node;
-    };
-
-    _this._onChange = function (event) {
-      if (!_this._controlled) {
-        _this._resizeComponent();
-      }
-
-      _this.props.onChange(event, (0, _assertThisInitialized2.default)(_this));
-    };
-
-    _this._resizeComponent = function (callback) {
-      if (callback === void 0) {
-        callback = noop;
-      }
-
-      var nodeHeight = calculateNodeHeight(_this._ref, _this._uid, _this.props.useCacheForDOMMeasurements, _this.props.minRows, _this.props.maxRows);
-
-      if (nodeHeight === null) {
-        callback();
-        return;
-      }
-
-      var height = nodeHeight.height,
-          minHeight = nodeHeight.minHeight,
-          maxHeight = nodeHeight.maxHeight,
-          rowCount = nodeHeight.rowCount,
-          valueRowCount = nodeHeight.valueRowCount;
-      _this.rowCount = rowCount;
-      _this.valueRowCount = valueRowCount;
-
-      if (_this.state.height !== height || _this.state.minHeight !== minHeight || _this.state.maxHeight !== maxHeight) {
-        _this.setState({
-          height: height,
-          minHeight: minHeight,
-          maxHeight: maxHeight
-        }, callback);
-
-        return;
-      }
-
-      callback();
-    };
-
-    _this.state = {
-      height: props.style && props.style.height || 0,
-      minHeight: -Infinity,
-      maxHeight: Infinity
-    };
-    _this._uid = uid++;
-    _this._controlled = props.value !== undefined;
-    _this._resizeLock = false;
-    return _this;
-  }
-
-  var _proto = TextareaAutosize.prototype;
-
-  _proto.render = function render() {
-    var _this$props = this.props,
-        _inputRef = _this$props.inputRef,
-        _maxRows = _this$props.maxRows,
-        _minRows = _this$props.minRows,
-        _onHeightChange = _this$props.onHeightChange,
-        _useCacheForDOMMeasurements = _this$props.useCacheForDOMMeasurements,
-        props = (0, _objectWithoutPropertiesLoose2.default)(_this$props, ["inputRef", "maxRows", "minRows", "onHeightChange", "useCacheForDOMMeasurements"]);
-    props.style = (0, _extends2.default)({}, props.style, {
-      height: this.state.height
-    });
-    var maxHeight = Math.max(props.style.maxHeight || Infinity, this.state.maxHeight);
-
-    if (maxHeight < this.state.height) {
-      props.style.overflow = 'hidden';
-    }
-
-    return (0, _react.createElement)("textarea", (0, _extends2.default)({}, props, {
-      onChange: this._onChange,
-      ref: this._onRef
-    }));
-  };
-
-  _proto.componentDidMount = function componentDidMount() {
-    var _this2 = this;
-
-    this._resizeComponent(); // Working around Firefox bug which runs resize listeners even when other JS is running at the same moment
-    // causing competing rerenders (due to setState in the listener) in React.
-    // More can be found here - facebook/react#6324
-
-
-    this._resizeListener = function () {
-      if (_this2._resizeLock) {
-        return;
-      }
-
-      _this2._resizeLock = true;
-
-      _this2._resizeComponent(function () {
-        _this2._resizeLock = false;
-      });
-    };
-
-    window.addEventListener('resize', this._resizeListener);
-  };
-
-  _proto.componentDidUpdate = function componentDidUpdate(prevProps, prevState) {
-    if (prevProps !== this.props) {
-      this._resizeComponent();
-    }
-
-    if (this.state.height !== prevState.height) {
-      this.props.onHeightChange(this.state.height, this);
-    }
-  };
-
-  _proto.componentWillUnmount = function componentWillUnmount() {
-    window.removeEventListener('resize', this._resizeListener);
-    purgeCache(this._uid);
-  };
-
-  return TextareaAutosize;
-}(_react.Component);
-
-TextareaAutosize.defaultProps = {
-  inputRef: noop,
-  onChange: noop,
-  onHeightChange: noop,
-  useCacheForDOMMeasurements: false
-};
-"development" !== "production" ? TextareaAutosize.propTypes = {
-  inputRef: (0, _propTypes.oneOfType)([_propTypes.func, (0, _propTypes.shape)({
-    current: _propTypes.any
-  })]),
-  maxRows: _propTypes.number,
-  minRows: _propTypes.number,
-  onChange: _propTypes.func,
-  onHeightChange: _propTypes.func,
-  style: _propTypes.object,
-  useCacheForDOMMeasurements: _propTypes.bool,
-  value: _propTypes.string
-} : void 0;
-var _default = TextareaAutosize;
-exports.default = _default;
-},{"@babel/runtime/helpers/esm/extends":"../node_modules/@babel/runtime/helpers/esm/extends.js","@babel/runtime/helpers/esm/objectWithoutPropertiesLoose":"../node_modules/@babel/runtime/helpers/esm/objectWithoutPropertiesLoose.js","@babel/runtime/helpers/esm/assertThisInitialized":"../node_modules/@babel/runtime/helpers/esm/assertThisInitialized.js","@babel/runtime/helpers/esm/inheritsLoose":"../node_modules/@babel/runtime/helpers/esm/inheritsLoose.js","react":"../node_modules/react/index.js","prop-types":"../node_modules/prop-types/index.js"}],"../src/components/Theme.tsx":[function(require,module,exports) {
-"use strict";
-
-var __makeTemplateObject = this && this.__makeTemplateObject || function (cooked, raw) {
-  if (Object.defineProperty) {
-    Object.defineProperty(cooked, "raw", {
-      value: raw
-    });
-  } else {
-    cooked.raw = raw;
-  }
-
-  return cooked;
-};
-
-var __importDefault = this && this.__importDefault || function (mod) {
-  return mod && mod.__esModule ? mod : {
-    "default": mod
-  };
-};
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var styled_components_1 = __importDefault(require("styled-components"));
-
-exports.Theme = {
-  colors: {
-    light: "#F5F7F9",
-    lightAccent: "#dce2e8",
-    lightAccent2: "#c5ccd4",
-    dark: "#45689D",
-    darkAccent: "#809BC6",
-    brand: "cornflowerBlue",
-    red: "#ff5851"
-  },
-  fonts: {
-    body: "IBM Plex Sans, sans-serif",
-    heading: "IBM Plex Sans, sans-serif",
-    headingSize: "22px",
-    subHeadingSize: "16px",
-    normalSize: "14px"
-  }
-};
-exports.SidebarTitle = styled_components_1.default.div(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n  font-size: ", ";\n  font-weight: bolder;\n  border: 1px solid ", ";\n  padding: 15px;\n  display: flex;\n  flex: 0 1 auto;\n"], ["\n  font-size: ", ";\n  font-weight: bolder;\n  border: 1px solid ", ";\n  padding: 15px;\n  display: flex;\n  flex: 0 1 auto;\n"])), exports.Theme.fonts.subHeadingSize, exports.Theme.colors.lightAccent);
-exports.BaseSidebar = styled_components_1.default.div(templateObject_2 || (templateObject_2 = __makeTemplateObject(["\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n  overflow: hidden;\n"], ["\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n  overflow: hidden;\n"])));
-exports.LeftPanelDefaultWidth = 350;
-exports.CanvasStyle = styled_components_1.default.div(templateObject_3 || (templateObject_3 = __makeTemplateObject(["\n  position: relative;\n  background-size: 10px 10px;\n  background-color: white;\n  background-image: linear-gradient(\n      90deg,\n      hsla(0, 10%, 0%, 0.05) 1px,\n      transparent 0\n    ),\n    linear-gradient(180deg, hsla(0, 10%, 0%, 0.05) 1px, transparent 0);\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n  cursor: not-allowed;\n"], ["\n  position: relative;\n  background-size: 10px 10px;\n  background-color: white;\n  background-image: linear-gradient(\n      90deg,\n      hsla(0, 10%, 0%, 0.05) 1px,\n      transparent 0\n    ),\n    linear-gradient(180deg, hsla(0, 10%, 0%, 0.05) 1px, transparent 0);\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n  cursor: not-allowed;\n"])));
-var templateObject_1, templateObject_2, templateObject_3;
-},{"styled-components":"../node_modules/styled-components/dist/styled-components.browser.esm.js"}],"../src/components/Airflow/AirflowNode.tsx":[function(require,module,exports) {
+},{"react":"../node_modules/react/index.js"}],"../src/components/Airflow/AirflowNode.tsx":[function(require,module,exports) {
 "use strict";
 
 var __makeTemplateObject = this && this.__makeTemplateObject || function (cooked, raw) {
@@ -87867,32 +87869,32 @@ var lodash_1 = require("lodash");
 
 var styled_components_1 = __importStar(require("styled-components"));
 
-var react_tooltip_1 = __importDefault(require("react-tooltip"));
-
 var react_textarea_autosize_1 = __importDefault(require("react-textarea-autosize"));
 
 var fa_1 = require("react-icons/fa");
 
 var Theme_1 = require("../Theme");
 
+var react_tooltip_1 = __importDefault(require("react-tooltip"));
+
 exports.Outer = styled_components_1.default.div(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n  border: 1px solid ", ";\n  padding: 15px;\n  display: flex;\n  flex: 0 1 auto;\n  flex-direction: column;\n"], ["\n  border: 1px solid ", ";\n  padding: 15px;\n  display: flex;\n  flex: 0 1 auto;\n  flex-direction: column;\n"])), Theme_1.Theme.colors.lightAccent);
 var Tooltip = styled_components_1.default.div(templateObject_2 || (templateObject_2 = __makeTemplateObject(["\n  float: left;\n  padding: 4px;\n  font-size: ", ";\n  color: ", ";\n"], ["\n  float: left;\n  padding: 4px;\n  font-size: ", ";\n  color: ", ";\n"])), Theme_1.Theme.fonts.normalSize, Theme_1.Theme.colors.darkAccent);
-var StyledTooltip = styled_components_1.default(react_tooltip_1.default)(templateObject_3 || (templateObject_3 = __makeTemplateObject(["\n  max-width: 300px;\n"], ["\n  max-width: 300px;\n"])));
-exports.SectionTitle = styled_components_1.default.div(templateObject_4 || (templateObject_4 = __makeTemplateObject(["\n  padding: 8px 4px;\n  font-size: ", ";\n  color: ", ";\n"], ["\n  padding: 8px 4px;\n  font-size: ", ";\n  color: ", ";\n"])), Theme_1.Theme.fonts.subHeadingSize, Theme_1.Theme.colors.darkAccent);
-var OperatorNameStyle = styled_components_1.css(templateObject_5 || (templateObject_5 = __makeTemplateObject(["\n  font-size: ", ";\n  border-radius: 3px;\n"], ["\n  font-size: ", ";\n  border-radius: 3px;\n"])), Theme_1.Theme.fonts.subHeadingSize);
-var Name = styled_components_1.default.div(templateObject_6 || (templateObject_6 = __makeTemplateObject(["\n  ", "\n  padding: 3px;\n"], ["\n  ", "\n  padding: 3px;\n"])), OperatorNameStyle);
-var NameInput = styled_components_1.default.input(templateObject_7 || (templateObject_7 = __makeTemplateObject(["\n  padding: 7px;\n  border: 1px solid ", ";\n  outline: none;\n  &:hover {\n    background: ", ";\n  }\n  ", "\n"], ["\n  padding: 7px;\n  border: 1px solid ", ";\n  outline: none;\n  &:hover {\n    background: ", ";\n  }\n  ", "\n"])), Theme_1.Theme.colors.brand, Theme_1.Theme.colors.light, OperatorNameStyle);
-exports.Type = styled_components_1.default.div(templateObject_8 || (templateObject_8 = __makeTemplateObject(["\n  float: right;\n  font-size: ", ";\n  font-style: italic;\n"], ["\n  float: right;\n  font-size: ", ";\n  font-style: italic;\n"])), Theme_1.Theme.fonts.normalSize);
-var SmartTextAreaBase = styled_components_1.css(templateObject_9 || (templateObject_9 = __makeTemplateObject(["\n  border-radius: 5px;\n  height: 100%;\n  width: 100%;\n  font-family: ", ";\n  background: white;\n"], ["\n  border-radius: 5px;\n  height: 100%;\n  width: 100%;\n  font-family: ", ";\n  background: white;\n"])), Theme_1.Theme.fonts.body);
-var SmartTextAreaInput = styled_components_1.css(templateObject_10 || (templateObject_10 = __makeTemplateObject(["\n  border: none;\n  padding: 10px;\n\n  &:hover {\n    background: ", ";\n    outline: none;\n  }\n  &:focus {\n    background: ", ";\n    outline: none;\n  }\n"], ["\n  border: none;\n  padding: 10px;\n\n  &:hover {\n    background: ", ";\n    outline: none;\n  }\n  &:focus {\n    background: ", ";\n    outline: none;\n  }\n"])), Theme_1.Theme.colors.light, Theme_1.Theme.colors.light);
-var SmartTextAreaDiv = styled_components_1.default.div(templateObject_11 || (templateObject_11 = __makeTemplateObject(["\n  ", ";\n  padding: 1px;\n  border: 1px solid ", ";\n"], ["\n  ", ";\n  padding: 1px;\n  border: 1px solid ", ";\n"])), SmartTextAreaBase, Theme_1.Theme.colors.brand);
-var StyledSelect = styled_components_1.default.select(templateObject_12 || (templateObject_12 = __makeTemplateObject(["\n  ", ";\n  ", ";\n"], ["\n  ", ";\n  ", ";\n"])), SmartTextAreaBase, SmartTextAreaInput);
-var StyledOption = styled_components_1.default.option(templateObject_13 || (templateObject_13 = __makeTemplateObject(["\n  ", ";\n"], ["\n  ", ";\n"])), SmartTextAreaBase);
-var StyledTextarea = styled_components_1.default(react_textarea_autosize_1.default)(templateObject_14 || (templateObject_14 = __makeTemplateObject(["\n  ", ";\n  ", ";\n  resize: none;\n  overflow: hidden;\n"], ["\n  ", ";\n  ", ";\n  resize: none;\n  overflow: hidden;\n"])), SmartTextAreaBase, SmartTextAreaInput);
-var StyledLableDiv = styled_components_1.default.div(templateObject_15 || (templateObject_15 = __makeTemplateObject(["\n  width: 100%;\n  display: flex;\n  flex-direction: row;\n"], ["\n  width: 100%;\n  display: flex;\n  flex-direction: row;\n"])));
-var StyledLabel = styled_components_1.default.div(templateObject_16 || (templateObject_16 = __makeTemplateObject(["\n  ", ";\n  font-size: ", ";\n  padding: 4px 10px 0px 6px;\n  color: ", ";\n  float: left;\n  width: auto;\n"], ["\n  ", ";\n  font-size: ", ";\n  padding: 4px 10px 0px 6px;\n  color: ", ";\n  float: left;\n  width: auto;\n"])), SmartTextAreaBase, Theme_1.Theme.fonts.normalSize, Theme_1.Theme.colors.darkAccent);
-var StyledInfo = styled_components_1.default.div(templateObject_17 || (templateObject_17 = __makeTemplateObject(["\n  ", ";\n  font-size: ", ";\n  padding: 3px;\n  /* border-radius: 4px; */\n  color: ", ";\n  float: right;\n  text-align: right;\n  width: 20px;\n"], ["\n  ", ";\n  font-size: ", ";\n  padding: 3px;\n  /* border-radius: 4px; */\n  color: ", ";\n  float: right;\n  text-align: right;\n  width: 20px;\n"])), SmartTextAreaBase, Theme_1.Theme.fonts.normalSize, Theme_1.Theme.colors.darkAccent);
-var StyledErrorMessage = styled_components_1.default.div(templateObject_18 || (templateObject_18 = __makeTemplateObject(["\n  ", ";\n  font-size: ", ";\n  font-style: italic;\n  padding: 4px 10px 0px 6px;\n  color: red;\n  float: right;\n  text-align: right;\n"], ["\n  ", ";\n  font-size: ", ";\n  font-style: italic;\n  padding: 4px 10px 0px 6px;\n  color: red;\n  float: right;\n  text-align: right;\n"])), SmartTextAreaBase, Theme_1.Theme.fonts.normalSize);
+exports.SectionTitle = styled_components_1.default.div(templateObject_3 || (templateObject_3 = __makeTemplateObject(["\n  padding: 8px 4px;\n  font-size: ", ";\n  color: ", ";\n"], ["\n  padding: 8px 4px;\n  font-size: ", ";\n  color: ", ";\n"])), Theme_1.Theme.fonts.subHeadingSize, Theme_1.Theme.colors.darkAccent);
+var OperatorNameStyle = styled_components_1.css(templateObject_4 || (templateObject_4 = __makeTemplateObject(["\n  font-size: ", ";\n  border-radius: 3px;\n"], ["\n  font-size: ", ";\n  border-radius: 3px;\n"])), Theme_1.Theme.fonts.subHeadingSize);
+var Name = styled_components_1.default.div(templateObject_5 || (templateObject_5 = __makeTemplateObject(["\n  ", "\n  padding: 3px;\n"], ["\n  ", "\n  padding: 3px;\n"])), OperatorNameStyle);
+var NameInput = styled_components_1.default.input(templateObject_6 || (templateObject_6 = __makeTemplateObject(["\n  padding: 7px;\n  border: 1px solid ", ";\n  outline: none;\n  &:hover {\n    background: ", ";\n  }\n  ", "\n"], ["\n  padding: 7px;\n  border: 1px solid ", ";\n  outline: none;\n  &:hover {\n    background: ", ";\n  }\n  ", "\n"])), Theme_1.Theme.colors.brand, Theme_1.Theme.colors.light, OperatorNameStyle);
+exports.Type = styled_components_1.default.div(templateObject_7 || (templateObject_7 = __makeTemplateObject(["\n  float: right;\n  font-size: ", ";\n  font-style: italic;\n"], ["\n  float: right;\n  font-size: ", ";\n  font-style: italic;\n"])), Theme_1.Theme.fonts.normalSize);
+var SmartTextAreaBase = styled_components_1.css(templateObject_8 || (templateObject_8 = __makeTemplateObject(["\n  border-radius: 5px;\n  height: 100%;\n  width: 100%;\n  font-family: ", ";\n  background: white;\n"], ["\n  border-radius: 5px;\n  height: 100%;\n  width: 100%;\n  font-family: ", ";\n  background: white;\n"])), Theme_1.Theme.fonts.body);
+var SmartTextAreaInput = styled_components_1.css(templateObject_9 || (templateObject_9 = __makeTemplateObject(["\n  border: none;\n  padding: 10px;\n\n  &:hover {\n    background: ", ";\n    outline: none;\n  }\n  &:focus {\n    background: ", ";\n    outline: none;\n  }\n"], ["\n  border: none;\n  padding: 10px;\n\n  &:hover {\n    background: ", ";\n    outline: none;\n  }\n  &:focus {\n    background: ", ";\n    outline: none;\n  }\n"])), Theme_1.Theme.colors.light, Theme_1.Theme.colors.light);
+var SmartTextAreaDiv = styled_components_1.default.div(templateObject_10 || (templateObject_10 = __makeTemplateObject(["\n  ", ";\n  padding: 1px;\n  border: 1px solid ", ";\n"], ["\n  ", ";\n  padding: 1px;\n  border: 1px solid ", ";\n"])), SmartTextAreaBase, Theme_1.Theme.colors.brand);
+var StyledSelect = styled_components_1.default.select(templateObject_11 || (templateObject_11 = __makeTemplateObject(["\n  ", ";\n  ", ";\n"], ["\n  ", ";\n  ", ";\n"])), SmartTextAreaBase, SmartTextAreaInput);
+var StyledOption = styled_components_1.default.option(templateObject_12 || (templateObject_12 = __makeTemplateObject(["\n  ", ";\n"], ["\n  ", ";\n"])), SmartTextAreaBase);
+var StyledTextarea = styled_components_1.default(react_textarea_autosize_1.default)(templateObject_13 || (templateObject_13 = __makeTemplateObject(["\n  ", ";\n  ", ";\n  resize: none;\n  overflow: hidden;\n"], ["\n  ", ";\n  ", ";\n  resize: none;\n  overflow: hidden;\n"])), SmartTextAreaBase, SmartTextAreaInput);
+var StyledLableDiv = styled_components_1.default.div(templateObject_14 || (templateObject_14 = __makeTemplateObject(["\n  width: 100%;\n  display: flex;\n  flex-direction: row;\n"], ["\n  width: 100%;\n  display: flex;\n  flex-direction: row;\n"])));
+var StyledLabel = styled_components_1.default.div(templateObject_15 || (templateObject_15 = __makeTemplateObject(["\n  ", ";\n  font-size: ", ";\n  padding: 4px 10px 0px 6px;\n  color: ", ";\n  float: left;\n  width: auto;\n"], ["\n  ", ";\n  font-size: ", ";\n  padding: 4px 10px 0px 6px;\n  color: ", ";\n  float: left;\n  width: auto;\n"])), SmartTextAreaBase, Theme_1.Theme.fonts.normalSize, Theme_1.Theme.colors.darkAccent);
+var StyledInfo = styled_components_1.default.div(templateObject_16 || (templateObject_16 = __makeTemplateObject(["\n  ", ";\n  font-size: ", ";\n  padding: 3px;\n  /* border-radius: 4px; */\n  color: ", ";\n  float: right;\n  text-align: right;\n  width: 20px;\n"], ["\n  ", ";\n  font-size: ", ";\n  padding: 3px;\n  /* border-radius: 4px; */\n  color: ", ";\n  float: right;\n  text-align: right;\n  width: 20px;\n"])), SmartTextAreaBase, Theme_1.Theme.fonts.normalSize, Theme_1.Theme.colors.darkAccent);
+var StyledErrorMessage = styled_components_1.default.div(templateObject_17 || (templateObject_17 = __makeTemplateObject(["\n  ", ";\n  font-size: ", ";\n  font-style: italic;\n  padding: 4px 10px 0px 6px;\n  color: red;\n  float: right;\n  text-align: right;\n"], ["\n  ", ";\n  font-size: ", ";\n  font-style: italic;\n  padding: 4px 10px 0px 6px;\n  color: red;\n  float: right;\n  text-align: right;\n"])), SmartTextAreaBase, Theme_1.Theme.fonts.normalSize);
+var StyledTooltip = styled_components_1.default(react_tooltip_1.default)(templateObject_18 || (templateObject_18 = __makeTemplateObject(["\n  max-width: 300px;\n"], ["\n  max-width: 300px;\n"])));
 
 var isValid = function isValid(params) {
   var value = params.value,
@@ -88169,15 +88171,12 @@ function (_super) {
     var _this = this;
 
     return React.createElement("div", null, React.createElement(exports.Outer, null, React.createElement("div", null, React.createElement(Tooltip, null, this.props.nameField), React.createElement(fa_1.FaInfoCircle, {
-      "data-tip": this.props.properties.description,
+      "data-tip": this.props.properties.description || "",
       style: {
         float: "right",
         marginLeft: "5px"
       }
-    }), this.props.type ? React.createElement(exports.Type, null, this.props.type) : null), React.createElement(StyledTooltip, {
-      multiline: true,
-      place: "right"
-    }), React.createElement(NameInput, {
+    }), this.props.type ? React.createElement(exports.Type, null, this.props.type) : null), React.createElement(NameInput, {
       placeholder: "Input name..",
       type: "text",
       value: this.props.properties.name || "",
@@ -88198,7 +88197,10 @@ function (_super) {
       })) : React.createElement("div", {
         key: p.id + "-" + i + "-div-name-placeholder"
       })];
-    }))));
+    }))), React.createElement(StyledTooltip, {
+      effect: "solid",
+      place: "right"
+    }));
   };
 
   return RenderedAirflowParametersAsForm;
@@ -88248,7 +88250,7 @@ function (_super) {
 
 exports.AirflowNodeForm = AirflowNodeForm;
 var templateObject_1, templateObject_2, templateObject_3, templateObject_4, templateObject_5, templateObject_6, templateObject_7, templateObject_8, templateObject_9, templateObject_10, templateObject_11, templateObject_12, templateObject_13, templateObject_14, templateObject_15, templateObject_16, templateObject_17, templateObject_18;
-},{"react":"../node_modules/react/index.js","lodash":"../node_modules/lodash/lodash.js","styled-components":"../node_modules/styled-components/dist/styled-components.browser.esm.js","react-tooltip":"../node_modules/react-tooltip/dist/index.es.js","react-textarea-autosize":"../node_modules/react-textarea-autosize/dist/react-textarea-autosize.esm.browser.js","react-icons/fa":"../node_modules/react-icons/fa/index.esm.js","../Theme":"../src/components/Theme.tsx"}],"../src/components/Airflow/AirflowDag.tsx":[function(require,module,exports) {
+},{"react":"../node_modules/react/index.js","lodash":"../node_modules/lodash/lodash.js","styled-components":"../node_modules/styled-components/dist/styled-components.browser.esm.js","react-textarea-autosize":"../node_modules/react-textarea-autosize/dist/react-textarea-autosize.esm.browser.js","react-icons/fa":"../node_modules/react-icons/fa/index.esm.js","../Theme":"../src/components/Theme.tsx","react-tooltip":"../node_modules/react-tooltip/dist/index.es.js"}],"../src/components/Airflow/AirflowDag.tsx":[function(require,module,exports) {
 "use strict";
 
 var __extends = this && this.__extends || function () {
@@ -88778,11 +88780,8 @@ var react_flow_chart_1 = require("@mrblenny/react-flow-chart");
 
 var styled_components_1 = __importDefault(require("styled-components"));
 
-var react_tooltip_1 = __importDefault(require("react-tooltip"));
-
 var AppLayout = styled_components_1.default.div(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n  display: flex;\n  flex-direction: column;\n  flex: 1;\n  max-width: 100vw;\n  max-height: 100vh;\n"], ["\n  display: flex;\n  flex-direction: column;\n  flex: 1;\n  max-width: 100vw;\n  max-height: 100vh;\n"])));
 var Content = styled_components_1.default.div(templateObject_2 || (templateObject_2 = __makeTemplateObject(["\n  display: flex;\n  flex-direction: column;\n  flex: 1 1 auto;\n  overflow: hidden;\n"], ["\n  display: flex;\n  flex-direction: column;\n  flex: 1 1 auto;\n  overflow: hidden;\n"])));
-var StyledTooltip = styled_components_1.default(react_tooltip_1.default)(templateObject_3 || (templateObject_3 = __makeTemplateObject(["\n  max-width: 300px;\n"], ["\n  max-width: 300px;\n"])));
 
 var MainPage =
 /** @class */
@@ -88819,18 +88818,15 @@ function (_super) {
     })), react_1.default.createElement(__1.OperatorSidebar, {
       operators: app.state.operators,
       refreshOperators: refreshOperators
-    }))), react_1.default.createElement(StyledTooltip, {
-      effect: "solid",
-      place: "right"
-    }));
+    }))));
   };
 
   return MainPage;
 }(react_1.default.Component);
 
 exports.MainPage = MainPage;
-var templateObject_1, templateObject_2, templateObject_3;
-},{"react":"../node_modules/react/index.js","..":"../src/components/index.ts","../Theme":"../src/components/Theme.tsx","@mrblenny/react-flow-chart":"../node_modules/@mrblenny/react-flow-chart/src/index.js","styled-components":"../node_modules/styled-components/dist/styled-components.browser.esm.js","react-tooltip":"../node_modules/react-tooltip/dist/index.es.js"}],"../src/components/Page/Page.tsx":[function(require,module,exports) {
+var templateObject_1, templateObject_2;
+},{"react":"../node_modules/react/index.js","..":"../src/components/index.ts","../Theme":"../src/components/Theme.tsx","@mrblenny/react-flow-chart":"../node_modules/@mrblenny/react-flow-chart/src/index.js","styled-components":"../node_modules/styled-components/dist/styled-components.browser.esm.js"}],"../src/components/Page/Page.tsx":[function(require,module,exports) {
 "use strict";
 
 var __makeTemplateObject = this && this.__makeTemplateObject || function (cooked, raw) {
@@ -90510,7 +90506,7 @@ function (_super) {
     _this.apiClient = new ApiClient_1.APIClient();
 
     _this.cleanState = function (state) {
-      return __assign(__assign({}, state), {
+      var x = __assign(__assign({}, state), {
         nodes: lodash_1.mapValues(state.nodes, function (node) {
           return __assign(__assign({}, node), {
             position: {
@@ -90519,7 +90515,13 @@ function (_super) {
             }
           });
         })
-      });
+      }); // x.offset = {
+      //   x: x.offset.x,
+      //   y: x.offset.y,
+      // }
+
+
+      return x;
     }; //////////////////////////////////////////////////
     // Navigation and event handlers
     //////////////////////////////////////////////////
@@ -90553,12 +90555,14 @@ function (_super) {
           return _this.toggleFileBrowser();
         }
       }, {
-        tooltip: "Covnert to Python DAG",
+        tooltip: "Convert to Python DAG",
         icon: React.createElement(fa_1.FaProjectDiagram, null),
         callback: function callback() {
           return _this.convertToDag();
         }
       }],
+      // Uncomment to include
+      // FIXME: include in a debug mode? 
       dropdownHandlers: [// {
         //   name: "File",
         //   callback: () => <MenuItems.FileDropdown getApp={() => this} />
@@ -90572,7 +90576,8 @@ function (_super) {
         //   callback: () => <MenuItems.HelpDropdown getApp={() => this} />
         // }
       ]
-    };
+    }; // FIXME: If localstorage is corrupted then this won't stop spinning
+
     _this.state = localStorage.get("windmillChart") || lodash_1.cloneDeep(defaultChartState_1.defaultChart);
     _this.convertToDag = _this.convertToDag.bind(_this);
     _this.newWml = _this.newWml.bind(_this);
@@ -90720,15 +90725,14 @@ function (_super) {
   };
 
   App.prototype.saveWml = function () {
+    // FIXME: Can't include position as react-flow-chart nested state here
     var _a = this.cleanState(this.state),
-        offset = _a.offset,
         filename = _a.filename,
         dag = _a.dag,
         nodes = _a.nodes,
         links = _a.links;
 
     var persistentState = {
-      offset: offset,
       filename: filename,
       dag: dag,
       nodes: nodes,
@@ -90738,15 +90742,14 @@ function (_super) {
   };
 
   App.prototype.convertToDag = function () {
+    // FIXME: Can't include position as react-flow-chart nested state here
     var _a = this.cleanState(this.state),
-        offset = _a.offset,
         filename = _a.filename,
         dag = _a.dag,
         nodes = _a.nodes,
         links = _a.links;
 
     var persistentState = {
-      offset: offset,
       filename: filename,
       dag: dag,
       nodes: nodes,
@@ -90841,7 +90844,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64008" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53912" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
