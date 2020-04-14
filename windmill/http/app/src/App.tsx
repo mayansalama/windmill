@@ -12,7 +12,7 @@ import {
   IAirflowOperator,
   IAirflowOperatorProperties,
   MainPage,
-  IDropdownNavbarProps
+  IDropdownNavbarProps,
 } from "./components";
 import * as MenuItems from "./components/Navbar/NavbarDropdowns";
 import { defaultChart } from "./misc/defaultChartState";
@@ -34,6 +34,7 @@ export class App extends React.Component<{}, IAppState> {
     super(props);
     // FIXME: If localstorage is corrupted then this won't stop spinning
     this.state = localStorage.get("windmillChart") || cloneDeep(defaultChart);
+    // this.state = cloneDeep(defaultChart);
 
     this.convertToDag = this.convertToDag.bind(this);
     this.newWml = this.newWml.bind(this);
@@ -59,20 +60,20 @@ export class App extends React.Component<{}, IAppState> {
   cleanState = (state: IAppState) => {
     const x = {
       ...state,
-      nodes: mapValues(state.nodes, node => {
+      nodes: mapValues(state.nodes, (node) => {
         return {
           ...node,
           position: {
             x: node.position.x,
-            y: node.position.y
-          }
+            y: node.position.y,
+          },
         };
-      })
+      }),
     };
-    // x.offset = {
-    //   x: x.offset.x,
-    //   y: x.offset.y,
-    // }
+    x.offset = {
+      x: x.offset.x,
+      y: x.offset.y,
+    };
     return x;
   };
 
@@ -85,9 +86,9 @@ export class App extends React.Component<{}, IAppState> {
   }
 
   public updateFilename(name: string) {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       ...prevState,
-      filename: name
+      filename: name,
     }));
   }
 
@@ -95,33 +96,33 @@ export class App extends React.Component<{}, IAppState> {
     key: string,
     newProps: IAirflowOperatorProperties
   ) {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       ...prevState,
       nodes: {
         ...prevState.nodes,
         [key]: {
           ...prevState.nodes[key],
-          ["properties"]: newProps
-        }
-      }
+          ["properties"]: newProps,
+        },
+      },
     }));
 
     this.saveStateToLocal();
   }
 
   public updateDag(newProps: IAirflowDag) {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       ...prevState,
-      dag: newProps
+      dag: newProps,
     }));
 
     this.saveStateToLocal();
   }
 
   public incLoading(inc = 1) {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       ...prevState,
-      isLoading: prevState.isLoading + inc
+      isLoading: prevState.isLoading + inc,
     }));
   }
 
@@ -129,10 +130,10 @@ export class App extends React.Component<{}, IAppState> {
     this.incLoading();
     this.apiClient
       .getWml(filename)
-      .then(data => {
-        this.setState(prevState => ({
+      .then((data) => {
+        this.setState((prevState) => ({
           ...prevState,
-          ...data
+          ...data,
         }));
       })
       .then(() => {
@@ -145,10 +146,10 @@ export class App extends React.Component<{}, IAppState> {
     this.incLoading();
     this.apiClient
       .getOperators()
-      .then(data => {
-        this.setState(prevState => ({
+      .then((data) => {
+        this.setState((prevState) => ({
           ...prevState,
-          operators: data
+          operators: data,
         }));
       })
       .then(() => this.incLoading(-1));
@@ -158,16 +159,16 @@ export class App extends React.Component<{}, IAppState> {
     this.incLoading();
     this.apiClient
       .getDagSpec()
-      .then(data => {
+      .then((data) => {
         // Set values to defaults where applicable
         for (let i = 0; i < data.parameters.length; i++) {
           if (data.parameters[i].default) {
             data.parameters[i].value = data.parameters[i].default;
           }
         }
-        this.setState(prevState => ({
+        this.setState((prevState) => ({
           ...prevState,
-          dag: data
+          dag: data,
         }));
       })
       .then(() => this.incLoading(-1));
@@ -185,26 +186,26 @@ export class App extends React.Component<{}, IAppState> {
       {
         tooltip: "New WML",
         icon: <FaFile />,
-        callback: () => this.newWml()
+        callback: () => this.newWml(),
       },
       {
         tooltip: "Save WML",
         icon: <FaSave />,
-        callback: () => this.saveWml()
+        callback: () => this.saveWml(),
       },
       {
         tooltip: "Open WML",
         icon: <FaFolderOpen />,
-        callback: () => this.toggleFileBrowser()
+        callback: () => this.toggleFileBrowser(),
       },
       {
         tooltip: "Convert to Python DAG",
         icon: <FaProjectDiagram />,
-        callback: () => this.convertToDag()
-      }
+        callback: () => this.convertToDag(),
+      },
     ],
     // Uncomment to include
-    // FIXME: include in a debug mode? 
+    // FIXME: include in a debug mode?
     dropdownHandlers: [
       // {
       //   name: "File",
@@ -216,30 +217,30 @@ export class App extends React.Component<{}, IAppState> {
       // },
       // {
       //   name: "View",
-      //   callback: () => <MenuItems.ViewDropdown getApp={() => this} />
-      // }
-    ]
+      //   callback: () => <MenuItems.ViewDropdown getApp={() => this} />,
+      // },
+    ],
   };
 
   public newWml() {
     this.setState({
-      ...defaultChart
+      ...defaultChart,
     });
     this.refreshDag();
     this.refreshOperators();
   }
 
   public toggleFileBrowser() {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       ...prevState,
-      isFileBrowserOpen: !prevState.isFileBrowserOpen
+      isFileBrowserOpen: !prevState.isFileBrowserOpen,
     }));
   }
 
   public toggleRenameBox() {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       ...prevState,
-      isRenameBoxOpen: !prevState.isRenameBoxOpen
+      isRenameBoxOpen: !prevState.isRenameBoxOpen,
     }));
   }
 
@@ -283,19 +284,19 @@ export class App extends React.Component<{}, IAppState> {
         {this.state.isFileBrowserOpen ? (
           <FileBrowser getApp={() => this} />
         ) : (
-            <div />
-          )}
+          <div />
+        )}
         {this.state.isRenameBoxOpen ? (
           <RenameBox getApp={() => this} />
         ) : (
-            <div />
-          )}
+          <div />
+        )}
         <div
           style={{
             filter:
               this.state.isFileBrowserOpen || this.state.isRenameBoxOpen
                 ? "opacity(0.3)"
-                : ""
+                : "",
           }}
         >
           <MainPage actions={stateActions} getApp={() => this} />

@@ -69,7 +69,7 @@ pushed to a configured git repository.
 - [x] API Endpoint to trigger WML -> DAG
 - [x] Make sure that nodes are being put in right order using ports
 - [ ] Edge cases for WML -> DAG
-- [ ] Allow weird dag/task ids (e.g. 123)
+- [ ] Allow repeated/weird dag/task ids (e.g. 123)
 - [ ] Get WML owner and last-modified details during wml list
 - [ ] Allow custom operators
 - [ ] Strategy for Python Opjects (e.g. callables) - allow either a import ref or an inline statement

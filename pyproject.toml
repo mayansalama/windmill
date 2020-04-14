@@ -10,6 +10,8 @@ packages = [
 ]
 homepage = "https://github.com/mayansalama/windmill"
 repository = "https://github.com/mayansalama/windmill"
+exclude = ["windmill/http/app/*"]
+include = ["windmill/http/app/dist/*"]
 
 [tool.poetry.dependencies]
 python = "^3.6"

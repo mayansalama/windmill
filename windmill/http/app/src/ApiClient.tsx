@@ -1,11 +1,10 @@
 import axios, { Method } from "axios";
 
-
 const BaseURI = "http://127.0.0.1:8000";
 
 const client = axios.create({
   baseURL: BaseURI,
-  data: JSON
+  data: JSON,
 });
 
 export class APIClient {
@@ -37,14 +36,16 @@ export class APIClient {
     return client({
       method,
       url: resource,
-      data
+      data,
       //   headers: {
       //     Authorization: `Bearer ${this.accessToken}`
       //   }
-    }).then(resp => {
-      return resp.data ? resp.data : [];
-    }).catch((error) => {
-      console.log(error);
-    });
+    })
+      .then((resp) => {
+        return resp.data ? resp.data : [];
+      })
+      .catch((error) => {
+        console.log(`${error}: ${error.response.data}`);
+      });
   }
 }
