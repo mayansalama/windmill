@@ -157,9 +157,17 @@ class Links:
         graph = DiGraph()
         for link_dict in links:
             try:
+                # Link goes from out nodes to in node
+                # Front end flow chart allows link to start at our in node
+                if link_dict["from_node"]["portId"] == "out_port":
+                    from_dict = link_dict["from_node"]
+                    to_dict = link_dict["to_node"]
+                else:
+                    from_dict = link_dict["to_node"]
+                    to_dict = link_dict["from_node"]
                 graph.add_edge(
-                    task_name_mappings[link_dict["from_node"]["nodeId"]],
-                    task_name_mappings[link_dict["to_node"]["nodeId"]],
+                    task_name_mappings[from_dict["nodeId"]],
+                    task_name_mappings[to_dict["nodeId"]],
                 )
             except KeyError as e:
                 raise DagHandlerValidationError(
@@ -173,7 +181,7 @@ class Links:
 
     @staticmethod
     def graph_to_efficient_representation(graph):
-        """Greedy algorithm to find an efficient representation of a graph.
+        """Greedy algorithm to find an efficient representation of a graph
 
         A Graph that looks like: 
 

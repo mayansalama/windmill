@@ -7,7 +7,7 @@
   "repository": "git@github.com:mayansalama/windmill.git",
   "scripts": {
     "start": "parcel public/index.html",
-    "prebuild": "rm -rf dist",
+    "prebuild": "find dist/ -type f -not -name '.gitkeep' -delete",
     "build": "parcel build public/index.html"
   },
   "keywords": [],

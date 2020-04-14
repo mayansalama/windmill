@@ -39,7 +39,7 @@ pushed to a configured git repository.
 - [x] Switch nav menu to icons 
 - [x] Add convert DAG call
 - [ ] Add hotkeys to menu functions
-- [ ] Make input/output nodes more clear
+- [x] Make input/output nodes more clear
 - [ ] Check if file already exists on rename
 - [ ] Prompt save if there are nodes on open
 - [x] Fix loss of state on refresh bug
@@ -47,8 +47,11 @@ pushed to a configured git repository.
 - [ ] Make Flask Backend URI configurable
 - [ ] Add a last saved time to NavBar
 - [ ] Add error handling to backend calls
+- [ ] Only save local state if valid
 - [ ] Add tests
 - [ ] Get task descriptions from Operator list
+- [ ] XSS and injection vulns? 
+- [ ] Ctl+Shift+F FIXME
 
 ### Back-End Features
 
@@ -64,13 +67,14 @@ pushed to a configured git repository.
 - [x] Move airflow dependency as extra
 - [x] Convert WML into Python DAG
 - [x] API Endpoint to trigger WML -> DAG
-- [ ] Make sure that nodes are being put in right order using ports
+- [x] Make sure that nodes are being put in right order using ports
 - [ ] Edge cases for WML -> DAG
+- [ ] Allow weird dag/task ids (e.g. 123)
 - [ ] Get WML owner and last-modified details during wml list
 - [ ] Allow custom operators
 - [ ] Strategy for Python Opjects (e.g. callables) - allow either a import ref or an inline statement
 - [ ] Backport existing Python DAGs to WMLs
-- [ ] Allow DAG updates to propogate to WMLs
+- [ ] Allow DAG updates to propogate to WMLs (probably better to just always backport - consolidating would be a mess)
 - [ ] Add tests for different airflow version
 - [ ] Version lock travis tox and poetry version? 
 
@@ -79,6 +83,7 @@ pushed to a configured git repository.
 - [ ] Validate on backend or front end or both?
 - [ ] Doco
 - [ ] Add permission restrictions for valid tags 
+- [ ] Only include dist folder from app in poetry build
 
 ## Dev User Guide
 
@@ -86,8 +91,10 @@ To run as a dev:
 
 1. Clone from git
 2. Run `poetry install -E airflow`
-3. Run `windmill-dev start-backend`
+4. Run `npm install from windmill/http/app`
 4. Run `windmill-dev start-frontend`
+3. Run `windmill-dev start-backend`
+5. Open `127.0.0.1:1234`
 
 ## Run Python Tests
 

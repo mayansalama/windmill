@@ -93,8 +93,8 @@ class TestV1Dag(Fixture):
         existing_link = deepcopy(data)["links"].popitem()[1]
         data["links"]["a broken link"] = {
             "id": "a cyclical link",
-            "from": {"nodeId": existing_link["to"]["nodeId"], "portId": "bottom"},
-            "to": {"nodeId": existing_link["from"]["nodeId"], "portId": "top"},
+            "from": {"nodeId": existing_link["to"]["nodeId"], "portId": "out_port"},
+            "to": {"nodeId": existing_link["from"]["nodeId"], "portId": "in_port"},
         }
 
         res: Response = self.client.post(

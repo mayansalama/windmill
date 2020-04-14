@@ -135,12 +135,6 @@ const StyledErrorMessage = styled.div`
   text-align: right;
 `;
 
-
-const StyledTooltip = styled(ReactTooltip)`
-  max-width: 300px;
-`;
-
-
 const isValid = (params: IAirflowOperatorParameter): string => {
   const { value, required, type } = params;
   let err_msg = "";
@@ -190,7 +184,7 @@ class SmartTextarea extends React.Component<ISmartTextAreaProps> {
       <StyledTextarea
         id={id}
         value={value}
-        onChange={event => this.onChange(event.target.value)}
+        onChange={(event) => this.onChange(event.target.value)}
         placeholder={placeholder || "Input string..."}
       />
     );
@@ -204,7 +198,7 @@ class SmartTextarea extends React.Component<ISmartTextAreaProps> {
       <StyledTextarea
         id={id}
         value={value}
-        onChange={event => this.onChange(event.target.value)}
+        onChange={(event) => this.onChange(event.target.value)}
         placeholder={placeholder || "Input number..."}
       />
     );
@@ -213,7 +207,7 @@ class SmartTextarea extends React.Component<ISmartTextAreaProps> {
   public renderBool() {
     return (
       <StyledSelect
-        onChange={event => this.onChange(event.target.value)}
+        onChange={(event) => this.onChange(event.target.value)}
         value={this.props.params.value}
       >
         <StyledOption>True</StyledOption>
@@ -243,8 +237,8 @@ class SmartTextarea extends React.Component<ISmartTextAreaProps> {
           borderColor: errmsg
             ? "red"
             : required
-              ? Theme.colors.brand
-              : Theme.colors.lightAccent2
+            ? Theme.colors.brand
+            : Theme.colors.lightAccent2,
         }}
       >
         <StyledLableDiv>
@@ -375,11 +369,19 @@ export interface IRenderedAirflowParametersAsFormProps {
 
 export class RenderedAirflowParametersAsForm extends React.Component<
   IRenderedAirflowParametersAsFormProps
-  > {
+> {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
     this.handleNameChange = this.handleNameChange.bind(this);
+  }
+
+  componentDidUpdate() {
+    ReactTooltip.rebuild();
+  }
+
+  componentDidMount() {
+    ReactTooltip.rebuild();
   }
 
   handleChange(params: IAirflowOperatorParameter, index: number) {
@@ -420,7 +422,7 @@ export class RenderedAirflowParametersAsForm extends React.Component<
               borderColor:
                 this.props.properties.name === "" || !this.props.properties.name
                   ? "red"
-                  : Theme.colors.brand
+                  : Theme.colors.brand,
             }}
           />
         </Outer>
@@ -440,14 +442,12 @@ export class RenderedAirflowParametersAsForm extends React.Component<
                     <br key={`${p.id}-${i}-br`} />
                   </div>
                 ) : (
-                    <div key={`${p.id}-${i}-div-name-placeholder`} />
-                  )
+                  <div key={`${p.id}-${i}-div-name-placeholder`} />
+                ),
               ];
             })
           )}
         </Outer>
-        {/* FIXME: For some reason this is the only place I can put a styled tooltip and still have it working */}
-        <StyledTooltip effect="solid" place="right" />
       </div>
     );
   }
@@ -462,7 +462,7 @@ interface IAirflowNodeDefaultProps extends INodeInnerDefaultProps {
 }
 
 export const AirflowNode = ({ node }: IAirflowNodeDefaultProps) => {
-  const valid = node.properties.parameters.every(op => isValid(op) === "");
+  const valid = node.properties.parameters.every((op) => isValid(op) === "");
   return (
     <Outer style={{ borderColor: valid ? Theme.colors.lightAccent : "red" }}>
       <Tooltip>{node.type}</Tooltip>

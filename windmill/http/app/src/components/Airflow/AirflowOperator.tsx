@@ -1,9 +1,9 @@
-import * as React from "react";
-import styled from "styled-components";
-import { cloneDeep, StringNullableChain } from "lodash";
-import { FaWindowMaximize } from "react-icons/fa";
-import { INode, REACT_FLOW_CHART } from "@mrblenny/react-flow-chart";
-import { Theme } from "../Theme";
+import { INode, REACT_FLOW_CHART } from '@mrblenny/react-flow-chart';
+import * as React from 'react';
+import { FaWindowMaximize } from 'react-icons/fa';
+import styled from 'styled-components';
+
+import { Theme } from '../Theme';
 
 const Outer = styled.div`
   padding: 10px 10px;
@@ -17,18 +17,18 @@ const Outer = styled.div`
 `;
 
 const DefaultPorts = {
-  port1: {
-    id: "port1",
+  in_port: {
+    id: "in_port",
     type: "top",
     properties: {
-      custom: "property"
+      value: "in"
     }
   },
-  port2: {
-    id: "port2",
+  out_port: {
+    id: "out_port",
     type: "bottom",
     properties: {
-      custom: "property"
+      value: "out"
     }
   }
 };
