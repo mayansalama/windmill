@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "airflow-windmill"
-version = "0.0.3"
+version = "0.0.4"
 description = "Drag'N'Drop Web Frontend for Building and Managing Airflow DAGs"
 authors = ["mayansalama <micsalama@gmail.com>"]
 readme = "README.md"
