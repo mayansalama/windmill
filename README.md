@@ -11,12 +11,17 @@ pushed to a configured git repository.
 
 ## Getting Started
 
-1. Install with `pip install airflow-windmill`
+1. python3 -V  # 3.6 and 3.7 should both be fine
+2. If on *nix, `sudo apt-get install python3-venv`
+3. python3 -m venv venv
+4. source venv/bin/activate
+5. Install with `pip install 'airflow-windmill'`
    1. Airflow is expected to be installed on the system. This allows Windmill to run with arbitrary versions of Airflow
-   2. Otherwise it can be packaged with windmill using `pip install airflow-windmill[airflow]`. The version is defined in `pyproject.toml`
-2. Run `windmill init` to create a local Windmill project
-3. `cd windmill-project`
-4. Run `windmill run` from this folder to run the app locally
+   2. Otherwise it can be packaged with windmill using `pip install 'airflow-windmill[airflow]'`. The version is defined in `pyproject.toml`
+6. Run `windmill init` to create a local Windmill project
+7. `cd windmill-project`
+8. Run `windmill run` from this folder to run the app locally
+9. Navigate to 127.0.0.1:8000
 
 ## MVP Required Features
 
@@ -90,11 +95,14 @@ pushed to a configured git repository.
 To run as a dev:
 
 1. Clone from git
-2. Run `poetry install -E airflow`
-4. Run `npm install from windmill/http/app`
-4. Run `windmill-dev start-frontend`
-3. Run `windmill-dev start-backend`
-5. Open `127.0.0.1:1234`
+2. Run `curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python`
+3. Run `source $HOME/.poetry/env`
+4. Activate your python virtualenv of choice
+5. Run `poetry install -E airflow`
+6. Run `npm --prefix ./windmill/http/app install ./windmill/http/app`
+7. Run `windmill-dev start-frontend`
+8. Run `windmill-dev start-backend`
+9. Open `127.0.0.1:1234`
 
 ## Run Python Tests
 

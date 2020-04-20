@@ -10,3 +10,9 @@ windmill-project/
 
 # Ignore top level dist created by Poetry 
 dist/*
+
+# Ignore node modules
+node_modules/
+
+# if running nodeenv to manage node, ignore its env folder
+env/
