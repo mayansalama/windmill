@@ -8,7 +8,7 @@ import {
   Page,
   OperatorPort,
   SelectedSidebar,
-  OperatorSidebar
+  OperatorSidebar,
 } from "..";
 import { App } from "../../";
 import { CanvasStyle } from "../Theme";
@@ -70,7 +70,24 @@ export class MainPage extends React.Component<{
                 Components={{
                   NodeInner: AirflowNode,
                   CanvasOuter: CanvasStyle,
-                  Port: OperatorPort
+                  Port: OperatorPort,
+                }}
+                config={{
+                  validateLink: ({
+                    linkId,
+                    fromNodeId,
+                    fromPortId,
+                    toNodeId,
+                    toPortId,
+                    chart,
+                  }): boolean => {
+                    // no links between same node
+                    if (
+                      fromNodeId === toNodeId
+                    )
+                      return false;
+                    return true;
+                  },
                 }}
               />
             </Content>
