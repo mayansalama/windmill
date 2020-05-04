@@ -23,7 +23,7 @@ class TestCli(TestCase):
     def test_init_non_empty_folder(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             os.chdir(tmpdir)
-            assert os.getcwd().endswith(tmpdir) # Mac does some weird private stuff
+            assert os.getcwd().endswith(tmpdir)  # Mac does some weird private stuff
             assert not os.path.exists("test")
 
             # We can create a project in an existing dir
