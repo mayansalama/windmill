@@ -10,7 +10,8 @@ class RunConfig(ConfigUtil):
     @property
     def project_conf(self):
         from .project_config import ProjectConfig
-        return ProjectConfig.from_conf_file(self.conf_file)            
+
+        return ProjectConfig.from_conf_file(self.conf_file)
 
     def __init__(
         self,

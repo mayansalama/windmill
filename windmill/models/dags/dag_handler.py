@@ -284,4 +284,4 @@ class DagHandler(_ParamHandler):
         """
         template = self.env.get_template("dag.j2")
         res = template.render(dag=self)
-        return black.format_str(res, line_length=80)
+        return black.format_str(res, line_length=120)
