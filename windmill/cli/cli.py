@@ -7,6 +7,7 @@ from copy import deepcopy
 from decli import cli
 from doccli import DocCliParser
 
+import windmill
 from ..config.project_config import ProjectConfig
 from ..config.run_config import RunConfig
 from ..constants import ProjectDefaults
@@ -139,10 +140,23 @@ class DevCli:
             except Exception as e:
                 logging.error(f"Unable to start webserver ({e}) - aborting")
 
+    class UpdateNpm:
+        """Runs NPM update"""
+
+        command_name = "update-npm"
+
+        @staticmethod
+        def update_npm(**kwargs):
+            os.chdir(
+                os.path.abspath(os.path.join(windmill.__file__, "..", "http", "app"))
+            )
+            os.system("npm update || (npm install && npm update)")
+
     @classmethod
     def run_cli(cls):
         parser = DocCliParser(cls)
         parser.add_subcommand(cls.StartFrontend, func=cls.StartFrontend.start_frontend)
         parser.add_subcommand(cls.StartBackend, func=cls.StartBackend.start_backend)
+        parser.add_subcommand(cls.UpdateNpm, func=cls.UpdateNpm.update_npm)
 
         run_parser(parser)

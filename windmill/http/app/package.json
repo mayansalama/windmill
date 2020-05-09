@@ -14,7 +14,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/lodash": "^4.14.149",
+    "@types/lodash": "^4.14.150",
     "@types/react-onclickoutside": "^6.7.3",
     "lodash": "^4.17.15",
     "parcel-bundler": "^1.12.4",
@@ -22,20 +22,19 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
-    "@mrblenny/react-flow-chart": "0.0.7",
+    "@mrblenny/react-flow-chart": "0.0.12",
     "@types/react": "^16.9.34",
-    "@types/react-dom": "^16.9.6",
+    "@types/react-dom": "^16.9.7",
     "@types/react-resizable": "^1.7.2",
     "@types/react-textarea-autosize": "^4.3.5",
     "@types/react-tooltip": "^3.11.0",
-    "@types/styled-components": "^4.4.3",
     "axios": "^0.19.2",
     "circular-json": "^0.5.9",
     "gh-pages": "^2.2.0",
     "local-storage": "^2.0.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-icons": "^3.9.0",
+    "react-icons": "^3.10.0",
     "react-onclickoutside": "^6.9.0",
     "react-textarea-autosize": "^7.1.2",
     "react-tooltip": "^3.11.6"

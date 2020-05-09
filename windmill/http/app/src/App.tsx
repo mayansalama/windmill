@@ -215,10 +215,10 @@ export class App extends React.Component<{}, IAppState> {
       //   name: "Help",
       //   callback: () => <MenuItems.HelpDropdown getApp={() => this} />
       // },
-      // {
-      //   name: "View",
-      //   callback: () => <MenuItems.ViewDropdown getApp={() => this} />,
-      // },
+      {
+        name: "View",
+        callback: () => <MenuItems.ViewDropdown getApp={() => this} />,
+      },
     ],
   };
 
