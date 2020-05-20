@@ -40,7 +40,8 @@
                 "id": "start_date",
                 "inheritedFrom": null,
                 "required": false,
-                "type": "datetime.datetime"
+                "type": "datetime.datetime",
+                "value": "2020/05/20"
             },
             {
                 "default": null,

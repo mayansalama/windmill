@@ -1,6 +1,6 @@
 from abc import ABC, abstractproperty
 from copy import deepcopy
-from typing import List
+from typing import List, Dict
 
 import black
 from airflow.models.dag import DAG
@@ -10,8 +10,10 @@ from marshmallow import Schema, fields
 from networkx import DiGraph, is_directed_acyclic_graph, dag_longest_path
 
 from ..schemas.app_schemas import DagSchema, OperatorParameterSchema
+from ...config.project_config import ProjectConfig
 from ...exceptions import DagHandlerValidationError
 from ...utils.class_parser import ClassParser
+from ...utils.import_handler import import_str_as_module, import_dag_from_project
 
 _op_schema = OperatorParameterSchema()
 
@@ -54,6 +56,28 @@ class _ParamHandler(ABC):
     def param_to_callable(self, param_name):
         return f"{self.snake_name}_{underscore(param_name)}_callable"
 
+    @staticmethod
+    def render_non_callable_for_jinja(value_dict: Dict) -> str:
+        """Renders values according to datatypes
+
+        Arguments:
+            value_dict {Dict} -- OperatorParameterSchema
+
+        Returns:
+            str -- String to be rendered by Jinja
+        """
+        typ = value_dict["type"]
+        val = value_dict["value"]
+
+        if typ == "str":
+            return "'" + val.replace("'", "''") + "'"
+        elif typ == "datetime.datetime":
+            return f"parser.parse('{val}')"
+        # elif typ == "datetime.timedelta":
+        # TODO regex for cron, presets (e.g. @once), or timedelta parsing
+        else:  # default to str
+            return str(val)
+
     @property
     def callables(self):
         return {
@@ -64,18 +88,18 @@ class _ParamHandler(ABC):
 
     @property
     def params_to_kwargs(self):
-        """Converts task parameters into a valid kwargs expression. Relies on double asterixes 
-        so that we don't need to worry about quotes 
+        """Converts task parameters into a valid kwargs expression
         """
-        non_callables = {
-            k: v["value"] for k, v in self.params.items() if k not in self.callables
-        }
-        callables = ", ".join(
-            [f"{k} = {self.param_to_callable(k)}" for k in self.callables]
+        non_callables = [
+            f"{k} = {self.render_non_callable_for_jinja(v)}"
+            for k, v in self.params.items()
+            if k not in self.callables
+        ]
+        params = ", ".join(
+            non_callables
+            + [f"{k} = {self.param_to_callable(k)}" for k in self.callables]
         )
-        if callables:
-            return f"**{non_callables}, {callables}"
-        return f"**{non_callables}"
+        return params
 
 
 class TaskHandler(_ParamHandler):
@@ -277,11 +301,37 @@ class DagHandler(_ParamHandler):
         return [task for task in self.tasks if task.python_callable]
 
     def compile_to_python(self):
-        """Compiles the Dag Instance into Python code 
+        """Compiles the Dag Instance into Python Code:
+        - Python generated using Jinja template
+        - Formatted using Black
+        - Validated using Airflow by attempting an import
         
         Returns:
             [str]: The formatted DAG 
         """
         template = self.env.get_template("dag.j2")
         res = template.render(dag=self)
-        return black.format_str(res, line_length=120)
+        py_code = black.format_str(res, line_length=80)
+
+        try:
+            import_str_as_module(py_code, "wml_dag")
+        except Exception as e:
+            raise DagHandlerValidationError(f"Rendered dag is invalid: {str(e)}") from e
+
+        return py_code
+
+    @classmethod
+    def load_from_dag(cls, dag_object):
+        pass
+
+
+class DagFileHandler:
+    def __init__(self, pyfile: str, config: ProjectConfig):
+        self.pyfile = pyfile
+        self.conf = config
+
+        self.mod = import_dag_from_project(pyfile, config)
+
+    @property
+    def dags(self):
+        return [v for v in self.mod.__dict__.values() if type(v) == DAG]

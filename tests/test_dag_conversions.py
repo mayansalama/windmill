@@ -51,6 +51,41 @@ class TestWmlMarshalling(Fixture):
         paths = Links.graph_to_efficient_representation(G)
         assert paths == [[1, 2, 4, 5, 6], [1, 3, 7], [3, 6]]
 
+    def test_wml_conversion_to_python__fails_on_no_start_date(self):
+        new_wml = deepcopy(self.valid_wml_dict)
+        for param in new_wml["dag"]["parameters"]:
+            if param["id"] == "start_date":
+                param.pop("value")
+        dag_handler = DagHandler.load_from_wml(new_wml)
+        with self.assertRaises(DagHandlerValidationError):
+            dag_handler.compile_to_python()
+
+    def test_wml_conversion_to_python__fails_on_start_date_missing_from_one_task(self):
+        new_wml = deepcopy(self.valid_wml_dict)
+        for param in new_wml["dag"]["parameters"]:
+            if param["id"] == "start_date":
+                param.pop("value")
+        node_ids = list(new_wml["nodes"].keys())
+        for param in new_wml["nodes"][node_ids[0]]["properties"]["parameters"]:
+            if param["id"] == "start_date":
+                param["value"] = "2020/05/20"
+        dag_handler = DagHandler.load_from_wml(new_wml)
+        with self.assertRaises(DagHandlerValidationError):
+            dag_handler.compile_to_python()
+
+    def test_wml_conversion_to_python__succeeds_on_start_date_only_in_tasks(self):
+        new_wml = deepcopy(self.valid_wml_dict)
+        for param in new_wml["dag"]["parameters"]:
+            if param["id"] == "start_date":
+                param.pop("value")
+        for node in new_wml["nodes"].values():
+            for param in node["properties"]["parameters"]:
+                if param["id"] == "start_date":
+                    param["value"] = "2020/05/20"
+        dag_handler = DagHandler.load_from_wml(new_wml)
+        py_code = dag_handler.compile_to_python()
+        assert py_code
+
 
 class TestTaskMarshalling(Fixture):
     def test_task_marshall_from_node(self):
@@ -77,17 +112,17 @@ class TestTaskMarshalling(Fixture):
             TaskHandler.load_from_node(node)
 
 
-class TestDagHandlerMarhsalling(Fixture):
-    def test_dag_params_from_wml(self):
+class TestDagHandlerMarshalling(Fixture):
+    def test_dag_conversion_sanity(self):
         di = DagHandler.load_from_wml(self.valid_wml_dict)
         assert di.params["dag_id"]["value"] == "ValidDag"
         assert [t.operator_type for t in di.tasks] == ["BashOperator", "BashOperator"]
         assert len(di.links.node_ids) == 2
 
         # Note that the rest of the values are defaults and are ignored
-        assert list(di.params.keys()) == ["dag_id", "description"]
+        assert list(di.params.keys()) == ["dag_id", "description", "start_date"]
 
-    def test_dag_params_from_wml_fails_on_missing_required_param(self):
+    def test_dag_params__fails_on_missing_required_param(self):
         new_wml = deepcopy(self.valid_wml)
         ind = [
             i
@@ -101,7 +136,7 @@ class TestDagHandlerMarhsalling(Fixture):
         with self.assertRaises(DagHandlerValidationError):
             DagHandler.load_from_wml(new_wml)
 
-    def test_invalid_dag_fails(self):
+    def test_invalid_dag_fails__circular_tasks(self):
         # Add in an additional link that closes the loop - this should break the test
         existing_link = deepcopy(self.valid_wml_dict)["links"].popitem()[1]
         self.valid_wml_dict["links"]["a cyclical link"] = {
