@@ -1,16 +1,26 @@
+import logging
+import uuid
 from abc import ABC, abstractproperty
 from copy import deepcopy
-from typing import List, Dict
+from typing import List, Dict, Union
 
 import black
 from airflow.models.dag import DAG
 from inflection import underscore
 from jinja2 import Environment, PackageLoader, select_autoescape
-from marshmallow import Schema, fields
-from networkx import DiGraph, is_directed_acyclic_graph, dag_longest_path
+from marshmallow import fields, Schema
+from networkx import (
+    DiGraph,
+    is_directed_acyclic_graph,
+    dag_longest_path,
+    topological_sort,
+    edge_bfs,
+)
 
-from ..schemas.app_schemas import DagSchema, OperatorParameterSchema
+from ..operators.operator_index import get_operator_index
+from ..schemas.app_schemas import DagSchema, OperatorParameterSchema, MinimalWmlSchema
 from ...config.project_config import ProjectConfig
+from ...constants import GraphConstants
 from ...exceptions import DagHandlerValidationError
 from ...utils.class_parser import ClassParser
 from ...utils.import_handler import import_str_as_module, import_dag_from_project
@@ -72,9 +82,9 @@ class _ParamHandler(ABC):
         if typ == "str":
             return "'" + val.replace("'", "''") + "'"
         elif typ == "datetime.datetime":
+            # TODO parse to datetime here, and then use native datetime object
             return f"parser.parse('{val}')"
-        # elif typ == "datetime.timedelta":
-        # TODO regex for cron, presets (e.g. @once), or timedelta parsing
+        # TODO datetime.timedelta - regex for cron, presets (e.g. @once), or timedelta parsing
         else:  # default to str
             return str(val)
 
@@ -148,20 +158,55 @@ class TaskHandler(_ParamHandler):
 
         return TaskHandler(node_id, operator_type, module, task_params)
 
+    def to_app_schema(self, x=0, y=0):
+        """Convert into NodeSchema
+
+        Keyword Arguments:
+            x {int} --  x coordinate (default: {0})
+            y {int} --  y coordinate (default: {0})
+
+        Returns:
+            Dict -- JSON dict matching NodeSchema
+        """
+        op_index = get_operator_index()
+        for operator in op_index.marshalled_operators:
+            # FIXME Validate module?
+            if operator["type"] == self.operator_type:
+                properties_dict = deepcopy(operator["properties"])
+                for parameter in properties_dict["parameters"]:
+                    field = parameter["id"]
+                    if field in self.params:
+                        parameter["value"] = self.params[field]["value"]
+                properties_dict["name"] = self.params["task_id"]["value"]
+                return {
+                    "id": self.node_id,
+                    "position": {"x": x, "y": y},
+                    "properties": properties_dict,
+                    "type": self.operator_type,
+                }
+
+        raise DagHandlerValidationError(
+            f"Unable to find operator class task {self.operator_type}"
+        )
+
 
 class Links:
-    def __init__(self, graph):
+    def __init__(self, graph, task_name_mappings):
         """Metadata describing the links in a DAG between tasks
         
         Args:
             link_graph (Digraph): Networkx Digraph object describing nodes and edges
         """
         self.graph = graph
-        self.paths = self.get_bitshift_paths()
+        self.task_name_mappings = task_name_mappings
 
     @property
     def node_ids(self):
         return set(self.graph.nodes)
+
+    @property
+    def paths(self):
+        return self.get_bitshift_paths()
 
     @staticmethod
     def load_from_links(links, task_name_mappings):
@@ -189,10 +234,7 @@ class Links:
                 else:
                     from_dict = link_dict["to_node"]
                     to_dict = link_dict["from_node"]
-                graph.add_edge(
-                    task_name_mappings[from_dict["nodeId"]],
-                    task_name_mappings[to_dict["nodeId"]],
-                )
+                graph.add_edge(from_dict["nodeId"], to_dict["nodeId"])
             except KeyError as e:
                 raise DagHandlerValidationError(
                     f"Unable to find node(s) [{e}] referenced by links"
@@ -201,7 +243,7 @@ class Links:
         if not is_directed_acyclic_graph(graph):
             raise DagHandlerValidationError("Links do not form a valid DAG")
 
-        return Links(graph)
+        return Links(graph, task_name_mappings)
 
     @staticmethod
     def graph_to_efficient_representation(graph):
@@ -210,8 +252,8 @@ class Links:
         A Graph that looks like: 
 
             1 -> 2 -> 4 -> 5-> -->6
-              -> 3 -------------|
-                 \-> 7
+              -> 3 ---------- /
+                 \ -> 7
 
         Will go to:
         [1, 2, 4, 5, 6]
@@ -231,7 +273,64 @@ class Links:
 
     def get_bitshift_paths(self):
         paths = self.graph_to_efficient_representation(self.graph)
-        return [" >> ".join(path) for path in paths if len(path) > 1]
+        return [
+            " >> ".join([self.task_name_mappings.get(n, n) for n in path])
+            for path in paths
+            if len(path) > 1
+        ]
+
+    @staticmethod
+    def graph_to_coords(g):
+        """Topologically sorts graph and returns a Dict of structure:
+        nodeId: {x: , y: }
+
+        Note Nodes will be spaced such that the gap between nodes is a multiple 
+        of height/width. This constant is defined in GraphConstants.NODE_SPACING_FACTOR
+
+        Graphs are sorted downwards, and nodes are centre justitifed
+        """
+        levels = []
+        for node in topological_sort(g):
+            upstream_nodes = list(edge_bfs(g, node, orientation="reverse"))
+            ind = 0
+            for up_node, _, _ in upstream_nodes:
+                for level_index, level in enumerate(levels):
+                    if up_node in level:
+                        ind = max(ind, level_index + 1)
+            if len(levels) < ind + 1:
+                levels.append([node])
+            else:
+                levels[ind].append(node)
+        max_width = max([len(l) for l in levels])
+
+        dx = GraphConstants.NODE_WIDTH
+        dy = GraphConstants.NODE_HEIGHT
+        s = GraphConstants.NODE_SPACING_FACTOR
+        nodes = {}
+        for l_index, level in enumerate(levels):
+            spacing = (max_width + 1) / (len(level) + 1)
+            for n_index, node in enumerate(level):
+                nodes[node] = {
+                    "x": (n_index + 1) * spacing * dx * s,
+                    "y": (l_index + 1) * dy * s,
+                }
+        return nodes
+
+    def to_app_schema(self):
+        """Return a Dict of the same structure as LinkSchema
+        """
+        links = {}
+        for u, v in self.graph.edges:
+            link_id = str(uuid.uuid4())
+            links[link_id] = {
+                "id": link_id,
+                "from_node": {"nodeId": u, "portId": "out_port"},
+                "to_node": {"nodeId": v, "portId": "in_port"},
+            }
+        return links
+
+    def to_coords(self):
+        return self.graph_to_coords(self.graph)
 
 
 class DagHandler(_ParamHandler):
@@ -242,7 +341,9 @@ class DagHandler(_ParamHandler):
         autoescape=select_autoescape(enabled_extensions=["j2"]),
     )
 
-    def __init__(self, dag_params: dict, tasks: List[TaskHandler], links: Links):
+    def __init__(
+        self, dag_params: dict, tasks: List[TaskHandler], links: Links, filename: str
+    ):
         """Handler to manage conversions between WMLs and Python DAGs. Should be 
         generated using DagHandler.load_from_wml
         
@@ -250,6 +351,7 @@ class DagHandler(_ParamHandler):
             dag_params (dict): Dictionary of DAG parameters
             tasks (List[TaskHandler]): List of tasks metadata
             links (Links): Object describing links between tasks
+            filename (Links): Name of the source file (with no extension)
         
         Raises:
             DagHandlerValidationError: Raised if WML can't be converted into a valid DAG instance
@@ -257,6 +359,11 @@ class DagHandler(_ParamHandler):
         self.params = dag_params
         self.tasks = tasks
         self.links = links
+        self.filename = filename
+
+    @property
+    def dag_id(self):
+        return self.params["dag_id"]["value"]
 
     @property
     def snake_name(self):
@@ -265,7 +372,7 @@ class DagHandler(_ParamHandler):
         Returns:
             [str]: dag_name
         """
-        return underscore(self.params["dag_id"]["value"])
+        return underscore(self.dag_id)
 
     @classmethod
     def marshall_dag_docstring(cls):
@@ -276,7 +383,7 @@ class DagHandler(_ParamHandler):
         """Returns a validated DagHandler from a Wml Dict
         
         Args:
-            wml_dict (dict): Full WML file converted to a Dict
+            wml_dict (dict): Dict matching MinimalWmlSchema
         
         Raises:
             DagHandlerValidationError: If instance params are invalid
@@ -294,18 +401,55 @@ class DagHandler(_ParamHandler):
         task_name_mappings = {t.node_id: t.snake_name for t in tasks}
         links = Links.load_from_links(wml_dict["links"].values(), task_name_mappings)
 
-        return DagHandler(dag_params, tasks, links)
+        return DagHandler(dag_params, tasks, links, wml_dict["filename"])
+
+    def to_wml(self) -> Dict:
+        """Render DagHandler as a WML dict
+
+        Returns:
+            [Dict] -- Dict matching MinimalWmlSchema 
+        """
+        dag_dict = self.marshall_dag_docstring()
+        for parameter in dag_dict["parameters"]:
+            field = parameter["id"]
+            if field in self.params:
+                parameter["value"] = self.params[field]["value"]
+        dag_dict["name"] = self.dag_id
+
+        links = self.links.to_app_schema()
+        coords = self.links.to_coords()
+        nodes = {t.node_id: t.to_app_schema(**coords[t.node_id]) for t in self.tasks}
+
+        wml = {
+            "filename": self.filename,
+            "dag": dag_dict,
+            "links": links,
+            "nodes": nodes,
+        }
+        return MinimalWmlSchema().dump(wml)
 
     @property
     def callable_tasks(self):
         return [task for task in self.tasks if task.python_callable]
 
-    def compile_to_python(self):
-        """Compiles the Dag Instance into Python Code:
+    @classmethod
+    def load_from_dag(cls, dag: DAG):
+        dag_dict = cls.marshall_dag_docstring()
+        for parameter in dag_dict["parameters"]:
+            field = parameter["id"]
+            if hasattr(dag, field):
+                parameter["value"] = getattr(dag, field)
+            elif hasattr(dag, f"_{field}"):
+                parameter["value"] = getattr(dag, f"_{field}")
+            else:
+                logging.warn(f"Unable to find property {field} in obj {dag}")
+
+    def to_python(self):
+        """Renders the Dag Instance as Python Code:
         - Python generated using Jinja template
         - Formatted using Black
-        - Validated using Airflow by attempting an import
-        
+        - Import from str to validate import
+
         Returns:
             [str]: The formatted DAG 
         """
@@ -320,10 +464,6 @@ class DagHandler(_ParamHandler):
 
         return py_code
 
-    @classmethod
-    def load_from_dag(cls, dag_object):
-        pass
-
 
 class DagFileHandler:
     def __init__(self, pyfile: str, config: ProjectConfig):
@@ -334,4 +474,4 @@ class DagFileHandler:
 
     @property
     def dags(self):
-        return [v for v in self.mod.__dict__.values() if type(v) == DAG]
+        return {k: v for k, v in self.mod.__dict__.items() if type(v) == DAG}

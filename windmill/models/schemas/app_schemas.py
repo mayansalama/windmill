@@ -2,6 +2,7 @@ import re
 
 from marshmallow import Schema, fields
 
+from ...constants import GraphConstants
 
 VALID_PARAMETER_TYPES = (
     "str",
@@ -69,18 +70,44 @@ class PortSchema(Schema):
 
 
 class SizeSchema(Schema):
-    width = fields.Int()
-    height = fields.Int()
+    width = fields.Int(required=True)
+    height = fields.Int(required=True)
 
 
 class NodeSchema(Schema):
     id = fields.Str(required=True)
     position = fields.Nested(PositionSchema, required=True)
-    orientation = fields.Int(required=True)
+    orientation = fields.Int(default=GraphConstants.ORIENTATION)
     type = fields.Str(required=True)
-    ports = fields.Dict(keys=fields.Str(), values=fields.Nested(PortSchema))
+    ports = fields.Dict(
+        keys=fields.Str(),
+        values=fields.Nested(PortSchema),
+        default={
+            "port1": {
+                "id": "port1",
+                "position": {"x": int(GraphConstants.NODE_WIDTH / 2), "y": 0},
+                "properties": {"custom": "property"},
+                "type": "top",
+            },
+            "port2": {
+                "id": "port2",
+                "position": {
+                    "x": int(GraphConstants.NODE_WIDTH / 2),
+                    "y": GraphConstants.NODE_HEIGHT,
+                },
+                "properties": {"custom": "property"},
+                "type": "bottom",
+            },
+        },
+    )
     properties = fields.Nested(OperatorPropertiesSchema())
-    size = fields.Nested(SizeSchema)
+    size = fields.Nested(
+        SizeSchema,
+        default={
+            "width": GraphConstants.NODE_WIDTH,
+            "height": GraphConstants.NODE_HEIGHT,
+        },
+    )
 
 
 class LinkSpecSchema(Schema):

@@ -166,7 +166,7 @@
                 "id": "on_failure_callback",
                 "inheritedFrom": null,
                 "required": false,
-                "type": "str"
+                "type": "callable"
             },
             {
                 "default": null,
@@ -174,7 +174,7 @@
                 "id": "on_success_callback",
                 "inheritedFrom": null,
                 "required": false,
-                "type": "str"
+                "type": "callable"
             },
             {
                 "default": null,
@@ -417,7 +417,7 @@
                         "id": "on_failure_callback",
                         "inheritedFrom": "BaseOperator",
                         "required": false,
-                        "type": "str"
+                        "type": "callable"
                     },
                     {
                         "default": null,
@@ -425,7 +425,7 @@
                         "id": "on_retry_callback",
                         "inheritedFrom": "BaseOperator",
                         "required": false,
-                        "type": "str"
+                        "type": "callable"
                     },
                     {
                         "default": null,
@@ -433,7 +433,7 @@
                         "id": "on_success_callback",
                         "inheritedFrom": "BaseOperator",
                         "required": false,
-                        "type": "str"
+                        "type": "callable"
                     },
                     {
                         "default": "all_success",
@@ -489,7 +489,7 @@
             },
             "size": {
                 "width": 200,
-                "height": 79
+                "height": 80
             },
             "type": "BashOperator"
         },
@@ -715,7 +715,7 @@
                         "id": "on_failure_callback",
                         "inheritedFrom": "BaseOperator",
                         "required": false,
-                        "type": "str"
+                        "type": "callable"
                     },
                     {
                         "default": null,
@@ -723,7 +723,7 @@
                         "id": "on_retry_callback",
                         "inheritedFrom": "BaseOperator",
                         "required": false,
-                        "type": "str"
+                        "type": "callable"
                     },
                     {
                         "default": null,
@@ -731,7 +731,7 @@
                         "id": "on_success_callback",
                         "inheritedFrom": "BaseOperator",
                         "required": false,
-                        "type": "str"
+                        "type": "callable"
                     },
                     {
                         "default": "all_success",

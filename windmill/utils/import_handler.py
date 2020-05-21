@@ -19,6 +19,7 @@ def import_str_as_module(code: str, name: str, doc: str = "") -> ModuleType:
     Returns:
         ModuleType -- instantiated module
     """
+    # TODO - add custom operators (dont add project to path - too many name conflicts)
 
     module = ModuleType(name, doc)
 

@@ -9,6 +9,9 @@ from .operator_handler import OperatorHandler
 from ...exceptions import OperatorMarshallError
 
 
+__all__ = ["get_operator_index"]
+
+
 class OperatorIndex:
     def __init__(self, custom_operators=""):
         """Stateful object to index built-in and custom airflow
@@ -21,6 +24,13 @@ class OperatorIndex:
 
         self.custom_operators = custom_operators
         self.operator_list = self.get_operators()
+        self._marshalled_operators = None
+
+    @property
+    def marshalled_operators(self):
+        if not self._marshalled_operators:
+            self._marshalled_operators = self.marshall_operator_list()
+        return self._marshalled_operators
 
     def marshall_operator_list(self):
         """Return a JSON marshalled list of Operators as per OperatorHandler schema
@@ -70,3 +80,14 @@ class OperatorIndex:
             )
 
         return list(ops)
+
+
+_operator_index: OperatorIndex = None
+
+
+def get_operator_index() -> OperatorIndex:
+    global _operator_index
+
+    if not _operator_index:
+        _operator_index = OperatorIndex()
+    return _operator_index
