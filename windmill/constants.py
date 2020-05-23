@@ -5,6 +5,7 @@ class ProjectDefaults:
     DAGS_FOLDER = "dags"
     OPERATORS_FOLDER = "custom_operators"
 
+
 class ServerDefaults:
     HOST_ADDRESS = "localhost"
     HOST_PORT = 8000

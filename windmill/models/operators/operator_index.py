@@ -31,7 +31,7 @@ class OperatorIndex:
         if not self._marshalled_operators:
             self._marshalled_operators = self.marshall_operator_list()
         return self._marshalled_operators
-    
+
     def marshall_operator(self, operator):
         return OperatorHandler.from_operator(operator).dump()
 
