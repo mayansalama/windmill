@@ -1,5 +1,5 @@
 import datetime
-from dateutil.tz import tzutc
+from dateutil.tz import *
 
 from airflow.models.dag import DAG
 from airflow.operators.bash_operator import BashOperator
