@@ -1,11 +1,17 @@
+import datetime
+import json
 import logging
+import re
 import uuid
 from abc import ABC, abstractproperty
 from copy import deepcopy
+from os.path import basename, splitext
 from typing import List, Dict, Union
 
 import black
 from airflow.models.dag import DAG
+from airflow.operators import BaseOperator
+from dateutil import parser
 from inflection import underscore
 from jinja2 import Environment, PackageLoader, select_autoescape
 from marshmallow import fields, Schema
@@ -67,6 +73,30 @@ class _ParamHandler(ABC):
         return f"{self.snake_name}_{underscore(param_name)}_callable"
 
     @staticmethod
+    def parameter_list_from_obj(obj: object, param_list: List):
+        """Populates value field in a list of dicts matching OperatorParameterSchema
+        from an Object, using getattr and hasattr. 
+
+        Values are serialised using JSON
+
+        Arguments:
+            obj {object} -- Any object that can use getattr and hasattr (not dicts)
+            param_dict {List} -- List of OperatorParameterSchema
+        """
+        for param in param_list:
+            field = param["id"]
+            if field == "xcom_push":
+                field = "xcom_push_flag"
+            if hasattr(obj, field):
+                param["value"] = getattr(obj, field)
+            elif hasattr(obj, f"_{field}"):
+                param["value"] = getattr(obj, f"_{field}")
+            else:
+                logging.warn(f"Unable to find property {field} in obj {obj}")
+            param.update(_op_schema.dump(param))
+        return param_list
+
+    @staticmethod
     def render_non_callable_for_jinja(value_dict: Dict) -> str:
         """Renders values according to datatypes
 
@@ -82,8 +112,8 @@ class _ParamHandler(ABC):
         if typ == "str":
             return "'" + val.replace("'", "''") + "'"
         elif typ == "datetime.datetime":
-            # TODO parse to datetime here, and then use native datetime object
-            return f"parser.parse('{val}')"
+            dt = parser.parse(val)
+            return f"{repr(dt)}"
         # TODO datetime.timedelta - regex for cron, presets (e.g. @once), or timedelta parsing
         else:  # default to str
             return str(val)
@@ -127,14 +157,31 @@ class TaskHandler(_ParamHandler):
         self.module = module
         self.params = task_params
 
+        self._snake_name = None
+
+    @property
+    def task_id(self):
+        return self.params["task_id"]["value"]
+
     @property
     def snake_name(self):
-        """snakecase version of task_params["task_id"]
+        """snakecase version of task_params["task_id"]. Python 
+        variable names can't start with a number
         
         Returns:
             [str]: task_name
         """
-        return underscore(self.params["task_id"]["value"])
+        if not self._snake_name:
+            name = underscore(self.task_id)
+            name = re.sub("[^0-9a-zA-Z_]", "", name)
+            name = re.sub("^[^a-zA-Z_]+", "", name)
+
+            return name
+        return self._snake_name
+
+    @snake_name.setter
+    def snake_name(self, val):
+        self._snake_name = val
 
     @classmethod
     def load_from_node(cls, node_dict):
@@ -151,12 +198,33 @@ class TaskHandler(_ParamHandler):
         module = node_dict["properties"]["module"]
         task_params = cls.parameter_list_to_dict(node_dict["properties"]["parameters"])
 
+        # DAG is populated by Jinja template
+        if "dag" in task_params:
+            task_params.pop("dag")
+
         if not task_params.get("task_id"):
             raise DagHandlerValidationError(
                 f"Node {node_id} missing required parameter task_id"
             )
 
         return TaskHandler(node_id, operator_type, module, task_params)
+
+    @classmethod
+    def load_from_task(cls, task: BaseOperator):
+        """Creates a TaskHandler from an Airflow Task
+
+        Arguments:
+            task {BaseOperator} -- Instantiated Operator
+        
+        Returns:
+            [TaskHandler]: The converted TaskHandler object
+        """
+        task_dict = get_operator_index().marshall_operator(task.__class__)
+        task_dict["id"] = str(uuid.uuid4())
+
+        # Populate values in parameters list
+        cls.parameter_list_from_obj(task, task_dict["properties"]["parameters"])
+        return cls.load_from_node(task_dict)
 
     def to_app_schema(self, x=0, y=0):
         """Convert into NodeSchema
@@ -287,7 +355,11 @@ class Links:
         Note Nodes will be spaced such that the gap between nodes is a multiple 
         of height/width. This constant is defined in GraphConstants.NODE_SPACING_FACTOR
 
-        Graphs are sorted downwards, and nodes are centre justitifed
+        Graphs are sorted downwards, and nodes are centre justitifed, like this
+            1
+        2   3   4
+          5   6
+            7
         """
         levels = []
         for node in topological_sort(g):
@@ -375,6 +447,39 @@ class DagHandler(_ParamHandler):
         return underscore(self.dag_id)
 
     @classmethod
+    def fix_task_names(self, tasks: List[TaskHandler]):
+        """Task IDs are enforced as unique (as of AF 2.0) but when
+        converting to python vars there's potential for clashes.
+
+        Although they're somewhat allowed in AF1.0, this will raise 
+        an error if duplicate task names are 
+         
+        Arguments:
+            tasks {List[TaskHandler]} -- Task handlers to dedupe
+
+        Raises:
+            DagHandlerValidationError: On duplicated task ids
+        """
+        task_ids = [t.task_id for t in tasks]
+        if len(task_ids) != len(set(task_ids)):
+            raise DagHandlerValidationError("DAGs cannot have duplicate task IDs")
+
+        snake_names = []
+        for task in tasks:
+            if task.snake_name in snake_names:
+                basename = task.snake_name
+                ind = 0
+                name = f"{basename}_{ind}"
+                while name in snake_names:
+                    ind += 1
+                    name = f"{basename}_{ind}"
+                snake_names.append(name)
+                task.snake_name = name
+            else:
+                snake_names.append(task.task_id)
+        return tasks
+
+    @classmethod
     def marshall_dag_docstring(cls):
         return DagSchema().dump(cls.docstring_parser.parse_class(DAG)[1])
 
@@ -398,6 +503,7 @@ class DagHandler(_ParamHandler):
         tasks = [
             TaskHandler.load_from_node(node) for node in wml_dict["nodes"].values()
         ]
+        tasks = cls.fix_task_names(tasks)
         task_name_mappings = {t.node_id: t.snake_name for t in tasks}
         links = Links.load_from_links(wml_dict["links"].values(), task_name_mappings)
 
@@ -435,20 +541,32 @@ class DagHandler(_ParamHandler):
     @classmethod
     def load_from_dag(cls, dag: DAG):
         dag_dict = cls.marshall_dag_docstring()
-        for parameter in dag_dict["parameters"]:
-            field = parameter["id"]
-            if hasattr(dag, field):
-                parameter["value"] = getattr(dag, field)
-            elif hasattr(dag, f"_{field}"):
-                parameter["value"] = getattr(dag, f"_{field}")
-            else:
-                logging.warn(f"Unable to find property {field} in obj {dag}")
+        dag_params = cls.parameter_list_to_dict(
+            cls.parameter_list_from_obj(dag, dag_dict["parameters"])
+        )
+
+        # TODO: Remove values if mastered in dag (e.g. start_date, default args)
+        tasks = [TaskHandler.load_from_task(task) for task in dag.task_dict.values()]
+        tasks = cls.fix_task_names(tasks)
+        task_id_to_node_id = {task.task_id: task.node_id for task in tasks}
+
+        task_name_mappings = {t.node_id: t.snake_name for t in tasks}
+        graph = DiGraph()
+        for task_id, task in dag.task_dict.items():
+            for upstream_task_id in task.downstream_task_ids:
+                graph.add_edge(
+                    task_id_to_node_id[task_id], task_id_to_node_id[upstream_task_id]
+                )
+
+        links = Links(graph, task_name_mappings)
+
+        return DagHandler(dag_params, tasks, links, splitext(basename(dag.fileloc))[0])
 
     def to_python(self):
         """Renders the Dag Instance as Python Code:
         - Python generated using Jinja template
         - Formatted using Black
-        - Import from str to validate import
+        - Import from str to validate generated py code
 
         Returns:
             [str]: The formatted DAG 

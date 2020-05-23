@@ -31,6 +31,9 @@ class OperatorIndex:
         if not self._marshalled_operators:
             self._marshalled_operators = self.marshall_operator_list()
         return self._marshalled_operators
+    
+    def marshall_operator(self, operator):
+        return OperatorHandler.from_operator(operator).dump()
 
     def marshall_operator_list(self):
         """Return a JSON marshalled list of Operators as per OperatorHandler schema

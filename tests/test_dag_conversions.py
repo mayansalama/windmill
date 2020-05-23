@@ -1,12 +1,12 @@
 import json
 from copy import deepcopy
 from unittest import TestCase
-
 import networkx as nx
 from marshmallow import EXCLUDE
 
 from windmill.constants import GraphConstants
 from windmill.exceptions import DagHandlerValidationError
+from windmill.utils.import_handler import import_str_as_module
 from windmill.models.schemas.app_schemas import MinimalWmlSchema
 from windmill.models.dags.dag_handler import DagHandler, TaskHandler, Links
 
@@ -192,8 +192,15 @@ class TestPyToWml(Fixture):
     def test_py_to_daghandler__sanity(self):
         from .data.valid import valid_dag
 
-        # DAG object can be parsed -> Need to work on links and tasks
-        DagHandler.load_from_dag(valid_dag)
+        # Double passthrough - as default args are populated when
+        # instantiating dag
+        handler = DagHandler.load_from_dag(valid_dag)
+        handler_pycode = handler.to_python()
+
+        # Recreate handler
+        mod = import_str_as_module(handler_pycode, "test_py2dag")
+        handler = DagHandler.load_from_dag(getattr(mod, "valid_dag"))
+        assert handler.to_python() == handler_pycode
 
     def test_dag_handler_to_wml__sanity(self):
         in_d = MinimalWmlSchema().dump(self.valid_wml_dict)

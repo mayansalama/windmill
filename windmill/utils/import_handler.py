@@ -20,10 +20,9 @@ def import_str_as_module(code: str, name: str, doc: str = "") -> ModuleType:
         ModuleType -- instantiated module
     """
     # TODO - add custom operators (dont add project to path - too many name conflicts)
-
     module = ModuleType(name, doc)
 
-    exec(code) in module.__dict__
+    exec(code, module.__dict__)
     return module
 
 

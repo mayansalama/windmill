@@ -1,5 +1,5 @@
-from dateutil import parser
-from datetime import timedelta
+import datetime
+from dateutil.tz import tzutc
 
 from airflow.models.dag import DAG
 {% for task in dag.tasks -%}

@@ -1,5 +1,5 @@
-from dateutil import parser
-from datetime import timedelta
+import datetime
+from dateutil.tz import tzutc
 
 from airflow.models.dag import DAG
 from airflow.operators.bash_operator import BashOperator
@@ -9,7 +9,7 @@ from airflow.operators.bash_operator import BashOperator
 valid_dag = DAG(
     dag_id="ValidDag",
     description="This is a valid test dag",
-    start_date=parser.parse("2020/05/20"),
+    start_date=datetime.datetime(2020, 5, 20, 0, 0),
 )
 
 

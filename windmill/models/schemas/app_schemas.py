@@ -26,13 +26,15 @@ PARAMETER_MAPPINGS = {
 
 
 def validate_parameter_type(typ):
+    if typ not in VALID_PARAMETER_TYPES:
+        print(typ)
     return typ in VALID_PARAMETER_TYPES
 
 
 class OperatorParameterSchema(Schema):
     id = fields.Str(required=True)
     type = fields.Str(validator=validate_parameter_type, required=True)
-    value = fields.Str()
+    value = fields.Str(allow_none=True)
     default = fields.Str(allow_none=True)
     description = fields.Str()
     required = fields.Bool(default=False)
