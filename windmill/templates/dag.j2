@@ -1,3 +1,6 @@
+import datetime
+from dateutil.tz import *
+
 from airflow.models.dag import DAG
 {% for task in dag.tasks -%}
 from {{ task.module }} import {{ task.operator_type}}

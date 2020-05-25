@@ -10,19 +10,8 @@ from marshmallow.exceptions import ValidationError
 from ...config.project_config import ProjectConfig
 from ...exceptions import DagHandlerValidationError
 from ...models.dags.dag_handler import DagHandler
-from ...models.operators.operator_index import OperatorIndex
+from ...models.operators.operator_index import get_operator_index
 from ...models.schemas.app_schemas import OperatorSchema, MinimalWmlSchema
-
-
-_operator_index: OperatorIndex = None
-
-
-def get_operator_index() -> OperatorIndex:
-    global _operator_index
-
-    if not _operator_index:
-        _operator_index = OperatorIndex()
-    return _operator_index
 
 
 app = Flask(__name__, static_folder="../app/dist/")
@@ -51,7 +40,7 @@ def get_operators():
     """
     logging.info(f"GET /v1/operators")
 
-    return jsonify(get_operator_index().marshall_operator_list()), 200
+    return jsonify(get_operator_index().marshalled_operators), 200
 
 
 @app.route("/v1/wml/", methods=["GET"])
@@ -112,7 +101,7 @@ def post_dag(name):
 
         try:
             dag_handler = DagHandler.load_from_wml(wml_dict_parsed)
-            py_content = dag_handler.compile_to_python()
+            py_content = dag_handler.to_python()
         except DagHandlerValidationError as e:
             logging.exception(f"Unable to convert WML '{name}' to DAG")
             return f"Error: {e}", 400
