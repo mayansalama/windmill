@@ -24,6 +24,7 @@ const Button = styled.div`
 
 const P = styled.p`
   margin-left: 15px;
+  padding: 0.8rem;
 `;
 
 const PropertiesDiv = styled.div`

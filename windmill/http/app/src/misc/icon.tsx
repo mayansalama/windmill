@@ -3,15 +3,15 @@ import styled from "styled-components";
 import { Theme } from "../components/Theme";
 
 const Svg = styled.svg`
-  position: absolute;
-  padding: 7px 7px;
-  flex: 0 1;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background: white;
-  border-radius: 5px;
+  // position: absolute;
+  // padding: 7px 7px;
+  // flex: 0 1;
+  // left: 0;
+  // top: 0;
+  // width: 100%;
+  // height: 100%;
+  // background: white;
+  // border-radius: 5px;
 `;
 
 const Path = styled.path`

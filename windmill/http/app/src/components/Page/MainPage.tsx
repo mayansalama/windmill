@@ -20,19 +20,20 @@ const AppLayout = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;
-  max-width: 100vw;
-  max-height: 100vh;
+  width: 100vw;
+  height: 100vh;
 `;
 
 const Content = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1 1 auto;
-  overflow: hidden;
+  // overflow: hidden;
 `;
 
 const StyledTooltip = styled(ReactTooltip)`
   max-width: 300px;
+  // font-family: IBM Plex Sans, sans-serif;
 `;
 
 export class MainPage extends React.Component<{
@@ -82,10 +83,7 @@ export class MainPage extends React.Component<{
                     chart,
                   }): boolean => {
                     // no links between same node
-                    if (
-                      fromNodeId === toNodeId
-                    )
-                      return false;
+                    if (fromNodeId === toNodeId) return false;
                     return true;
                   },
                 }}
@@ -96,7 +94,7 @@ export class MainPage extends React.Component<{
               refreshOperators={refreshOperators}
             />
           </ResizablePanel>
-          <StyledTooltip effect="solid" place="right" />
+          <StyledTooltip effect="solid" place="bottom" type="light" />
         </Page>
       </AppLayout>
     );

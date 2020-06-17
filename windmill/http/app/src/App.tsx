@@ -17,6 +17,7 @@ import {
 import * as MenuItems from "./components/Navbar/NavbarDropdowns";
 import { defaultChart } from "./misc/defaultChartState";
 import { Icon, StyledSpinner } from "./misc/icon";
+import "./index.css";
 
 export interface IAppState extends IChart {
   filename?: string;
@@ -30,7 +31,7 @@ export interface IAppState extends IChart {
 export class App extends React.Component<{}, IAppState> {
   apiClient = new APIClient();
 
-  constructor(props) {
+  constructor(props: Readonly<{}>) {
     super(props);
     // FIXME: If localstorage is corrupted then this won't stop spinning
     this.state = localStorage.get("windmillChart") || cloneDeep(defaultChart);
@@ -209,14 +210,14 @@ export class App extends React.Component<{}, IAppState> {
     dropdownHandlers: [
       // {
       //   name: "File",
-      //   callback: () => <MenuItems.FileDropdown getApp={() => this} />
+      //   callback: () => <MenuItems.FileDropdown getApp={() => this} />,
       // },
       // {
       //   name: "Help",
-      //   callback: () => <MenuItems.HelpDropdown getApp={() => this} />
+      //   callback: () => <MenuItems.HelpDropdown getApp={() => this} />,
       // },
       {
-        name: "View",
+        name: "Debug",
         callback: () => <MenuItems.ViewDropdown getApp={() => this} />,
       },
     ],

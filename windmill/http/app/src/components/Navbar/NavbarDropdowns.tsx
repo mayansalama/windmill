@@ -2,25 +2,37 @@ import * as React from "react";
 import styled from "styled-components";
 import { Theme } from "../Theme";
 
-const MenuItem = styled.div`
-  font-size: ${Theme.fonts.subHeadingSize};
+const oldMenuItem = styled.div`
+  // font-size: ${Theme.fonts.subHeadingSize};
+  // // padding: 3px 12px;
+  // &:hover {
+  //   background-color: grey;
+  //   box-shadow: 30px 30px 30px rgba(0, 0, 0, 0.5) inset;
+  //   -webkit-border-radius: 71px;
+  // }
+  // &:active {
+  //   background: #5682d2;
+  // }
+  cursor: pointer;
+`;
+
+const MenuItem = styled.span`
   padding: 3px 12px;
   &:hover {
-    box-shadow: 30px 30px 30px rgba(0, 0, 0, 0.5) inset;
+    box-shadow: 30px 30px 30px rgba(0.5, 0.5, 0.5, 0.5) inset;
+    -webkit-border-radius: 71px;
   }
-  &:active {
-    background: #5682d2;
-  }
+  cursor: pointer;
 `;
 
 const DropdownBox = styled.div`
   display: flex;
-  flex: 1 0 auto;
+  // flex: 1 0 auto;
   position: absolute;
   background: ${Theme.colors.light};
-  flex-direction: column;
+  // flex-direction: column;
   border: 3px solid ${Theme.colors.lightAccent2};
-  z-index: 10;
+  z-index: 10; /* helps with focussing above the canvas */
 `;
 
 const DropdownBoxItem = styled.div`
@@ -32,13 +44,14 @@ const DropdownBoxItem = styled.div`
     background: ${Theme.colors.lightAccent};
   }
   min-width: 300px;
+  cursor: pointer;
 `;
 
 const Sep = styled.hr`
-  width: 80%;
-  color: ${Theme.colors.dark};
-  margin-left: auto;
-  margin-right: auto;
+  // width: 80%;
+  // color: ${Theme.colors.dark};
+  // margin-left: auto;
+  // margin-right: auto;
 `;
 
 interface IDropdownItem {
@@ -56,7 +69,7 @@ class Dropdown extends React.Component<
 > {
   node: React.RefObject<HTMLDivElement>;
   state = {
-    showDropdown: false
+    showDropdown: false,
   };
   constructor(props) {
     super(props);
@@ -64,11 +77,13 @@ class Dropdown extends React.Component<
   }
 
   public componentDidMount() {
-    window.addEventListener("click", e => this.closeAfterUnrelatedClick(e));
+    window.addEventListener("click", (e) => this.closeAfterUnrelatedClick(e));
   }
 
   public componentWillUnmount() {
-    window.removeEventListener("click", e => this.closeAfterUnrelatedClick(e));
+    window.removeEventListener("click", (e) =>
+      this.closeAfterUnrelatedClick(e)
+    );
   }
 
   public closeDropdownBeforeCallback = (callback: Function) => {
@@ -76,7 +91,7 @@ class Dropdown extends React.Component<
     return callback();
   };
 
-  public closeAfterUnrelatedClick = event => {
+  public closeAfterUnrelatedClick = (event) => {
     if (this.node.current && !this.node.current.contains(event.target)) {
       this.setState({ showDropdown: false });
     }
@@ -106,7 +121,9 @@ class Dropdown extends React.Component<
         <MenuItem onClick={this.renderDropdown}>{this.props.title}</MenuItem>
         {this.state.showDropdown ? (
           <DropdownBox>
-            <DropdownButtons />
+            <li>
+              <DropdownButtons />
+            </li>
           </DropdownBox>
         ) : null}
       </div>
@@ -146,7 +163,7 @@ export class FileDropdown extends React.Component<IDropdown> {
         items={[
           { title: "New...", callback: this.handleNew },
           { title: "Open", callback: this.handleOpen },
-          { title: "Save", callback: this.handleSave }
+          { title: "Save", callback: this.handleSave },
         ]}
       />
     );
@@ -158,15 +175,27 @@ export class ViewDropdown extends React.Component<IDropdown> {
     console.log(getApp().state);
   }
 
+  public handleAbout() {
+    console.log("About?");
+  }
+
   public render() {
     return (
       <Dropdown
-        title="View"
+        title="Debug"
         items={[
           {
             title: "Log DagState",
-            callback: () => this.handleDagState(this.props.getApp)
-          }
+            callback: () => this.handleDagState(this.props.getApp),
+          },
+          {
+            title: "Help",
+            callback: () => this.handleAbout(),
+          },
+          {
+            title: "File",
+            callback: () => <Dropdown />,
+          },
         ]}
       />
     );
@@ -185,8 +214,8 @@ export class HelpDropdown extends React.Component<IDropdown> {
         items={[
           {
             title: "About",
-            callback: () => this.handleAbout()
-          }
+            callback: () => this.handleAbout(),
+          },
         ]}
       />
     );
