@@ -1,8 +1,8 @@
 import * as React from "react";
-import ReactTooltip from "react-tooltip";
 import styled from "styled-components";
 import { Theme } from "../Theme";
-import { StyledSpinner } from "../../misc/icon";
+import { Icon, StyledHomeSpinner } from "../../misc/icon";
+import Logo from "../../../assets/tom_profile_round.png";
 
 export interface IDropdownNavbarProps {
   icon: JSX.Element;
@@ -14,29 +14,34 @@ export interface IDropdownNavbarProps {
 }
 
 export const DropdownNavbar = (props: IDropdownNavbarProps) => {
-  const {
-    filename,
-    icon,
-    brand,
-    buttons,
-    dropdownHandlers,
-    renameHandler,
-  } = props;
+  const { filename, brand, buttons, dropdownHandlers, renameHandler } = props;
   const DropdownButtons: any = () =>
     dropdownHandlers.map((link) => link.callback());
   return (
     <Navbar>
-      <Brand href={brand.to}>{icon}</Brand>
+      <Brand href={brand.to}>
+        <div style={{ position: "relative" }}>
+          <StyledHomeSpinner style={{ width: "30px", height: "30px" }}>
+            <Icon />
+          </StyledHomeSpinner>
+        </div>
+      </Brand>
       <WindmillTitle>
         <h1>Windmill</h1>
       </WindmillTitle>
-      {/* <DropDownSplit> */}
+      <Avatar>
+        <img src={Logo} />
+        <Username>Tom K.</Username>
+      </Avatar>
       <Debug>
         <DropdownButtons />
       </Debug>
       <FilenameContainer>
         {filename === "Untitled" ? (
-          <Filename data-tip="Rename" onClick={() => renameHandler()}>
+          <Filename
+            data-tip="Rename your workspace"
+            onClick={() => renameHandler()}
+          >
             {filename}
           </Filename>
         ) : (
@@ -59,35 +64,20 @@ export const DropdownNavbar = (props: IDropdownNavbarProps) => {
           })
         )}
       </MenuContainer>
-      {/* </DropDownSplit> */}
     </Navbar>
   );
 };
 
 const Navbar = styled.nav`
   display: grid;
-  grid-template-columns: 35px 120px 0.5fr 2fr 220px;
-  color: white;
-  padding: 1rem;
+  grid-template-columns: 40px 120px 1fr 0.5fr 2fr 220px;
+  color: ${Theme.colors.light};
+  padding: 0.8rem;
   font-family: ${Theme.fonts.heading};
-  align-items: baseline;
-  // color: ${Theme.colors.light};
-  // display: flex;
-  // flex: 1;
-  // align-items: center;
-  // a {
-  //   color: ${Theme.colors.light};
-  //   text-decoration: none;
-  // }
+  -webkit-align-items: baseline;
 `;
 
-const Brand = styled.a`
-  width: 25px;
-  height: 25px;
-  // font-weight: bold;
-  // font-style: italic;
-  // margin: 0.2rem 0.5rem 0.2rem 0.5rem;
-`;
+const Brand = styled.a``;
 
 const WindmillTitle = styled.div`
   grid-column: 2 / span 1;
@@ -97,56 +87,48 @@ const WindmillTitle = styled.div`
   }
 `;
 
-const DropDownSplit = styled.div`
-  // display: flex;
-  // flex-direction: column;
-  // flex: 1;
-  // grid-column-start: 1;
-  // grid-column-end: 3;
-  // margin-top: 1rem;
+const Avatar = styled.div`
+  grid-column: 3 / span 1;
+
+  img {
+    object-fit: cover;
+    width: 1rem;
+    align-self: baseline;
+    justify-self: baseline;
+    align-items: baseline;
+  }
+`;
+
+const Username = styled.span`
+  font-size: 0.8rem;
+  padding: 4px;
+`;
+
+const Debug = styled.div`
+  grid-column: 4 / span 1;
 `;
 
 const FilenameContainer = styled.div`
-  // margin: 0px 0px;
-  // display: flex;
-  // flex-wrap: nowrap;
-  // -webkit-overflow-scrolling: touch;
-  grid-column: 4 / span 1;
-  text-align: center;
+  grid-column: 5 / span 1;
+  justify-self: center;
 `;
 
 const Filename = styled.span`
-  // padding: 3px 12px;
-  // color: white;
-  // text-align: left;
-  // font-size: ${Theme.fonts.headingSize};
-  // transition: 0.3s ease all;
-  // border-radius: 3px;
-  // cursor: pointer;
-  // &:hover {
-  //   background: ${Theme.colors.darkAccent};
-  // }
-
+  transition: 0.3s ease all;
   padding: 3px 12px;
+  cursor: pointer;
+
   &:hover {
     box-shadow: 30px 30px 30px rgba(0.5, 0.5, 0.5, 0.5) inset;
     -webkit-border-radius: 71px;
   }
-  cursor: pointer;
 
   data-tip {
-    font-size: 5rem;
+    font-size: ${Theme.fonts.headingSize};
   }
 `;
 
-const Debug = styled.div``;
-
 const MenuContainer = styled.div`
   display: flex;
-  // align-items: stretch;
   justify-content: space-around;
-  // width: 100%;
-  // background: #cacaca;
-  // margin: 0;
-  // padding: 0;
 `;

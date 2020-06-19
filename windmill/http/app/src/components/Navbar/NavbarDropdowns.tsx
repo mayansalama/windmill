@@ -194,7 +194,7 @@ export class ViewDropdown extends React.Component<IDropdown> {
           },
           {
             title: "File",
-            callback: () => <Dropdown />,
+            callback: () => <HelpDropdown />,
           },
         ]}
       />

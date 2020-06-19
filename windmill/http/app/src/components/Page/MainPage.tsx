@@ -15,19 +15,20 @@ import { CanvasStyle } from "../Theme";
 import { FlowChart } from "@mrblenny/react-flow-chart";
 import styled from "styled-components";
 import ReactTooltip from "react-tooltip";
+import { Footer } from "../Footer/Footer";
 
 const AppLayout = styled.div`
   display: flex;
   flex-direction: column;
-  flex: 1;
+  // flex: 1;
   width: 100vw;
   height: 100vh;
 `;
 
 const Content = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
+  // display: flex;
+  // flex-direction: column;
+  // flex: 1 1 auto;
   // overflow: hidden;
 `;
 
@@ -96,6 +97,7 @@ export class MainPage extends React.Component<{
           </ResizablePanel>
           <StyledTooltip effect="solid" place="bottom" type="light" />
         </Page>
+        <Footer />
       </AppLayout>
     );
   }

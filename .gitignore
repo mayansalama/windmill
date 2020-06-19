@@ -16,3 +16,6 @@ node_modules/
 
 # if running nodeenv to manage node, ignore its env folder
 env/
+.DS_Store
+windmill/http/app/package-lock.json
+windmill/http/app/package-lock.json
