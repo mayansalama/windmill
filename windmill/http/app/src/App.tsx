@@ -4,6 +4,7 @@ import { cloneDeep, mapValues } from "lodash";
 import * as React from "react";
 import { render } from "react-dom";
 import { FaFile, FaSave, FaFolderOpen, FaProjectDiagram } from "react-icons/fa";
+import SaveIcon from "../assets/save-icon.png";
 import { APIClient } from "./ApiClient";
 import {
   FileBrowser,
@@ -305,6 +306,53 @@ export class App extends React.Component<{}, IAppState> {
       </div>
     );
   }
+}
+
+// Icon
+function IconSave() {
+  return (
+    <svg
+      width="32"
+      height="34"
+      version="1.1"
+      viewBox="0 0 210 297"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <defs>
+        <marker id="Arrow1Lstart" overflow="visible" orient="auto">
+          <path
+            transform="scale(.8) translate(12.5)"
+            d="m0 0 5-5-17.5 5 17.5 5-5-5z"
+            fill-rule="evenodd"
+            stroke="#FFF"
+            stroke-width="5pt"
+          />
+        </marker>
+      </defs>
+      <g transform="translate(186.41 131.22)" stroke="#000">
+        <path
+          transform="scale(.26458)"
+          d="m-404.69 223.19h-133.37c-24.288 0-43.842-19.553-43.842-43.842v-448.38c0-24.288 19.553-43.842 43.842-43.842v0h448.38c24.288 0 43.842 19.553 43.842 43.842v448.38c0 24.288-19.556 44.175-43.842 43.842l-133.37-1.83"
+          fill="none"
+          stroke-linecap="round"
+          stroke-width="110.2"
+          // style="paint-order:normal"
+        />
+        <path
+          d="m-83.065 6.6142 0.042561 108.27"
+          fill="none"
+          marker-mid="url(#Arrow1Lstart)"
+          stroke-width="12.6458"
+        />
+        <path
+          d="m-69.33 114.88-13.692 23.716-13.692-23.716h13.692z"
+          stroke-linecap="round"
+          stroke-width="12.6458"
+          // style="paint-order:normal"
+        />
+      </g>
+    </svg>
+  );
 }
 
 render(<App />, document.getElementById("root"));

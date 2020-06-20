@@ -15,7 +15,7 @@ import { CanvasStyle } from "../Theme";
 import { FlowChart } from "@mrblenny/react-flow-chart";
 import styled from "styled-components";
 import ReactTooltip from "react-tooltip";
-import { Footer } from "../Footer/Footer";
+import { Footer } from "../Footer/FooterConsole";
 
 const AppLayout = styled.div`
   display: flex;
@@ -65,6 +65,7 @@ export class MainPage extends React.Component<{
               updateNodeProps={updateNodeProperties}
               updateDag={updateDag}
             />
+
             <Content>
               <FlowChart
                 chart={app.state}
@@ -90,6 +91,7 @@ export class MainPage extends React.Component<{
                 }}
               />
             </Content>
+
             <OperatorSidebar
               operators={app.state.operators}
               refreshOperators={refreshOperators}
@@ -97,7 +99,6 @@ export class MainPage extends React.Component<{
           </ResizablePanel>
           <StyledTooltip effect="solid" place="bottom" type="light" />
         </Page>
-        <Footer />
       </AppLayout>
     );
   }

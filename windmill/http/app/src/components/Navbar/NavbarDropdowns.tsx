@@ -2,20 +2,6 @@ import * as React from "react";
 import styled from "styled-components";
 import { Theme } from "../Theme";
 
-const oldMenuItem = styled.div`
-  // font-size: ${Theme.fonts.subHeadingSize};
-  // // padding: 3px 12px;
-  // &:hover {
-  //   background-color: grey;
-  //   box-shadow: 30px 30px 30px rgba(0, 0, 0, 0.5) inset;
-  //   -webkit-border-radius: 71px;
-  // }
-  // &:active {
-  //   background: #5682d2;
-  // }
-  cursor: pointer;
-`;
-
 const MenuItem = styled.span`
   padding: 3px 12px;
   &:hover {

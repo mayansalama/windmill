@@ -9,15 +9,15 @@ export const Theme = {
     dark: `#45689D`,
     darkAccent: `#809BC6`,
     brand: "cornflowerBlue",
-    red: `#ff5851`
+    red: `#ff5851`,
   },
   fonts: {
     body: `IBM Plex Sans, sans-serif`,
     heading: `IBM Plex Sans, sans-serif`,
     headingSize: `22px`,
     subHeadingSize: `16px`,
-    normalSize: `14px`
-  }
+    normalSize: `14px`,
+  },
 };
 
 export const SidebarTitle = styled.div`
@@ -32,7 +32,7 @@ export const SidebarTitle = styled.div`
 export const BaseSidebar = styled.div`
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 70vh;
   overflow: hidden;
 `;
 

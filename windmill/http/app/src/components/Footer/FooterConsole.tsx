@@ -1,20 +1,23 @@
 import React, { Component } from "react";
 import styled from "styled-components";
+import { Lazylog } from "./Lazylog";
 
-export function Footer() {
+export function FooterConsole() {
   return (
-    <FooterContainer>
+    <FooterConsoleContainer>
       <ConsoleText>
-        console ><ConsoleTextBlink> _ </ConsoleTextBlink>
+        console logs ><ConsoleTextBlink> _ </ConsoleTextBlink>
       </ConsoleText>
-    </FooterContainer>
+      {/* <Lazylog /> */}
+    </FooterConsoleContainer>
   );
 }
 
-const FooterContainer = styled.div`
-  height: 10rem;
+const FooterConsoleContainer = styled.div`
+  height: 30vh;
+  width: auto;
   background: black;
-  position: fixed;
+  // position: fixed;
   left: 0;
   bottom: 0;
   right: 0;

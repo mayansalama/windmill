@@ -29,25 +29,6 @@ export const DropdownNavbar = (props: IDropdownNavbarProps) => {
       <WindmillTitle>
         <h1>Windmill</h1>
       </WindmillTitle>
-      <Avatar>
-        <img src={Logo} />
-        <Username>Tom K.</Username>
-      </Avatar>
-      <Debug>
-        <DropdownButtons />
-      </Debug>
-      <FilenameContainer>
-        {filename === "Untitled" ? (
-          <Filename
-            data-tip="Rename your workspace"
-            onClick={() => renameHandler()}
-          >
-            {filename}
-          </Filename>
-        ) : (
-          <Filename onClick={() => renameHandler()}>{filename}</Filename>
-        )}
-      </FilenameContainer>
       <MenuContainer>
         {[].concat(
           ...buttons.map((b, i) => {
@@ -64,6 +45,26 @@ export const DropdownNavbar = (props: IDropdownNavbarProps) => {
           })
         )}
       </MenuContainer>
+      <Debug>
+        <DropdownButtons />
+      </Debug>
+      <FilenameContainer>
+        {filename === "Untitled" ? (
+          <Filename
+            data-tip="Rename your workspace"
+            onClick={() => renameHandler()}
+          >
+            {filename}
+          </Filename>
+        ) : (
+          <Filename onClick={() => renameHandler()}>{filename}</Filename>
+        )}
+      </FilenameContainer>
+      {/* placeholder for Github integration */}
+      <Avatar>
+        <img src={Logo} />
+        <Username>Tom K.</Username>
+      </Avatar>
     </Navbar>
   );
 };
@@ -88,14 +89,12 @@ const WindmillTitle = styled.div`
 `;
 
 const Avatar = styled.div`
-  grid-column: 3 / span 1;
+  grid-column: 6 / span 1;
+  justify-self: right;
 
   img {
     object-fit: cover;
     width: 1rem;
-    align-self: baseline;
-    justify-self: baseline;
-    align-items: baseline;
   }
 `;
 
@@ -129,6 +128,8 @@ const Filename = styled.span`
 `;
 
 const MenuContainer = styled.div`
+  rid-column: 3 / span 1;
   display: flex;
   justify-content: space-around;
+  cursor: pointer;
 `;
