@@ -199,25 +199,25 @@
             "id": "67188218-7988-45b2-9cdf-a95897f40eb4",
             "orientation": 0,
             "ports": {
-                "port1": {
-                    "id": "port1",
+                "in_port": {
+                    "id": "in_port",
                     "position": {
                         "x": 100,
                         "y": 0
                     },
                     "properties": {
-                        "custom": "property"
+                        "value": "in"
                     },
                     "type": "top"
                 },
-                "port2": {
-                    "id": "port2",
+                "out_port": {
+                    "id": "out_port",
                     "position": {
                         "x": 100,
                         "y": 80
                     },
                     "properties": {
-                        "custom": "property"
+                        "value": "out"
                     },
                     "type": "bottom"
                 }
@@ -502,22 +502,22 @@
             "orientation": 0,
             "type": "BashOperator",
             "ports": {
-                "port1": {
-                    "id": "port1",
+                "in_port": {
+                    "id": "in_port",
                     "type": "top",
                     "properties": {
-                        "custom": "property"
+                        "value": "in"
                     },
                     "position": {
                         "x": 100,
                         "y": 0
                     }
                 },
-                "port2": {
-                    "id": "port2",
+                "out_port": {
+                    "id": "out_port",
                     "type": "bottom",
                     "properties": {
-                        "custom": "property"
+                        "value": "out"
                     },
                     "position": {
                         "x": 100,
