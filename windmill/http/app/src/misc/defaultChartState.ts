@@ -2,9 +2,10 @@ import { IAppState } from "..";
 
 export const defaultChart: IAppState = {
   offset: {
-    x: -1000,
-    y: -1000
+    x: 0,
+    y: 0,
   },
+  scale: 1,
   nodes: {},
   links: {},
   selected: {},

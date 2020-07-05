@@ -9,7 +9,7 @@ from marshmallow.exceptions import ValidationError
 
 from ...config.project_config import ProjectConfig
 from ...exceptions import DagHandlerValidationError
-from ...models.dags.dag_handler import DagHandler
+from ...models.dags.dag_handler import DagHandler, DagFileHandler
 from ...models.operators.operator_index import get_operator_index
 from ...models.schemas.app_schemas import OperatorSchema, MinimalWmlSchema
 
@@ -49,15 +49,48 @@ def get_wmls(name=None):
     logging.info(f"GET /v1/wml/{name}")
 
     if name:
-        f_path = os.path.join(app.config["project_conf"].wml_dir, name)
-        if os.path.exists(f_path):
-            with open(f_path, "r") as f:
-                data = json.load(f)
-            return jsonify(data), 200
-        else:
-            return f"File {f_path} not found", 404
+        if os.path.splitext(name)[1] == ".wml":
+            f_path = os.path.join(app.config["project_conf"].wml_dir, name)
+            if os.path.exists(f_path):
+                try:
+                    with open(f_path, "r") as f:
+                        data = json.load(f)
+                    return jsonify(data), 200
+                except TypeError as e:
+                    logging.exception(f"Unable to parse WML file {f_path}")
+                    return (
+                        f"Unable to parse WML file {f_path} - internal state corrupted",
+                        400,
+                    )
+                except Exception as e:
+                    logging.exception(f"Unable to parse WML file {f_path}")
+                    return f"Internal error parsing WML", 400
+            else:
+                return f"File {f_path} not found", 404
+        elif os.path.splitext(name)[1] == ".py":
+            try:
+                dh = DagFileHandler(name, app.config["project_conf"])
+                return jsonify(dh.wml), 200
+            except DagHandlerValidationError as e:
+                logging.exception(f"Unable to parse python file {name}")
+                return f"Unable to parse python file {name}: {e}", 400
+            except FileNotFoundError:
+                return f"File {name} not found", 404
+            except Exception as e:
+                logging.exception(f"Unknown error parsing Python file {name}")
+                return f"Internal error parsing Python", 500
     else:
-        return jsonify(os.listdir(app.config["project_conf"].wml_dir)), 200
+        return (
+            jsonify(
+                [
+                    f
+                    for f in os.listdir(app.config["project_conf"].wml_dir)
+                    + os.listdir(app.config["project_conf"].dags_dir)
+                    if f.endswith(".wml") or f.endswith(".py")
+                ]
+            ),
+            200,
+        )
 
 
 @app.route("/v1/wml/<name>", methods=["POST"])

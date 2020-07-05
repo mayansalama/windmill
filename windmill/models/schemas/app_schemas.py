@@ -85,19 +85,19 @@ class NodeSchema(Schema):
         keys=fields.Str(),
         values=fields.Nested(PortSchema),
         default={
-            "port1": {
-                "id": "port1",
+            "in_port": {
+                "id": "in_port",
                 "position": {"x": int(GraphConstants.NODE_WIDTH / 2), "y": 0},
-                "properties": {"custom": "property"},
+                "properties": {"value": "in"},
                 "type": "top",
             },
-            "port2": {
-                "id": "port2",
+            "out_port": {
+                "id": "out_port",
                 "position": {
                     "x": int(GraphConstants.NODE_WIDTH / 2),
                     "y": GraphConstants.NODE_HEIGHT,
                 },
-                "properties": {"custom": "property"},
+                "properties": {"value": "out"},
                 "type": "bottom",
             },
         },

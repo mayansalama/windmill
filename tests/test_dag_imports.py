@@ -38,7 +38,7 @@ class Fixture(TestCase):
 class TestDagToDagHandler(Fixture):
     def test_valid_pyfile(self):
         dag_file_handler = DagFileHandler(self.testfile, self.conf)
-        dags = dag_file_handler.dags
+        dag = dag_file_handler.dag
 
-        assert len(dags) == 1
-        # assert dags[0].dag_id == "ValidDag"
+        # assert len(dags) == 1
+        assert dag.dag_id == "ValidDag"

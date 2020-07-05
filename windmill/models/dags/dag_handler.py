@@ -172,7 +172,7 @@ class TaskHandler(_ParamHandler):
             [str]: task_name
         """
         if not self._snake_name:
-            name = underscore(self.task_id)
+            name = underscore(self.task_id.replace(" ", "_"))
             name = re.sub("[^0-9a-zA-Z_]", "", name)
             name = re.sub("^[^a-zA-Z_]+", "", name)
 
@@ -314,8 +314,8 @@ class Links:
         return Links(graph, task_name_mappings)
 
     @staticmethod
-    def graph_to_efficient_representation(graph):
-        """Greedy algorithm to find an efficient representation of a graph
+    def graph_to_efficient_representation(graph):  # r to ignore Wd1401
+        r"""Greedy algorithm to find an efficient representation of a graph 
 
         A Graph that looks like: 
 
@@ -444,10 +444,10 @@ class DagHandler(_ParamHandler):
         Returns:
             [str]: dag_name
         """
-        return underscore(self.dag_id)
+        return underscore(self.dag_id.replace(" ", "_"))
 
     @classmethod
-    def fix_task_names(self, tasks: List[TaskHandler]):
+    def fix_task_names(self, dag_id, tasks: List[TaskHandler]):
         """Task IDs are enforced as unique (as of AF 2.0) but when
         converting to python vars there's potential for clashes.
 
@@ -455,6 +455,7 @@ class DagHandler(_ParamHandler):
         an error if duplicate task names are 
          
         Arguments:
+            dag_id {str}              -- Name of the dag
             tasks {List[TaskHandler]} -- Task handlers to dedupe
 
         Raises:
@@ -464,7 +465,7 @@ class DagHandler(_ParamHandler):
         if len(task_ids) != len(set(task_ids)):
             raise DagHandlerValidationError("DAGs cannot have duplicate task IDs")
 
-        snake_names = []
+        snake_names = [dag_id]
         for task in tasks:
             if task.snake_name in snake_names:
                 basename = task.snake_name
@@ -503,7 +504,7 @@ class DagHandler(_ParamHandler):
         tasks = [
             TaskHandler.load_from_node(node) for node in wml_dict["nodes"].values()
         ]
-        tasks = cls.fix_task_names(tasks)
+        tasks = cls.fix_task_names(dag_params["dag_id"], tasks)
         task_name_mappings = {t.node_id: t.snake_name for t in tasks}
         links = Links.load_from_links(wml_dict["links"].values(), task_name_mappings)
 
@@ -522,9 +523,15 @@ class DagHandler(_ParamHandler):
                 parameter["value"] = self.params[field]["value"]
         dag_dict["name"] = self.dag_id
 
-        links = self.links.to_app_schema()
-        coords = self.links.to_coords()
-        nodes = {t.node_id: t.to_app_schema(**coords[t.node_id]) for t in self.tasks}
+        if len(self.links.graph):
+            links = self.links.to_app_schema()
+            coords = self.links.to_coords()
+            nodes = {
+                t.node_id: t.to_app_schema(**coords[t.node_id]) for t in self.tasks
+            }
+        else:
+            links = {}
+            nodes = {t.node_id: t.to_app_schema() for t in self.tasks}
 
         wml = {
             "filename": self.filename,
@@ -547,7 +554,7 @@ class DagHandler(_ParamHandler):
 
         # TODO: Remove values if mastered in dag (e.g. start_date, default args)
         tasks = [TaskHandler.load_from_task(task) for task in dag.task_dict.values()]
-        tasks = cls.fix_task_names(tasks)
+        tasks = cls.fix_task_names(dag_params["dag_id"], tasks)
         task_id_to_node_id = {task.task_id: task.node_id for task in tasks}
 
         task_name_mappings = {t.node_id: t.snake_name for t in tasks}
@@ -591,5 +598,14 @@ class DagFileHandler:
         self.mod = import_dag_from_project(pyfile, config)
 
     @property
-    def dags(self):
-        return {k: v for k, v in self.mod.__dict__.items() if type(v) == DAG}
+    def dag(self):
+        dags = {k: v for k, v in self.mod.__dict__.items() if type(v) == DAG}
+        if len(dags) != 1:
+            raise DagHandlerValidationError(
+                f"Importing from Python only supports files with exactly one dag object. Found the following dags: {','.join(dags.keys())}"
+            )
+        return dags.popitem()[1]
+
+    @property
+    def wml(self):
+        return DagHandler.load_from_dag(self.dag).to_wml()
