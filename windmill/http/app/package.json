@@ -28,7 +28,7 @@
     "@types/react-resizable": "^1.7.2",
     "@types/react-textarea-autosize": "^4.3.5",
     "@types/react-tooltip": "^3.11.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "circular-json": "^0.5.9",
     "gh-pages": "^2.2.0",
     "local-storage": "^2.0.0",
